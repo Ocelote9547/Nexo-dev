@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../contacts/presentation/screens/contacts_screen.dart';
@@ -19,6 +20,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = ref.tokens(context);
     final screens = [
       DashboardScreen(onNavigate: (i) => setState(() => _index = i)),
       const ContactsScreen(),
@@ -26,11 +28,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       const SettingsScreen(),
     ];
 
-    return Scaffold(
-      body: IndexedStack(index: _index, children: screens),
-      bottomNavigationBar: _NexoBottomNav(
-        currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: tokens.background,
+        systemNavigationBarDividerColor: tokens.background,
+        systemNavigationBarIconBrightness:
+            tokens.isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarContrastEnforced: false,
+      ),
+      child: Scaffold(
+        backgroundColor: tokens.background,
+        body: IndexedStack(index: _index, children: screens),
+        bottomNavigationBar: _NexoBottomNav(
+          currentIndex: _index,
+          onTap: (i) => setState(() => _index = i),
+        ),
       ),
     );
   }

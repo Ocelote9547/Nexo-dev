@@ -129,7 +129,7 @@ class _OverviewCard extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _buildMainInfo()),
+                          Expanded(child: _buildMainInfo(includeMetrics: false)),
                           const SizedBox(width: 12),
                           _buildBrandMark(),
                         ],
@@ -140,7 +140,7 @@ class _OverviewCard extends StatelessWidget {
                   )
                 : Row(
                     children: [
-                      Expanded(child: _buildMainInfo()),
+                      Expanded(child: _buildMainInfo(includeMetrics: true)),
                       const SizedBox(width: 12),
                       _buildBrandMark(),
                     ],
@@ -151,7 +151,7 @@ class _OverviewCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMainInfo() {
+  Widget _buildMainInfo({required bool includeMetrics}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -184,8 +184,10 @@ class _OverviewCard extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 16),
-        _buildMetrics(),
+        if (includeMetrics) ...[
+          const SizedBox(height: 16),
+          _buildMetrics(),
+        ],
       ],
     );
   }

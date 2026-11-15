@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/database_provider.dart';
@@ -33,14 +37,23 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
 
   Future<void> _init() async {
     try {
+      // Detectar una instalación nueva antes de que Drift cree el archivo DB.
+      // Si ya existía nexo.sqlite, nunca mostrar el onboarding automáticamente
+      // por una actualización, aunque todavía no exista la clave de estado.
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final databaseFile = File(p.join(documentsDirectory.path, 'nexo.sqlite'));
+      final hadDatabase = await databaseFile.exists();
+
       final db = ref.read(appDatabaseProvider);
       await db.customSelect('SELECT 1').get();
       final settings = SettingsRepositoryImpl(db);
       final onboardingStatus = await settings.getString('onboarding_status');
       if (onboardingStatus == null) {
-        // DB preexistente: tratar como instalación ya configurada.
-        await settings.setString('onboarding_status', 'completed');
-        _onboardingPending = false;
+        _onboardingPending = !hadDatabase;
+        await settings.setString(
+          'onboarding_status',
+          _onboardingPending ? 'pending' : 'completed',
+        );
       } else {
         _onboardingPending = onboardingStatus == 'pending';
       }

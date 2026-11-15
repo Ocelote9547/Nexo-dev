@@ -55,25 +55,39 @@ class _NexoBottomNav extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = ref.tokens(context);
-    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
+    // La barra NEXO queda como una tarjeta flotante independiente.
+    // El espacio inferior mantiene separada la zona de gestos/botones Android.
     return Container(
-      height: 78 + bottomInset,
-      decoration: BoxDecoration(
-        color: tokens.surface,
-        border: Border(top: BorderSide(color: tokens.border, width: 1)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
-        child: Row(
-          children: List.generate(
-            _destinations.length,
-            (index) => Expanded(
-              child: _NavItem(
-                tokens: tokens,
-                destination: _destinations[index],
-                isSelected: currentIndex == index,
-                onTap: () => onTap(index),
+      color: tokens.background,
+      padding: EdgeInsets.fromLTRB(12, 8, 12, bottomInset + 8),
+      child: Container(
+        height: 72,
+        decoration: BoxDecoration(
+          color: tokens.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: tokens.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: tokens.isDark ? 0.30 : 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Row(
+            children: List.generate(
+              _destinations.length,
+              (index) => Expanded(
+                child: _NavItem(
+                  tokens: tokens,
+                  destination: _destinations[index],
+                  isSelected: currentIndex == index,
+                  onTap: () => onTap(index),
+                ),
               ),
             ),
           ),

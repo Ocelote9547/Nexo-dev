@@ -52,6 +52,14 @@ ${StackTrace.current}
         onCreate: (m) async {
           await m.createAll();
           await _createIndexes();
+          // Solo las bases recién creadas reciben el estado pendiente.
+          // Las instalaciones existentes no ejecutan onCreate y no verán onboarding.
+          await into(appSettings).insert(
+            AppSettingsCompanion.insert(
+              key: 'onboarding_status',
+              value: 'pending',
+            ),
+          );
         },
         onUpgrade: (m, from, to) async {
           if (from < 2) {

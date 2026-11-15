@@ -23,7 +23,6 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = ref.tokens(context);
-    final summaryAsync = ref.watch(dashboardSummaryProvider);
     final recentAsync = ref.watch(recentContactsProvider);
     final upcomingAsync = ref.watch(upcomingDatesProvider);
     final allContactsAsync = ref.watch(contactsListProvider);
@@ -31,54 +30,43 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: tokens.background,
       body: SafeArea(
-        child: summaryAsync.when(
-          data: (summary) => CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: _Header(tokens: tokens, onNavigate: onNavigate),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: _Header(tokens: tokens, onNavigate: onNavigate),
+            ),
+            SliverToBoxAdapter(child: _WelcomeCard(tokens: tokens)),
+            SliverToBoxAdapter(
+              child: _SearchBar(
+                tokens: tokens,
+                onTap: () => onNavigate?.call(1),
               ),
-              SliverToBoxAdapter(
-                child: _OverviewCard(
-                  tokens: tokens,
-                  totalContacts: summary.totalContacts,
-                  favoriteContacts: summary.favoriteContacts,
-                  totalCollections: summary.totalCollections,
-                ),
+            ),
+            SliverToBoxAdapter(
+              child: _FavoritesSection(
+                tokens: tokens,
+                contactsAsync: allContactsAsync,
+                onNavigate: onNavigate,
               ),
-              SliverToBoxAdapter(
-                child: _SearchBar(
-                  tokens: tokens,
-                  onTap: () => onNavigate?.call(1),
-                ),
+            ),
+            SliverToBoxAdapter(
+              child: _UpcomingSection(
+                tokens: tokens,
+                async: upcomingAsync,
+                onNavigate: onNavigate,
               ),
-              SliverToBoxAdapter(
-                child: _FavoritesSection(
-                  tokens: tokens,
-                  contactsAsync: allContactsAsync,
-                  onNavigate: onNavigate,
-                ),
+            ),
+            SliverToBoxAdapter(
+              child: _RecentSection(
+                tokens: tokens,
+                async: recentAsync,
+                onNavigate: onNavigate,
               ),
-              SliverToBoxAdapter(
-                child: _UpcomingSection(
-                  tokens: tokens,
-                  async: upcomingAsync,
-                  onNavigate: onNavigate,
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: _RecentSection(
-                  tokens: tokens,
-                  async: recentAsync,
-                  onNavigate: onNavigate,
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: NexoDesignSpacing.xxl),
-              ),
-            ],
-          ),
-          loading: () => const NexoLoading(),
-          error: (e, _) => NexoErrorState(message: 'Error al cargar el panel: $e'),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: NexoDesignSpacing.xxl),
+            ),
+          ],
         ),
       ),
     );
@@ -86,185 +74,100 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 // ============================================================================
-// Resumen principal — jerarquía visual de la pantalla de inicio
+// Bienvenida — tarjeta principal de la agenda, sin contadores
 // ============================================================================
 
-class _OverviewCard extends StatelessWidget {
+class _WelcomeCard extends StatelessWidget {
   final NexoDesignTokens tokens;
-  final int totalContacts;
-  final int favoriteContacts;
-  final int totalCollections;
-
-  const _OverviewCard({
-    required this.tokens,
-    required this.totalContacts,
-    required this.favoriteContacts,
-    required this.totalCollections,
-  });
+  const _WelcomeCard({required this.tokens});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < 360 ||
-              MediaQuery.textScalerOf(context).scale(1) > 1.3;
-
-          return Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [tokens.surfaceElevated, tokens.surface],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: tokens.border),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              tokens.surfaceElevated,
+              tokens.surface,
+              tokens.surfaceSecondary,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: tokens.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.045),
+              blurRadius: 22,
+              offset: const Offset(0, 9),
             ),
-            child: compact
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: _buildMainInfo(includeMetrics: false)),
-                          const SizedBox(width: 12),
-                          _buildBrandMark(),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildMetrics(),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(child: _buildMainInfo(includeMetrics: true)),
-                      const SizedBox(width: 12),
-                      _buildBrandMark(),
-                    ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TU ESPACIO PERSONAL',
+                    style: TextStyle(
+                      color: tokens.accent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.35,
+                    ),
                   ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMainInfo({required bool includeMetrics}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'TU AGENDA PERSONAL',
-          style: TextStyle(
-            color: tokens.accent,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.15,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '$totalContacts',
-          style: TextStyle(
-            color: tokens.textPrimary,
-            fontSize: 38,
-            height: 1,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -1.2,
-          ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          totalContacts == 1 ? 'contacto guardado' : 'contactos guardados',
-          style: TextStyle(
-            color: tokens.textSecondary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        if (includeMetrics) ...[
-          const SizedBox(height: 16),
-          _buildMetrics(),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildBrandMark() {
-    return Container(
-      width: 58,
-      height: 58,
-      decoration: BoxDecoration(
-        color: tokens.accent.withValues(alpha: 0.13),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: tokens.accent.withValues(alpha: 0.24),
-        ),
-      ),
-      child: Icon(Icons.hub_rounded, color: tokens.accent, size: 30),
-    );
-  }
-
-  Widget _buildMetrics() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        _OverviewMetric(
-          icon: Icons.star_rounded,
-          value: favoriteContacts,
-          label: 'Favoritos',
-          tokens: tokens,
-        ),
-        _OverviewMetric(
-          icon: Icons.folder_rounded,
-          value: totalCollections,
-          label: 'Colecciones',
-          tokens: tokens,
-        ),
-      ],
-    );
-  }
-}
-
-class _OverviewMetric extends StatelessWidget {
-  final IconData icon;
-  final int value;
-  final String label;
-  final NexoDesignTokens tokens;
-
-  const _OverviewMetric({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.tokens,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: tokens.background.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: tokens.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: tokens.accent, size: 15),
-          const SizedBox(width: 5),
-          Text(
-            '$value $label',
-            style: TextStyle(
-              color: tokens.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+                  const SizedBox(height: 9),
+                  Text(
+                    'Tu agenda, siempre cerca.',
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontSize: 21,
+                      height: 1.18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.45,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    'Personas importantes, organizadas en un solo lugar.',
+                    style: TextStyle(
+                      color: tokens.textSecondary,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 14),
+            Container(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [tokens.accent, tokens.accentSelected],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: tokens.accent.withValues(alpha: 0.22),
+                    blurRadius: 18,
+                    offset: const Offset(0, 7),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.hub_rounded, color: Colors.white, size: 30),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -526,7 +429,7 @@ class _FavoritesSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 92,
+                height: 82,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: favs.length > 5 ? 5 : favs.length,
@@ -551,7 +454,7 @@ class _FavoritesSection extends StatelessWidget {
               );
             },
             loading: () => const SizedBox(
-              height: 92,
+              height: 82,
               child: NexoLoading(),
             ),
             error: (e, _) => Text(
@@ -578,65 +481,66 @@ class _FavoriteItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
-      child: SizedBox(
-        width: 68,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: tokens.surfaceHigh,
-                    borderRadius: BorderRadius.circular(NexoDesignRadii.full),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(NexoDesignRadii.full),
-                    child: NexoAvatar(
-                      displayName: contact.displayName,
-                      photoPath: contact.photoPath,
-                      size: 52,
-                      tokens: tokens,
-                    ),
-                  ),
+    return Material(
+      color: tokens.surface,
+      elevation: tokens.isDark ? 3 : 1,
+      shadowColor: Colors.black.withValues(alpha: tokens.isDark ? 0.28 : 0.08),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          width: 190,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: tokens.border),
+          ),
+          child: Row(
+            children: [
+              ClipOval(
+                child: NexoAvatar(
+                  displayName: contact.displayName,
+                  photoPath: contact.photoPath,
+                  size: 48,
+                  tokens: tokens,
                 ),
-                if (contact.isFavorite)
-                  Positioned(
-                    right: 2,
-                    bottom: 2,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: tokens.accent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.star,
-                        color: Colors.white,
-                        size: 10,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: NexoDesignSpacing.xs),
-            Text(
-              contact.displayName,
-              style: NexoDesignTypography.contactCaption.copyWith(
-                color: tokens.textSecondary,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      contact.displayName,
+                      style: NexoDesignTypography.contactNameMedium.copyWith(
+                        color: tokens.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.star_rounded, color: tokens.favorite, size: 13),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Favorito',
+                          style: TextStyle(
+                            color: tokens.textSecondary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: tokens.textTertiary, size: 19),
+            ],
+          ),
         ),
       ),
     );
@@ -724,7 +628,9 @@ class _UpcomingSection extends StatelessWidget {
               return Column(
                 children: List.generate(
                   upcoming.length,
-                  (index) => _BirthdayRow(
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _BirthdayRow(
                     tokens: tokens,
                     upcoming: upcoming[index],
                     isLast: index == upcoming.length - 1,
@@ -736,6 +642,7 @@ class _UpcomingSection extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
                   ),
                 ),
               );
@@ -770,19 +677,21 @@ class _BirthdayRow extends StatelessWidget {
     final name = upcoming.contactName ?? 'Contacto';
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.zero,
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         height: 74,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: tokens.surface,
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: tokens.separator,
-                    width: 1,
-                  ),
-                ),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: tokens.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: tokens.isDark ? 0.18 : 0.045),
+              blurRadius: 16,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -964,7 +873,9 @@ class _RecentSection extends StatelessWidget {
               return Column(
                 children: List.generate(
                   recent.length,
-                  (index) => _RecentRow(
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _RecentRow(
                     tokens: tokens,
                     contact: recent[index],
                     isLast: index == recent.length - 1,
@@ -976,6 +887,7 @@ class _RecentSection extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
                   ),
                 ),
               );
@@ -1009,19 +921,21 @@ class _RecentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.zero,
+      borderRadius: BorderRadius.circular(18),
       child: Container(
-        height: 68,
+        height: 76,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: tokens.surface,
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: tokens.separator,
-                    width: 1,
-                  ),
-                ),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: tokens.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: tokens.isDark ? 0.18 : 0.045),
+              blurRadius: 16,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Row(
           children: [

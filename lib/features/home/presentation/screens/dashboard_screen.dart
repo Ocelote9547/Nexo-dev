@@ -106,90 +106,123 @@ class _OverviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [tokens.surfaceElevated, tokens.surface],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: tokens.border),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'TU AGENDA PERSONAL',
-                    style: TextStyle(
-                      color: tokens.accent,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.15,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$totalContacts',
-                    style: TextStyle(
-                      color: tokens.textPrimary,
-                      fontSize: 38,
-                      height: 1,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    totalContacts == 1 ? 'contacto guardado' : 'contactos guardados',
-                    style: TextStyle(
-                      color: tokens.textSecondary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 360 ||
+              MediaQuery.textScalerOf(context).scale(1) > 1.3;
+
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [tokens.surfaceElevated, tokens.surface],
+              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: tokens.border),
+            ),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _OverviewMetric(
-                        icon: Icons.star_rounded,
-                        value: favoriteContacts,
-                        label: 'Favoritos',
-                        tokens: tokens,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: _buildMainInfo()),
+                          const SizedBox(width: 12),
+                          _buildBrandMark(),
+                        ],
                       ),
-                      _OverviewMetric(
-                        icon: Icons.folder_rounded,
-                        value: totalCollections,
-                        label: 'Colecciones',
-                        tokens: tokens,
-                      ),
+                      const SizedBox(height: 16),
+                      _buildMetrics(),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(child: _buildMainInfo()),
+                      const SizedBox(width: 12),
+                      _buildBrandMark(),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                color: tokens.accent.withValues(alpha: 0.13),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: tokens.accent.withValues(alpha: 0.24),
-                ),
-              ),
-              child: Icon(Icons.hub_rounded, color: tokens.accent, size: 30),
-            ),
-          ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMainInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'TU AGENDA PERSONAL',
+          style: TextStyle(
+            color: tokens.accent,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.15,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '$totalContacts',
+          style: TextStyle(
+            color: tokens.textPrimary,
+            fontSize: 38,
+            height: 1,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -1.2,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          totalContacts == 1 ? 'contacto guardado' : 'contactos guardados',
+          style: TextStyle(
+            color: tokens.textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildMetrics(),
+      ],
+    );
+  }
+
+  Widget _buildBrandMark() {
+    return Container(
+      width: 58,
+      height: 58,
+      decoration: BoxDecoration(
+        color: tokens.accent.withValues(alpha: 0.13),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: tokens.accent.withValues(alpha: 0.24),
         ),
       ),
+      child: Icon(Icons.hub_rounded, color: tokens.accent, size: 30),
+    );
+  }
+
+  Widget _buildMetrics() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _OverviewMetric(
+          icon: Icons.star_rounded,
+          value: favoriteContacts,
+          label: 'Favoritos',
+          tokens: tokens,
+        ),
+        _OverviewMetric(
+          icon: Icons.folder_rounded,
+          value: totalCollections,
+          label: 'Colecciones',
+          tokens: tokens,
+        ),
+      ],
     );
   }
 }

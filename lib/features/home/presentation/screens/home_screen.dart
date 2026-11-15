@@ -46,10 +46,10 @@ class _NexoBottomNav extends ConsumerWidget {
   });
 
   static const List<_NavDestination> _destinations = [
-    _NavDestination(Icons.home_outlined, Icons.home_rounded, 'Inicio'),
-    _NavDestination(Icons.people_outline_rounded, Icons.people_rounded, 'Contactos'),
-    _NavDestination(Icons.folder_outlined, Icons.folder_rounded, 'Colecciones'),
-    _NavDestination(Icons.tune_rounded, Icons.tune_rounded, 'Ajustes'),
+    _NavDestination(Icons.home_outlined, Icons.home, 'Inicio'),
+    _NavDestination(Icons.people_outline, Icons.people, 'Contactos'),
+    _NavDestination(Icons.folder_outlined, Icons.folder, 'Colecciones'),
+    _NavDestination(Icons.settings, Icons.settings, 'Ajustes'),
   ];
 
   @override

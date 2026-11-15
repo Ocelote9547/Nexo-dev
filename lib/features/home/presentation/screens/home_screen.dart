@@ -49,7 +49,7 @@ class _NexoBottomNav extends ConsumerWidget {
     _NavDestination(Icons.home_outlined, Icons.home, 'Inicio'),
     _NavDestination(Icons.people_outline, Icons.people, 'Contactos'),
     _NavDestination(Icons.folder_outlined, Icons.folder, 'Colecciones'),
-    _NavDestination(Icons.settings, Icons.settings, 'Ajustes'),
+    _NavDestination(Icons.settings_outlined, Icons.settings, 'Ajustes'),
   ];
 
   @override
@@ -147,7 +147,11 @@ class _NavItem extends StatelessWidget {
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isSelected ? activeColor : tokens.textSecondary,
                   ),
-                  child: Text(destination.label, maxLines: 1),
+                  child: Text(
+                    destination.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

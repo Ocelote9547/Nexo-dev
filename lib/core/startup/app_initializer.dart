@@ -5,6 +5,7 @@ import '../providers/database_provider.dart';
 import '../../database/app_database.dart';
 import '../../shared/widgets/nexo_widgets.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../services/notifications/notification_providers.dart';
 import '../../features/settings/data/repositories/settings_repository_impl.dart';
 import '../../features/privacy/presentation/screens/unlock_screen.dart';
@@ -21,6 +22,7 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
   bool _ready = false;
   bool _locked = false;
   bool _unlocked = false;
+  bool _onboardingPending = false;
   Object? _error;
 
   @override
@@ -33,6 +35,15 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
     try {
       final db = ref.read(appDatabaseProvider);
       await db.customSelect('SELECT 1').get();
+      final settings = SettingsRepositoryImpl(db);
+      final onboardingStatus = await settings.getString('onboarding_status');
+      if (onboardingStatus == null) {
+        // DB preexistente: tratar como instalación ya configurada.
+        await settings.setString('onboarding_status', 'completed');
+        _onboardingPending = false;
+      } else {
+        _onboardingPending = onboardingStatus == 'pending';
+      }
       await _reconcileBirthdayNotifications(db);
       final privacy = ref.read(privacyServiceProvider);
       _locked = await privacy.hasPin();
@@ -93,6 +104,18 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
       return UnlockScreen(onUnlocked: () {
         setState(() => _unlocked = true);
       });
+    }
+    if (_onboardingPending) {
+      return OnboardingScreen(
+        onCompleted: () async {
+          final db = ref.read(appDatabaseProvider);
+          await SettingsRepositoryImpl(db).setString(
+            'onboarding_status',
+            'completed',
+          );
+          if (mounted) setState(() => _onboardingPending = false);
+        },
+      );
     }
     return const HomeScreen();
   }

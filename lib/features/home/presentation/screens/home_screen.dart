@@ -27,10 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _index,
-        children: screens,
-      ),
+      body: IndexedStack(index: _index, children: screens),
       bottomNavigationBar: _NexoBottomNav(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
@@ -39,26 +36,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// Barra de navegación inferior reconstruida — Estética premium Night Blue.
-///
-/// - Superficie navy integrada con el fondo.
-/// - Borde superior discreto.
-/// - Cuatro apartados: Inicio, Contactos, Colecciones, Ajustes.
-/// - Iconos lineales de 22 dp.
-/// - Etiquetas de 12 dp, siempre visibles.
-/// - Selección en azul eléctrico (#438BFF).
-/// - Animación discreta (200 ms).
-/// - Altura de contenido 74dp + insets inferiores de Android.
-/// - La navegación propia de NEXO está físicamente separada de la navegación
-///   del sistema Android: no se solapan ni se mezclan visualmente.
-/// - Adapta colores al tema activo (claro/oscuro/sistema).
 class _NexoBottomNav extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+
   const _NexoBottomNav({
     required this.currentIndex,
     required this.onTap,
   });
+
+  static const List<_NavDestination> _destinations = [
+    _NavDestination(Icons.home_outlined, Icons.home_rounded, 'Inicio'),
+    _NavDestination(Icons.people_outline_rounded, Icons.people_rounded, 'Contactos'),
+    _NavDestination(Icons.folder_outlined, Icons.folder_rounded, 'Colecciones'),
+    _NavDestination(Icons.tune_rounded, Icons.tune_rounded, 'Ajustes'),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,20 +58,14 @@ class _NexoBottomNav extends ConsumerWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      height: 74 + bottomInset,
+      height: 78 + bottomInset,
       decoration: BoxDecoration(
         color: tokens.surface,
-        border: Border(
-          top: BorderSide(
-            color: tokens.border,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: tokens.border, width: 1)),
       ),
       child: Padding(
         padding: EdgeInsets.only(bottom: bottomInset),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(
             _destinations.length,
             (index) => Expanded(
@@ -95,48 +81,22 @@ class _NexoBottomNav extends ConsumerWidget {
       ),
     );
   }
-
-  static const List<_NavDestination> _destinations = [
-    _NavDestination(
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
-      label: 'Inicio',
-    ),
-    _NavDestination(
-      icon: Icons.people_outline,
-      selectedIcon: Icons.people,
-      label: 'Contactos',
-    ),
-    _NavDestination(
-      icon: Icons.folder_outlined,
-      selectedIcon: Icons.folder,
-      label: 'Colecciones',
-    ),
-    _NavDestination(
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
-      label: 'Ajustes',
-    ),
-  ];
 }
 
 class _NavDestination {
   final IconData icon;
   final IconData selectedIcon;
   final String label;
-  const _NavDestination({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-  });
+
+  const _NavDestination(this.icon, this.selectedIcon, this.label);
 }
 
-/// Elemento individual de la barra inferior.
 class _NavItem extends StatelessWidget {
   final NexoDesignTokens tokens;
   final _NavDestination destination;
   final bool isSelected;
   final VoidCallback onTap;
+
   const _NavItem({
     required this.tokens,
     required this.destination,
@@ -146,39 +106,51 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                isSelected ? destination.selectedIcon : destination.icon,
-                size: 18,
-                color: isSelected
-                    ? tokens.accent
-                    : tokens.textTertiary,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                destination.label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected
-                      ? tokens.accent
-                      : tokens.textTertiary,
-                  height: 1.2,
+    final activeColor = tokens.accent;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: destination.label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 78,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  width: 58,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? activeColor.withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    isSelected ? destination.selectedIcon : destination.icon,
+                    size: 24,
+                    color: isSelected ? activeColor : tokens.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 180),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.1,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? activeColor : tokens.textSecondary,
+                  ),
+                  child: Text(destination.label, maxLines: 1),
+                ),
+              ],
+            ),
           ),
         ),
       ),

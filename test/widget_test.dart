@@ -142,6 +142,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.home_outlined));
       await tester.pumpAndSettle();
       expect(find.text('NEXO'), findsOneWidget);
+      expect(find.textContaining('contactos guardados'), findsNothing);
       await db.close();
     });
   });
@@ -458,7 +459,7 @@ void main() {
     });
   });
   group('Coverage additions', () {
-    testWidgets('dashboard with data renders stats', (tester) async {
+    testWidgets('dashboard does not show total contact count', (tester) async {
       final db = adb.AppDatabase(NativeDatabase.memory());
       await db.into(db.contacts).insert(adb.ContactsCompanion.insert(id: 'c1', givenName: Value('Ana'), isFavorite: Value(true)));
       await db.into(db.contacts).insert(adb.ContactsCompanion.insert(id: 'c2', givenName: Value('Bob')));

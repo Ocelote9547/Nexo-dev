@@ -550,8 +550,14 @@ void main() {
 
     testWidgets('settings recovery after rebuild', (tester) async {
       final db = adb.AppDatabase(NativeDatabase.memory());
+      final notifications = _MockNotificationService()
+        .._status = PermissionStatus.granted;
+      final overrides = [
+        appDatabaseProvider.overrideWithValue(db),
+        notificationServiceProvider.overrideWithValue(notifications),
+      ];
       await tester.pumpWidget(ProviderScope(
-        overrides: [appDatabaseProvider.overrideWithValue(db)],
+        overrides: overrides,
         child: MaterialApp(theme: NexoTheme.dark(), home: const SettingsScreen()),
       ));
       await tester.pumpAndSettle();
@@ -559,15 +565,17 @@ void main() {
           w is SwitchListTile &&
           w.title is Text &&
           (w.title as Text).data == 'Notificaciones de cumpleaños');
+      expect(tester.widget<SwitchListTile>(switchFinder).value, isFalse);
       await tester.tap(switchFinder);
       await tester.pumpAndSettle();
+      expect(tester.widget<SwitchListTile>(switchFinder).value, isTrue);
       await tester.pumpWidget(ProviderScope(
-        overrides: [appDatabaseProvider.overrideWithValue(db)],
+        overrides: overrides,
         child: MaterialApp(theme: NexoTheme.dark(), home: const SettingsScreen()),
       ));
       await tester.pumpAndSettle();
       final switchWidget = tester.widget<SwitchListTile>(switchFinder);
-      expect(switchWidget.value, isFalse);
+      expect(switchWidget.value, isTrue);
       await db.close();
     });
 

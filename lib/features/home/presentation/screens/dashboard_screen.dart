@@ -633,7 +633,6 @@ class _UpcomingSection extends StatelessWidget {
                     child: _BirthdayRow(
                     tokens: tokens,
                     upcoming: upcoming[index],
-                    isLast: index == upcoming.length - 1,
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -663,12 +662,10 @@ class _UpcomingSection extends StatelessWidget {
 class _BirthdayRow extends StatelessWidget {
   final NexoDesignTokens tokens;
   final UpcomingDate upcoming;
-  final bool isLast;
   final VoidCallback onTap;
   const _BirthdayRow({
     required this.tokens,
     required this.upcoming,
-    required this.isLast,
     required this.onTap,
   });
 
@@ -878,7 +875,6 @@ class _RecentSection extends StatelessWidget {
                     child: _RecentRow(
                     tokens: tokens,
                     contact: recent[index],
-                    isLast: index == recent.length - 1,
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -908,12 +904,10 @@ class _RecentSection extends StatelessWidget {
 class _RecentRow extends StatelessWidget {
   final NexoDesignTokens tokens;
   final Contact contact;
-  final bool isLast;
   final VoidCallback onTap;
   const _RecentRow({
     required this.tokens,
     required this.contact,
-    required this.isLast,
     required this.onTap,
   });
 

@@ -150,11 +150,10 @@ void main() {
   group('Dashboard', () {
     testWidgets('loading state', (tester) async {
       final db = adb.AppDatabase(NativeDatabase.memory());
-      final completer = Completer<DashboardSummary>();
       await tester.pumpWidget(ProviderScope(
         overrides: [
           appDatabaseProvider.overrideWithValue(db),
-          dashboardSummaryProvider.overrideWith((ref) => completer.future),
+          contactsListProvider.overrideWith((ref) => Stream<List<Contact>>.empty()),
         ],
         child: MaterialApp(theme: NexoTheme.dark(), home: const HomeScreen()),
       ));
@@ -182,12 +181,12 @@ void main() {
       await tester.pumpWidget(ProviderScope(
         overrides: [
           appDatabaseProvider.overrideWithValue(db),
-          dashboardSummaryProvider.overrideWith((ref) async => throw Exception('boom')),
+          upcomingDatesProvider.overrideWith((ref) async => throw Exception('boom')),
         ],
         child: MaterialApp(theme: NexoTheme.dark(), home: const HomeScreen()),
       ));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Error al cargar el panel'), findsOneWidget);
+      expect(find.textContaining('Error:'), findsOneWidget);
       await db.close();
     });
   });

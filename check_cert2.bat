@@ -1,0 +1,2 @@
+@echo off
+"C:\Users\Daniu\AppData\Local\Android\Sdk\build-tools\37.0.0\apksigner.bat" verify --print-certs "C:\Users\Daniu\Desktop/Apps Flutter/NEXO/build/app/outputs/flutter-apk/app-production-debug.apk"

@@ -1,0 +1,40 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+build/
+*.iml
+.idea/
+
+# Android
+*.apk
+*.aab
+app/release/
+app/debug/
+local.properties
+
+# iOS
+*.xcuserstate
+*.xcodeproj/
+*.xcworkspace/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+*.log
+.env
+*/.env
+
+# Dart
+*.dart_tool/
+/pubspec.lock

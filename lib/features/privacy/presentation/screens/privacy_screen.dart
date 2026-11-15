@@ -1,0 +1,337 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_auth/local_auth.dart';
+
+import '../../../../core/theme/nexo_theme.dart';
+import '../../../../core/providers/database_provider.dart';
+import '../../../../shared/widgets/nexo_widgets.dart';
+import '../../../settings/data/repositories/settings_repository_impl.dart';
+import 'package:nexo/features/privacy/presentation/providers/privacy_providers.dart';
+
+class PrivacyScreen extends ConsumerStatefulWidget {
+  const PrivacyScreen({super.key});
+
+  @override
+  ConsumerState<PrivacyScreen> createState() => _PrivacyScreenState();
+}
+
+class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
+  bool _hasPin = false;
+  bool _lockOnResume = false;
+  bool _useBiometrics = false;
+  bool _biometricsAvailable = false;
+  bool _loading = true;
+
+  final LocalAuthentication _auth = LocalAuthentication();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final privacy = ref.read(privacyServiceProvider);
+    final settings = SettingsRepositoryImpl(ref.read(appDatabaseProvider));
+    final hasPin = await privacy.hasPin();
+    final lock = await settings.getBool('privacy_lock_on_resume', defaultValue: false);
+    final bio = await _auth.canCheckBiometrics;
+    final useBio = await settings.getBool('privacy_use_biometrics', defaultValue: false);
+    if (mounted) {
+      setState(() {
+        _hasPin = hasPin;
+        _lockOnResume = lock;
+        _biometricsAvailable = bio;
+        _useBiometrics = useBio && bio;
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _setLockOnResume(bool v) async {
+    final settings = SettingsRepositoryImpl(ref.read(appDatabaseProvider));
+    await settings.setBool('privacy_lock_on_resume', v);
+    setState(() => _lockOnResume = v);
+  }
+
+  Future<void> _setUseBiometrics(bool v) async {
+    if (v && !_biometricsAvailable) return;
+    final settings = SettingsRepositoryImpl(ref.read(appDatabaseProvider));
+    await settings.setBool('privacy_use_biometrics', v);
+    setState(() => _useBiometrics = v);
+  }
+
+  Future<void> _createPin() async {
+    final controller = TextEditingController();
+    final confirm = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Crear PIN'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'PIN (4-16 dígitos)'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: confirm,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Confirmar PIN'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    if (controller.text != confirm.text) {
+      _showMessage('Los PIN no coinciden');
+      return;
+    }
+    final privacy = ref.read(privacyServiceProvider);
+    final success = await privacy.setPin(controller.text);
+    if (success) {
+      setState(() => _hasPin = true);
+      _showMessage('PIN configurado');
+    } else {
+      _showMessage('PIN inválido');
+    }
+  }
+
+  Future<void> _changePin() async {
+    final oldController = TextEditingController();
+    final newController = TextEditingController();
+    final confirmController = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cambiar PIN'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: oldController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'PIN actual'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: newController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Nuevo PIN'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: confirmController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Confirmar nuevo PIN'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Cambiar')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final privacy = ref.read(privacyServiceProvider);
+    if (!(await privacy.verifyPin(oldController.text))) {
+      _showMessage('PIN actual incorrecto');
+      return;
+    }
+    if (newController.text != confirmController.text) {
+      _showMessage('Los PIN no coinciden');
+      return;
+    }
+    final success = await privacy.setPin(newController.text);
+    if (success) {
+      _showMessage('PIN actualizado');
+    } else {
+      _showMessage('PIN inválido');
+    }
+  }
+
+  Future<void> _removePin() async {
+    final controller = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Desactivar protección'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Esta operación eliminará el PIN y la protección de acceso.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'PIN actual'),
+              keyboardType: TextInputType.number,
+              maxLength: 16,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Desactivar')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final privacy = ref.read(privacyServiceProvider);
+    if (!(await privacy.verifyPin(controller.text))) {
+      _showMessage('PIN actual incorrecto');
+      return;
+    }
+    await privacy.removePin();
+    setState(() => _hasPin = false);
+    _showMessage('Protección desactivada');
+  }
+
+  Future<void> _unlockNow() async {
+    final privacy = ref.read(privacyServiceProvider);
+    final controller = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Desbloquear'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: 'PIN'),
+          keyboardType: TextInputType.number,
+          maxLength: 16,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Desbloquear')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      final valid = await privacy.verifyPin(controller.text);
+      if (!valid) {
+        _showMessage('PIN incorrecto');
+      }
+    } catch (e) {
+      _showMessage('Error al verificar el PIN.');
+    }
+  }
+
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return const Scaffold(body: NexoLoading());
+    return Scaffold(
+      appBar: AppBar(title: const Text('Privacidad y seguridad')),
+      body: ListView(
+        padding: const EdgeInsets.all(NexoSpacing.lg),
+        children: [
+          Text('Protección de acceso', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: NexoSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Bloquear al volver a abrir'),
+                  subtitle: const Text(
+                    'Solicitar autenticación al abrir NEXO tras salir de la app.',
+                  ),
+                  value: _lockOnResume,
+                  onChanged: _hasPin ? _setLockOnResume : null,
+                ),
+                if (_hasPin) ...[
+                  const SizedBox(height: NexoSpacing.md),
+                  if (_biometricsAvailable)
+                    SwitchListTile(
+                      title: const Text('Desbloqueo biométrico'),
+                      subtitle: const Text('Usar huella dactilar o reconocimiento facial.'),
+                      value: _useBiometrics,
+                      onChanged: _setUseBiometrics,
+                    ),
+                  const SizedBox(height: NexoSpacing.md),
+                  ListTile(
+                    title: const Text('Cambiar PIN'),
+                    trailing: const Icon(Icons.edit),
+                    onTap: _changePin,
+                  ),
+                  const SizedBox(height: NexoSpacing.md),
+                  ListTile(
+                    title: const Text('Desactivar protección'),
+                    trailing: const Icon(Icons.lock_open),
+                    onTap: _removePin,
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('Probar desbloqueo ahora'),
+                    trailing: const Icon(Icons.lock),
+                    onTap: _unlockNow,
+                  ),
+                ],
+                if (!_hasPin)
+                  ListTile(
+                    title: const Text('Crear PIN'),
+                    trailing: const Icon(Icons.add),
+                    onTap: _createPin,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: NexoSpacing.xl),
+          Text('Biometría', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: NexoSpacing.md),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  title: const Text('Disponible en este dispositivo'),
+                  trailing: Text(
+                    _biometricsAvailable ? 'Sí' : 'No',
+                    style: TextStyle(
+                      color: _biometricsAvailable
+                          ? NexoColors.accent
+                          : NexoColors.textTertiary,
+                    ),
+                  ),
+                ),
+                if (!_biometricsAvailable)
+                  const ListTile(
+                    title: Text('No hay biometría'),
+                    subtitle: Text('Use el PIN para desbloquear.'),
+                    enabled: false,
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PinLockedException implements Exception {
+  final String message;
+  PinLockedException(this.message);
+}

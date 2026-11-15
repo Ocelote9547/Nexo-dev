@@ -32,13 +32,24 @@ class DashboardScreen extends ConsumerWidget {
       backgroundColor: tokens.background,
       body: SafeArea(
         child: summaryAsync.when(
-          data: (_) => CustomScrollView(
+          data: (summary) => CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: _Header(tokens: tokens, onNavigate: onNavigate),
               ),
               SliverToBoxAdapter(
-                child: _SearchBar(tokens: tokens),
+                child: _OverviewCard(
+                  tokens: tokens,
+                  totalContacts: summary.totalContacts,
+                  favoriteContacts: summary.favoriteContacts,
+                  totalCollections: summary.totalCollections,
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _SearchBar(
+                  tokens: tokens,
+                  onTap: () => onNavigate?.call(1),
+                ),
               ),
               SliverToBoxAdapter(
                 child: _FavoritesSection(
@@ -69,6 +80,156 @@ class DashboardScreen extends ConsumerWidget {
           loading: () => const NexoLoading(),
           error: (e, _) => NexoErrorState(message: 'Error al cargar el panel: $e'),
         ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// Resumen principal — jerarquía visual de la pantalla de inicio
+// ============================================================================
+
+class _OverviewCard extends StatelessWidget {
+  final NexoDesignTokens tokens;
+  final int totalContacts;
+  final int favoriteContacts;
+  final int totalCollections;
+
+  const _OverviewCard({
+    required this.tokens,
+    required this.totalContacts,
+    required this.favoriteContacts,
+    required this.totalCollections,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [tokens.surfaceElevated, tokens.surface],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: tokens.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TU AGENDA PERSONAL',
+                    style: TextStyle(
+                      color: tokens.accent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.15,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '$totalContacts',
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontSize: 38,
+                      height: 1,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    totalContacts == 1 ? 'contacto guardado' : 'contactos guardados',
+                    style: TextStyle(
+                      color: tokens.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _OverviewMetric(
+                        icon: Icons.star_rounded,
+                        value: favoriteContacts,
+                        label: 'Favoritos',
+                        tokens: tokens,
+                      ),
+                      _OverviewMetric(
+                        icon: Icons.folder_rounded,
+                        value: totalCollections,
+                        label: 'Colecciones',
+                        tokens: tokens,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: tokens.accent.withValues(alpha: 0.13),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: tokens.accent.withValues(alpha: 0.24),
+                ),
+              ),
+              child: Icon(Icons.hub_rounded, color: tokens.accent, size: 30),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OverviewMetric extends StatelessWidget {
+  final IconData icon;
+  final int value;
+  final String label;
+  final NexoDesignTokens tokens;
+
+  const _OverviewMetric({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.tokens,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: tokens.background.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: tokens.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: tokens.accent, size: 15),
+          const SizedBox(width: 5),
+          Text(
+            '$value $label',
+            style: TextStyle(
+              color: tokens.textSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -204,54 +365,43 @@ class _NavButton extends StatelessWidget {
 
 class _SearchBar extends StatelessWidget {
   final NexoDesignTokens tokens;
-  const _SearchBar({required this.tokens});
+  final VoidCallback onTap;
+
+  const _SearchBar({required this.tokens, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(NexoDesignRadii.full),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
           child: Container(
-            height: 48,
+            height: 54,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: tokens.surfaceElevated,
-              borderRadius: BorderRadius.circular(NexoDesignRadii.full),
-              border: Border.all(
-                color: tokens.border,
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: tokens.border),
             ),
             child: Row(
               children: [
-                const SizedBox(width: NexoDesignSpacing.md),
-                Icon(
-                  Icons.search,
-                  color: tokens.textTertiary,
-                  size: 20,
-                ),
-                const SizedBox(width: NexoDesignSpacing.md),
+                Icon(Icons.search_rounded, color: tokens.accent, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: TextField(
-                    enabled: false,
+                  child: Text(
+                    'Buscar entre tus contactos',
                     style: TextStyle(
-                      color: tokens.textPrimary,
+                      color: tokens.textSecondary,
                       fontSize: 14,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: 'Buscar contactos...',
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                const SizedBox(width: NexoDesignSpacing.md),
+                Icon(Icons.arrow_forward_rounded,
+                    color: tokens.textTertiary, size: 18),
               ],
             ),
           ),

@@ -35,7 +35,6 @@ class DashboardScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: _Header(tokens: tokens, onNavigate: onNavigate),
             ),
-            SliverToBoxAdapter(child: _WelcomeCard(tokens: tokens)),
             SliverToBoxAdapter(
               child: _SearchBar(
                 tokens: tokens,
@@ -65,106 +64,6 @@ class DashboardScreen extends ConsumerWidget {
             ),
             const SliverToBoxAdapter(
               child: SizedBox(height: NexoDesignSpacing.xxl),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// Bienvenida — tarjeta principal de la agenda, sin contadores
-// ============================================================================
-
-class _WelcomeCard extends StatelessWidget {
-  final NexoDesignTokens tokens;
-  const _WelcomeCard({required this.tokens});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              tokens.surfaceElevated,
-              tokens.surface,
-              tokens.surfaceSecondary,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: tokens.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.045),
-              blurRadius: 22,
-              offset: const Offset(0, 9),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'TU ESPACIO PERSONAL',
-                    style: TextStyle(
-                      color: tokens.accent,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 9),
-                  Text(
-                    'Tu agenda, siempre cerca.',
-                    style: TextStyle(
-                      color: tokens.textPrimary,
-                      fontSize: 21,
-                      height: 1.18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.45,
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    'Personas importantes, organizadas en un solo lugar.',
-                    style: TextStyle(
-                      color: tokens.textSecondary,
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 14),
-            Container(
-              width: 62,
-              height: 62,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [tokens.accent, tokens.accentSelected],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: tokens.accent.withValues(alpha: 0.22),
-                    blurRadius: 18,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.hub_rounded, color: Colors.white, size: 30),
             ),
           ],
         ),

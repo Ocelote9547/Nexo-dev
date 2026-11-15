@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/nexo_theme.dart';
@@ -361,6 +362,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: NexoSpacing.xl),
           Text('Datos', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: NexoSpacing.md),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.waving_hand_outlined),
+              title: const Text('Ver bienvenida de NEXO'),
+              subtitle: const Text(
+                'Previsualiza el asistente inicial sin modificar tus contactos.',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => OnboardingScreen(
+                    onCompleted: () async {
+                      if (mounted) Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: NexoSpacing.md),
           Card(
             child: ListTile(

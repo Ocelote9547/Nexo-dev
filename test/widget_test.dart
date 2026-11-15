@@ -14,7 +14,6 @@ import 'package:nexo/features/contacts/presentation/providers/contact_providers.
 import 'package:nexo/features/contacts/presentation/providers/search_providers.dart';
 import 'package:nexo/features/contacts/data/services/contact_search_service.dart';
 import 'package:nexo/features/collections/presentation/providers/collection_providers.dart';
-import 'package:nexo/features/dashboard/domain/services/dashboard_service.dart';
 import 'package:nexo/features/contacts/presentation/screens/contacts_screen.dart';
 import 'package:nexo/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:nexo/features/collections/presentation/screens/collections_screen.dart';

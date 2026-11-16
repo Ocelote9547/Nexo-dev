@@ -138,16 +138,14 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     final searchService = ref.read(contactSearchServiceProvider);
 
     return Scaffold(
-      backgroundColor: NexoDesignColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: NexoDesignColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Contactos',
-          style: TextStyle(
-            color: NexoDesignColors.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
           ),
         ),
         actions: [
@@ -316,7 +314,7 @@ class _CounterDisplay extends ConsumerWidget {
       ),
       child: Text(
         label,
-        style: NexoDesignTypography.contactCounter,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
     );
   }
@@ -340,7 +338,10 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(top: NexoDesignSpacing.md, bottom: NexoDesignSpacing.xs),
       child: Text(
         isFavorites ? 'Favoritos' : letter,
-        style: NexoDesignTypography.sectionLetter,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -454,10 +455,10 @@ class _AlphabetIndex extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Text(
                   l,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: NexoDesignColors.textTertiary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),

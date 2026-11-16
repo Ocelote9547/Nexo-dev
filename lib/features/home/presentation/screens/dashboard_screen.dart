@@ -286,33 +286,58 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-/// Ondas decorativas sutiles detrás de la marca NEXO.
+/// Ondas decorativas en capas, con degradado azul y cian detrás de la marca NEXO.
 class _NexoHeaderWavesPainter extends CustomPainter {
   final Color color;
   const _NexoHeaderWavesPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.35
-      ..strokeCap = StrokeCap.round;
-    for (var i = 0; i < 3; i++) {
-      final y = size.height * (0.38 + i * 0.16);
-      final path = Path()
-        ..moveTo(size.width * 0.34, y)
-        ..cubicTo(
-          size.width * 0.48, y - 9,
-          size.width * 0.60, y + 9,
-          size.width * 0.76, y,
-        )
-        ..cubicTo(
-          size.width * 0.86, y - 5,
-          size.width * 0.93, y + 4,
-          size.width, y - 1,
-        );
-      canvas.drawPath(path, paint);
+    if (size.width <= 0 || size.height <= 0) return;
+
+    final cyan = const Color(0xFF39C6E8);
+    final shader = LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        color.withValues(alpha: 0.04),
+        color.withValues(alpha: 0.58),
+        cyan.withValues(alpha: 0.48),
+        color.withValues(alpha: 0.08),
+      ],
+      stops: const [0.0, 0.38, 0.72, 1.0],
+    ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    for (var layer = 0; layer < 4; layer++) {
+      final path = Path();
+      for (var step = 0; step <= 72; step++) {
+        final x = size.width * step / 72;
+        final progress = x / size.width;
+        final centerLine = size.height * (0.30 + layer * 0.19);
+        final amplitude = 3.2 + layer * 0.45;
+        final y = centerLine +
+            math.sin(progress * math.pi * 2.15 + layer * 0.72) * amplitude;
+        if (step == 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
+      }
+
+      final glow = Paint()
+        ..shader = shader
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = layer == 0 ? 3.8 : 2.8
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.2);
+      canvas.drawPath(path, glow);
+
+      final line = Paint()
+        ..shader = shader
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = layer == 0 ? 1.25 : 0.95
+        ..strokeCap = StrokeCap.round;
+      canvas.drawPath(path, line);
     }
   }
 

@@ -221,23 +221,76 @@ class NexoPinKeypad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 7,
-      crossAxisSpacing: 7,
-      childAspectRatio: 2.0,
-      children: keys.map((key) => OutlinedButton(
-        onPressed: enabled ? () => _press(key) : null,
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        child: Text(key, style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-        )),
-      )).toList(),
+    final indicatorCount = maxLength <= 8 ? maxLength : 8;
+    final colors = Theme.of(context).colorScheme;
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 13),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var i = 0; i < indicatorCount; i++)
+                  Container(
+                    width: 11,
+                    height: 11,
+                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: i < controller.text.length
+                          ? colors.primary
+                          : colors.surfaceContainerHighest,
+                      border: Border.all(
+                        color: i < controller.text.length
+                            ? colors.primary
+                            : colors.outlineVariant,
+                      ),
+                    ),
+                  ),
+                if (controller.text.length > indicatorCount)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 3),
+                    child: Text(
+                      '+${controller.text.length - indicatorCount}',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.75,
+            children: keys.map((key) => OutlinedButton(
+              onPressed: enabled ? () => _press(key) : null,
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                backgroundColor: colors.surfaceContainerLow,
+                side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.7)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              ),
+              child: key == '⌫'
+                  ? const Icon(Icons.backspace_outlined, size: 20)
+                  : key == 'C'
+                      ? const Icon(Icons.clear_all_rounded, size: 21)
+                      : Text(
+                          key,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+            )).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

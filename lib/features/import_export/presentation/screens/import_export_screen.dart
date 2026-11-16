@@ -6,10 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/design/components/nexo_button.dart';
-import '../../../../core/design/components/nexo_card.dart';
 import '../../../../core/design/nexo_design_system.dart';
-import '../../../../shared/widgets/nexo_widgets.dart';
 import '../providers/import_export_providers.dart';
 import '../../domain/entities/import_export.dart';
 
@@ -192,186 +189,294 @@ class _ImportExportScreenState extends ConsumerState<ImportExportScreen> {
   @override
   Widget build(BuildContext context) {
     final repo = ref.read(importExportRepositoryProvider);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Importar y exportar')),
       body: ListView(
-        padding: const EdgeInsets.all(NexoDesignSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 30),
         children: [
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(19),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.primary.withValues(alpha: 0.15),
+                  colors.surfaceContainerLow,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.65)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 54,
+                  height: 54,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(15),
+                    color: colors.primary.withValues(alpha: 0.13),
+                    borderRadius: BorderRadius.circular(17),
                   ),
-                  child: Icon(Icons.swap_horiz_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 25),
+                  child: Icon(Icons.sync_alt_rounded, color: colors.primary, size: 28),
                 ),
-                const SizedBox(width: 13),
+                const SizedBox(width: 15),
                 Expanded(
-                  child: Text(
-                    'Transfiere tus contactos entre NEXO y otros formatos compatibles.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: NexoDesignSpacing.xl),
-          Text('EXPORTAR',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.0)),
-          const SizedBox(height: NexoDesignSpacing.md),
-          NexoCard(
-            child: Column(
-              children: [
-                NexoButton(
-                  onPressed: _busy ? null : _exportJson,
-                  variant: NexoButtonVariant.secondary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Exportar JSON'),
-                      Icon(Icons.download, size: 20),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: NexoDesignSpacing.md),
-                NexoButton(
-                  onPressed: _busy ? null : _exportCsv,
-                  variant: NexoButtonVariant.secondary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Exportar CSV'),
-                      Icon(Icons.download, size: 20),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: NexoDesignSpacing.md),
-                NexoButton(
-                  onPressed: _busy ? null : _exportVCard,
-                  variant: NexoButtonVariant.secondary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Exportar vCard'),
-                      Icon(Icons.download, size: 20),
+                      Text('Gestiona tus contactos',
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Guarda una copia en otro formato o incorpora contactos desde un archivo.',
+                        style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: NexoDesignSpacing.xl),
-          Text('IMPORTAR',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.0)),
-          const SizedBox(height: NexoDesignSpacing.md),
-          NexoCard(
-            child: Column(
-              children: [
-                NexoButton(
-                  onPressed: _busy ? null : () => _importFile(
-                    (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
-                        repo.importContactsFromJson(
-                          c,
-                          batchSize: batchSize ?? 50,
-                          onProgress: onProgress,
-                        ),
-                    'JSON',
+          const SizedBox(height: 25),
+          _TransferSectionHeading(
+            title: 'Exportar contactos',
+            subtitle: 'Crea un archivo con la información de NEXO.',
+            icon: Icons.file_upload_outlined,
+          ),
+          const SizedBox(height: 11),
+          _TransferActionTile(
+            icon: Icons.data_object_rounded,
+            title: 'Archivo JSON',
+            subtitle: 'Formato completo para conservar los datos de NEXO.',
+            onTap: _busy ? null : _exportJson,
+          ),
+          const SizedBox(height: 9),
+          _TransferActionTile(
+            icon: Icons.table_chart_outlined,
+            title: 'Hoja CSV',
+            subtitle: 'Compatible con hojas de cálculo.',
+            onTap: _busy ? null : _exportCsv,
+          ),
+          const SizedBox(height: 9),
+          _TransferActionTile(
+            icon: Icons.contact_page_outlined,
+            title: 'Tarjetas vCard',
+            subtitle: 'Para compartir o trasladar contactos entre agendas.',
+            onTap: _busy ? null : _exportVCard,
+          ),
+          const SizedBox(height: 25),
+          _TransferSectionHeading(
+            title: 'Importar contactos',
+            subtitle: 'Selecciona un archivo compatible para añadir datos.',
+            icon: Icons.file_download_outlined,
+          ),
+          const SizedBox(height: 11),
+          _TransferActionTile(
+            icon: Icons.data_object_rounded,
+            title: 'Importar JSON',
+            subtitle: 'Recupera contactos desde un archivo JSON de NEXO.',
+            primary: true,
+            onTap: _busy ? null : () => _importFile(
+              (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
+                  repo.importContactsFromJson(
+                    c,
+                    batchSize: batchSize ?? 50,
+                    onProgress: onProgress,
                   ),
-                  variant: NexoButtonVariant.primary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Importar JSON'),
-                      Icon(Icons.upload, size: 20),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: NexoDesignSpacing.md),
-                NexoButton(
-                  onPressed: _busy ? null : () => _importFile(
-                    (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
-                        repo.importContactsFromCsv(
-                          c,
-                          batchSize: batchSize ?? 50,
-                          onProgress: onProgress,
-                        ),
-                    'CSV',
-                  ),
-                  variant: NexoButtonVariant.primary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Importar CSV'),
-                      Icon(Icons.upload, size: 20),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: NexoDesignSpacing.md),
-                NexoButton(
-                  onPressed: _busy ? null : () => _importFile(
-                    (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
-                        repo.importContactsFromVCard(
-                          c,
-                          batchSize: batchSize ?? 50,
-                          onProgress: onProgress,
-                        ),
-                    'vCard',
-                    preCount: repo.countVcfCards,
-                  ),
-                  variant: NexoButtonVariant.primary,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Importar vCard'),
-                      Icon(Icons.upload, size: 20),
-                    ],
-                  ),
-                ),
-              ],
+              'JSON',
             ),
           ),
-          const SizedBox(height: NexoDesignSpacing.xl),
-          if (_busy)
-            Column(
-              children: [
-                const NexoLoading(),
-                const SizedBox(height: NexoDesignSpacing.md),
-                LinearProgressIndicator(
-                  value: _progress,
-                  color: NexoDesignColors.accent,
-                ),
-                const SizedBox(height: NexoDesignSpacing.md),
-                Text(
-                  _status,
-                  style: NexoDesignTypography.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+          const SizedBox(height: 9),
+          _TransferActionTile(
+            icon: Icons.table_chart_outlined,
+            title: 'Importar CSV',
+            subtitle: 'Añade contactos desde una hoja de cálculo.',
+            primary: true,
+            onTap: _busy ? null : () => _importFile(
+              (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
+                  repo.importContactsFromCsv(
+                    c,
+                    batchSize: batchSize ?? 50,
+                    onProgress: onProgress,
+                  ),
+              'CSV',
             ),
-          if (!_busy && _status.isNotEmpty)
-            Text(
-              _status,
-              style: NexoDesignTypography.bodyMedium,
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 9),
+          _TransferActionTile(
+            icon: Icons.contact_page_outlined,
+            title: 'Importar vCard',
+            subtitle: 'Formato habitual de las aplicaciones de contactos.',
+            primary: true,
+            onTap: _busy ? null : () => _importFile(
+              (String c, {int? batchSize, ImportProgressCallback? onProgress}) =>
+                  repo.importContactsFromVCard(
+                    c,
+                    batchSize: batchSize ?? 50,
+                    onProgress: onProgress,
+                  ),
+              'vCard',
+              preCount: repo.countVcfCards,
             ),
+          ),
+          if (_busy || _status.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(_busy ? Icons.sync_rounded : Icons.info_outline_rounded,
+                        color: colors.primary, size: 19),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          _busy ? 'Proceso en curso' : 'Resultado',
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      if (_busy)
+                        SizedBox(
+                          width: 17,
+                          height: 17,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: colors.primary),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 13),
+                  if (_busy)
+                    LinearProgressIndicator(
+                      value: _progress,
+                      minHeight: 6,
+                      borderRadius: BorderRadius.circular(8),
+                      color: colors.primary,
+                    ),
+                  if (_busy) const SizedBox(height: 12),
+                  Text(
+                    _status,
+                    style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _TransferSectionHeading extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const _TransferSectionHeading({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: colors.primary, size: 21),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 3),
+              Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TransferActionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool primary;
+  final VoidCallback? onTap;
+
+  const _TransferActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: primary
+          ? colors.primary.withValues(alpha: 0.075)
+          : colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: primary
+                  ? colors.primary.withValues(alpha: 0.30)
+                  : colors.outlineVariant.withValues(alpha: 0.55),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 43,
+                height: 43,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: colors.primary, size: 22),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 3),
+                    Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                primary ? Icons.add_circle_outline_rounded : Icons.download_rounded,
+                color: colors.primary,
+                size: 21,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

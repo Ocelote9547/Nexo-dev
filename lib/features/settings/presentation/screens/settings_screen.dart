@@ -334,28 +334,71 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           Text('Preferencias', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: NexoSpacing.md),
-          ..._appearancePreferences(),
-          const SizedBox(height: NexoSpacing.md),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.waving_hand_outlined),
-              title: const Text('Ver bienvenida de NEXO'),
-              subtitle: const Text(
-                'Previsualiza los cinco pasos del asistente sin modificar tus contactos.',
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  tokens.accent.withValues(alpha: 0.18),
+                  tokens.surface,
+                ],
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => OnboardingScreen(
-                    onCompleted: () async {
-                      if (mounted) Navigator.of(context).pop();
-                    },
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: tokens.accent.withValues(alpha: 0.38)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.waving_hand_rounded, color: tokens.accent),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Text(
+                        'Conoce NEXO',
+                        style: TextStyle(
+                          color: tokens.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Vuelve a recorrer la bienvenida y consulta cómo empezar, sin modificar tus contactos.',
+                  style: TextStyle(
+                    color: tokens.textSecondary,
+                    fontSize: 13,
+                    height: 1.4,
                   ),
                 ),
-              ),
+                const SizedBox(height: 13),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.play_circle_outline_rounded),
+                    label: const Text('Ver bienvenida'),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => OnboardingScreen(
+                          onCompleted: () async {
+                            if (mounted) Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: NexoSpacing.xl),
+          ..._appearancePreferences(),
+          const SizedBox(height: NexoSpacing.md),
           Card(
             child: Column(
               children: [

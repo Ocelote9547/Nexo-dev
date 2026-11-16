@@ -36,6 +36,9 @@ class DashboardScreen extends ConsumerWidget {
               child: _Header(tokens: tokens, onNavigate: onNavigate),
             ),
             SliverToBoxAdapter(
+              child: _WelcomeHero(tokens: tokens),
+            ),
+            SliverToBoxAdapter(
               child: _SearchBar(
                 tokens: tokens,
                 onTap: () => onNavigate?.call(1),
@@ -251,6 +254,106 @@ class _NavButton extends StatelessWidget {
             ),
           ),
           child: Icon(icon, color: tokens.textPrimary, size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// Bienvenida — bloque principal de Inicio
+// ============================================================================
+class _WelcomeHero extends StatelessWidget {
+  final NexoDesignTokens tokens;
+
+  const _WelcomeHero({required this.tokens});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(20, 19, 20, 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              tokens.isDark
+                  ? const Color(0xFF173B68)
+                  : const Color(0xFFDCEAFF),
+              tokens.surface,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: tokens.accent.withValues(alpha: tokens.isDark ? 0.42 : 0.28),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: tokens.accent.withValues(alpha: tokens.isDark ? 0.12 : 0.08),
+              blurRadius: 22,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'BIENVENIDO A NEXO',
+                    style: TextStyle(
+                      color: tokens.accent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tu agenda, siempre cerca.',
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
+                      height: 1.15,
+                      letterSpacing: -0.35,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Personas importantes, organizadas en un solo lugar.',
+                    style: TextStyle(
+                      color: tokens.textSecondary,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: tokens.accent.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: tokens.accent.withValues(alpha: 0.22),
+                ),
+              ),
+              child: Icon(
+                Icons.hub_rounded,
+                color: tokens.accent,
+                size: 29,
+              ),
+            ),
+          ],
         ),
       ),
     );

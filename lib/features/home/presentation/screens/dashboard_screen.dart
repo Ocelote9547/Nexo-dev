@@ -52,6 +52,7 @@ class DashboardScreen extends ConsumerWidget {
               child: _UpcomingSection(
                 tokens: tokens,
                 async: upcomingAsync,
+                contactsAsync: allContactsAsync,
                 onNavigate: onNavigate,
               ),
             ),
@@ -532,10 +533,12 @@ class _FavoriteItem extends StatelessWidget {
 class _UpcomingSection extends StatelessWidget {
   final NexoDesignTokens tokens;
   final AsyncValue<List<UpcomingDate>> async;
+  final AsyncValue<List<Contact>> contactsAsync;
   final void Function(int)? onNavigate;
   const _UpcomingSection({
     required this.tokens,
     required this.async,
+    required this.contactsAsync,
     this.onNavigate,
   });
 
@@ -623,19 +626,27 @@ class _UpcomingSection extends StatelessWidget {
                   itemCount: upcoming.length,
                   separatorBuilder: (_, _) =>
                       const SizedBox(width: NexoDesignSpacing.md),
-                  itemBuilder: (context, index) => _BirthdayRow(
-                    tokens: tokens,
-                    upcoming: upcoming[index],
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ContactDetailScreen(
-                            contactId: upcoming[index].contactId,
+                  itemBuilder: (context, index) {
+                    final matches = contactsAsync.valueOrNull
+                        ?.where((contact) => contact.id == upcoming[index].contactId);
+                    final contact = matches == null || matches.isEmpty
+                        ? null
+                        : matches.first;
+                    return _BirthdayRow(
+                      tokens: tokens,
+                      upcoming: upcoming[index],
+                      contact: contact,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => ContactDetailScreen(
+                              contactId: upcoming[index].contactId,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    );
+                  },
                 ),
               );
             },
@@ -655,10 +666,12 @@ class _UpcomingSection extends StatelessWidget {
 class _BirthdayRow extends StatelessWidget {
   final NexoDesignTokens tokens;
   final UpcomingDate upcoming;
+  final Contact? contact;
   final VoidCallback onTap;
   const _BirthdayRow({
     required this.tokens,
     required this.upcoming,
+    required this.contact,
     required this.onTap,
   });
 
@@ -696,7 +709,16 @@ class _BirthdayRow extends StatelessWidget {
                   color: tokens.accentSelected,
                   border: Border.all(color: tokens.accent.withValues(alpha: 0.35)),
                 ),
-                child: Icon(Icons.cake_outlined, color: tokens.accent, size: 34),
+                child: ClipOval(
+                  child: contact == null
+                      ? Icon(Icons.cake_outlined, color: tokens.accent, size: 34)
+                      : NexoAvatar(
+                          displayName: contact!.displayName,
+                          photoPath: contact!.photoPath,
+                          size: 72,
+                          tokens: tokens,
+                        ),
+                ),
               ),
               const SizedBox(height: 10),
               Text(

@@ -339,7 +339,7 @@ class _FavoritesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
         borderRadius: BorderRadius.circular(20),
@@ -414,7 +414,7 @@ class _FavoritesSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 103,
+                height: 82,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: favs.length > 5 ? 5 : favs.length,
@@ -478,8 +478,8 @@ class _FavoriteItem extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  width: 53,
-                  height: 53,
+                  width: 47,
+                  height: 47,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -498,7 +498,7 @@ class _FavoriteItem extends StatelessWidget {
                     child: NexoAvatar(
                       displayName: contact.displayName,
                       photoPath: contact.photoPath,
-                      size: 51,
+                      size: 45,
                       tokens: tokens,
                     ),
                   ),
@@ -520,7 +520,7 @@ class _FavoriteItem extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               contact.displayName,
               textAlign: TextAlign.center,

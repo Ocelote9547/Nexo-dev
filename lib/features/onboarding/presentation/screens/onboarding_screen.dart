@@ -82,14 +82,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 16, 22, 8),
+              padding: const EdgeInsets.fromLTRB(22, 14, 18, 10),
               child: Row(
                 children: [
                   Container(
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: colors.primary.withValues(alpha: 0.12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          colors.primary.withValues(alpha: 0.20),
+                          colors.primary.withValues(alpha: 0.07),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: colors.primary.withValues(alpha: 0.24),
@@ -98,12 +105,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Icon(Icons.hub_rounded, color: colors.primary),
                   ),
                   const SizedBox(width: 11),
-                  Text(
-                    'NEXO',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2.0,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'NEXO',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      Text(
+                        'TU AGENDA, SIEMPRE CERCA',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   TextButton(
@@ -114,21 +134,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+              padding: const EdgeInsets.fromLTRB(22, 10, 22, 14),
               child: Row(
                 children: List.generate(
                   _steps.length,
                   (index) => Expanded(
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      height: 4,
+                      duration: const Duration(milliseconds: 220),
+                      height: 5,
                       margin: EdgeInsets.only(
                         right: index == _steps.length - 1 ? 0 : 6,
                       ),
                       decoration: BoxDecoration(
                         color: index <= _step
                             ? colors.primary
-                            : colors.onSurface.withValues(alpha: 0.12),
+                            : colors.onSurface.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -138,125 +158,196 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Expanded(
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
+                duration: const Duration(milliseconds: 240),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
                 child: SingleChildScrollView(
                   key: ValueKey(_step),
-                  padding: const EdgeInsets.fromLTRB(26, 26, 26, 18),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 390),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 76,
-                          height: 76,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                colors.primary.withValues(alpha: 0.20),
-                                colors.secondary.withValues(alpha: 0.10),
-                              ],
+                  padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colors.primary.withValues(alpha: 0.16),
+                              colors.surface,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(26),
+                          border: Border.all(
+                            color: colors.primary.withValues(alpha: 0.22),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: colors.primary.withValues(alpha: 0.08),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
                             ),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: colors.primary.withValues(alpha: 0.20),
-                            ),
-                          ),
-                          child: Icon(step.icon, size: 36, color: colors.primary),
+                          ],
                         ),
-                        const SizedBox(height: 34),
-                        Text(
-                          step.eyebrow,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: colors.primary,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 13),
-                        Text(
-                          step.title,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            height: 1.12,
-                            letterSpacing: -0.6,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          step.description,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colors.onSurface.withValues(alpha: 0.72),
-                            height: 1.55,
-                          ),
-                        ),
-                        if (_step == 1) ...[
-                          const SizedBox(height: 26),
-                          Material(
-                            color: colors.surface,
-                            borderRadius: BorderRadius.circular(18),
-                            child: InkWell(
-                              onTap: _openImport,
-                              borderRadius: BorderRadius.circular(18),
-                              child: Container(
-                                padding: const EdgeInsets.all(17),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(
-                                    color: colors.primary.withValues(alpha: 0.24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 58,
+                                  height: 58,
+                                  decoration: BoxDecoration(
+                                    color: colors.primary.withValues(alpha: 0.13),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: colors.primary.withValues(alpha: 0.20),
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    step.icon,
+                                    size: 29,
+                                    color: colors.primary,
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.file_upload_outlined,
-                                        color: colors.primary, size: 25),
-                                    const SizedBox(width: 13),
-                                    const Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Importar ahora',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            'Abrir importación de archivos',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 11,
+                                    vertical: 7,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colors.surface.withValues(alpha: 0.72),
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: colors.onSurface.withValues(alpha: 0.08),
                                     ),
-                                    Icon(Icons.chevron_right_rounded,
-                                        color: colors.onSurface.withValues(alpha: 0.55)),
-                                  ],
+                                  ),
+                                  child: Text(
+                                    'PASO ${_step + 1} / ${_steps.length}',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: colors.onSurface.withValues(alpha: 0.70),
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.7,
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              step.eyebrow,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: colors.primary,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.35,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              step.title,
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontSize: 27,
+                                fontWeight: FontWeight.w800,
+                                height: 1.12,
+                                letterSpacing: -0.7,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            Text(
+                              step.description,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: colors.onSurface.withValues(alpha: 0.76),
+                                height: 1.55,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_step == 1) ...[
+                        const SizedBox(height: 18),
+                        Material(
+                          color: colors.surface,
+                          borderRadius: BorderRadius.circular(18),
+                          child: InkWell(
+                            onTap: _openImport,
+                            borderRadius: BorderRadius.circular(18),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: colors.primary.withValues(alpha: 0.22),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.file_upload_outlined,
+                                    color: colors.primary,
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 13),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Importar ahora',
+                                          style: theme.textTheme.titleSmall?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          'Abrir importación de archivos',
+                                          style: theme.textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: colors.onSurface.withValues(alpha: 0.55),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ],
+                        ),
                       ],
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+              padding: const EdgeInsets.fromLTRB(22, 10, 22, 20),
               child: Row(
                 children: [
-                  if (_step > 0)
+                  if (_step > 0) ...[
                     OutlinedButton(
                       onPressed: _finishing
                           ? null
                           : () => setState(() => _step--),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(104, 52),
+                        side: BorderSide(
+                          color: colors.primary.withValues(alpha: 0.38),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
                       child: const Text('Atrás'),
                     ),
-                  if (_step > 0) const SizedBox(width: 12),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
                     child: FilledButton(
                       onPressed: _finishing
@@ -276,7 +367,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text(isLast ? 'Entrar en NEXO' : 'Continuar'),
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(isLast ? 'Entrar en NEXO' : 'Continuar'),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  isLast
+                                      ? Icons.check_rounded
+                                      : Icons.arrow_forward_rounded,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ],

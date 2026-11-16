@@ -289,38 +289,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   List<Widget> _appearancePreferences() {
     final tokens = ref.tokens(context);
     return [
-      const SizedBox(height: NexoSpacing.md),
-      Text('Apariencia', style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: NexoSpacing.md),
-      Card(
-        child: Column(
-          children: [
-            _AppearanceRow(
-              tokens: tokens,
-              mode: NexoThemeMode.light,
-              current: _themeMode,
-              label: 'Claro',
-              subtitle: 'Fondo claro y superficies blancas',
-              onTap: _setThemeMode,
-            ),
-            _AppearanceRow(
-              tokens: tokens,
-              mode: NexoThemeMode.dark,
-              current: _themeMode,
-              label: 'Oscuro',
-              subtitle: 'Fondo azul noche y superficies navy',
-              onTap: _setThemeMode,
-            ),
-            _AppearanceRow(
-              tokens: tokens,
-              mode: NexoThemeMode.system,
-              current: _themeMode,
-              label: 'Automático',
-              subtitle: 'Sigue el tema del sistema Android',
-              onTap: _setThemeMode,
-            ),
-          ],
-        ),
+      _AppearanceRow(
+        tokens: tokens,
+        mode: NexoThemeMode.light,
+        current: _themeMode,
+        label: 'Claro',
+        subtitle: 'Fondo claro y superficies blancas',
+        onTap: _setThemeMode,
+      ),
+      Divider(height: 1, indent: 16, endIndent: 16, color: tokens.border),
+      _AppearanceRow(
+        tokens: tokens,
+        mode: NexoThemeMode.dark,
+        current: _themeMode,
+        label: 'Oscuro',
+        subtitle: 'Fondo azul noche y superficies navy',
+        onTap: _setThemeMode,
+      ),
+      Divider(height: 1, indent: 16, endIndent: 16, color: tokens.border),
+      _AppearanceRow(
+        tokens: tokens,
+        mode: NexoThemeMode.system,
+        current: _themeMode,
+        label: 'Automático',
+        subtitle: 'Sigue el tema del sistema Android',
+        onTap: _setThemeMode,
       ),
     ];
   }
@@ -678,9 +671,6 @@ class _SettingsSectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.findAncestorWidgetOfExactType<Theme>() == null
-        ? null
-        : null;
     final theme = Theme.of(context);
     return Row(
       children: [

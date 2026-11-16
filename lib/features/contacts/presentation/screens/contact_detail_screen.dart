@@ -122,11 +122,32 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           return ListView(
             padding: const EdgeInsets.all(NexoSpacing.lg),
             children: [
-              Center(child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 88)),
-              const SizedBox(height: NexoSpacing.md),
-              Center(child: Text(c.displayName, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center)),
-              if (c.nickname != null && c.nickname!.isNotEmpty)
-                Center(child: Text(c.nickname!, style: Theme.of(context).textTheme.bodyMedium)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45), width: 2),
+                      ),
+                      child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 88),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(c.displayName, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+                    if (c.nickname != null && c.nickname!.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(c.nickname!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    ],
+                  ],
+                ),
+              ),
               const SizedBox(height: NexoSpacing.md),
               Center(
                 child: IconButton(
@@ -234,14 +255,22 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (children.isEmpty) return const SizedBox.shrink();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: NexoSpacing.sm),
-        ...children,
-        const SizedBox(height: NexoSpacing.lg),
-      ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: NexoSpacing.md),
+      padding: const EdgeInsets.fromLTRB(16, 15, 12, 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary)),
+          const SizedBox(height: NexoSpacing.md),
+          ...children,
+        ],
+      ),
     );
   }
 }

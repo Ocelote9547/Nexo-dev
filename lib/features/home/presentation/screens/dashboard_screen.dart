@@ -134,9 +134,9 @@ class _Header extends ConsumerWidget {
                   'Tu agenda, siempre cerca.',
                   style: NexoDesignTypography.caption.copyWith(
                     color: tokens.textSecondary,
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.25,
+                    letterSpacing: 0.05,
                   ),
                 ),
               ],

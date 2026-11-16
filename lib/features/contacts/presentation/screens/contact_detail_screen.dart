@@ -167,7 +167,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                     icon: Icons.chat_rounded,
                     tooltip: 'WhatsApp',
                     onTap: () => qa.openWhatsApp(
-                      p.valueRaw.replaceAll(RegExp(r'\\D'), ''),
+                      p.valueRaw.replaceAll(RegExp(r'\D'), ''),
                     ),
                   ),
                   _Action(icon: Icons.copy, tooltip: 'Copiar', onTap: () => Clipboard.setData(ClipboardData(text: p.valueRaw))),

@@ -160,9 +160,10 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             TextField(
               controller: newController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Nuevo PIN'),
+              decoration: const InputDecoration(labelText: 'Nuevo PIN (4-8 dígitos)'),
               keyboardType: TextInputType.number,
-              maxLength: 16,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 8,
             ),
             const SizedBox(height: 12),
             TextField(
@@ -170,7 +171,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               obscureText: true,
               decoration: const InputDecoration(labelText: 'Confirmar nuevo PIN'),
               keyboardType: TextInputType.number,
-              maxLength: 16,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 8,
             ),
           ],
         ),

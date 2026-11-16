@@ -359,6 +359,14 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               letterSpacing: 1.0)),
           const SizedBox(height: NexoSpacing.sm),
           Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+              ),
+            ),
             child: Column(
               children: [
                 SwitchListTile(
@@ -414,6 +422,14 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               letterSpacing: 1.0)),
           const SizedBox(height: NexoSpacing.sm),
           Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+              ),
+            ),
             child: Column(
               children: [
                 ListTile(

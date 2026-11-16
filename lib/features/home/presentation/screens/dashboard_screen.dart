@@ -267,8 +267,21 @@ class _FavoritesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: tokens.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -331,7 +344,7 @@ class _FavoritesSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 82,
+                height: 126,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: favs.length > 5 ? 5 : favs.length,
@@ -471,8 +484,21 @@ class _UpcomingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: tokens.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -679,8 +705,21 @@ class _RecentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: tokens.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

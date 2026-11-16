@@ -122,7 +122,7 @@ class _NexoBottomNav extends ConsumerWidget {
   }
 }
 
-/// Onda continua con una cresta elevada que se desliza hasta la pestaña activa.
+/// Onda continua con una cresta elevada y capas de color que siguen la pestaña activa.
 class _NexoBottomWavePainter extends CustomPainter {
   final NexoDesignTokens tokens;
   final double selectedPosition;
@@ -132,39 +132,80 @@ class _NexoBottomWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (itemCount < 2 || size.width <= 0) return;
+    if (itemCount < 2 || size.width <= 0 || size.height <= 0) return;
 
-    final inset = 12.0;
+    const inset = 12.0;
     final usableWidth = size.width - inset * 2;
     final spacing = usableWidth / itemCount;
     final peakX = inset + spacing * (selectedPosition + 0.5);
-    final baseY = 27.0;
-    final amplitude = 19.0;
-    final sigma = spacing * 0.48;
+    const baseY = 39.0;
+    const amplitude = 27.0;
+    final sigma = spacing * 0.62;
+    final cyan = const Color(0xFF39C6E8);
+    final blue = tokens.accent;
+
+    double waveY(double x, double offset) {
+      final distance = (x - peakX) / sigma;
+      final crest = amplitude * math.exp(-0.5 * distance * distance);
+      final ripple = 1.15 * math.sin((x / size.width) * math.pi * 2 - 0.35);
+      return baseY + offset - crest + ripple;
+    }
+
+    final area = Path();
+    for (var step = 0; step <= 120; step++) {
+      final x = size.width * step / 120;
+      final y = waveY(x, 0);
+      if (step == 0) {
+        area.moveTo(x, y);
+      } else {
+        area.lineTo(x, y);
+      }
+    }
+    area
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    final fill = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          blue.withValues(alpha: tokens.isDark ? 0.17 : 0.12),
+          cyan.withValues(alpha: tokens.isDark ? 0.075 : 0.055),
+          blue.withValues(alpha: 0.015),
+        ],
+        stops: const [0.0, 0.48, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawPath(area, fill);
 
     for (var layer = 0; layer < 3; layer++) {
       final path = Path();
-      final offset = layer * 5.0;
-      for (var step = 0; step <= 100; step++) {
-        final x = size.width * step / 100;
-        final distance = (x - peakX) / sigma;
-        final crest = amplitude * math.exp(-0.5 * distance * distance);
-        final gentle = 1.7 * math.sin((x / size.width) * math.pi * 2 + layer * 0.35);
-        final y = baseY + offset - crest + gentle;
+      final offset = layer * 5.2;
+      for (var step = 0; step <= 120; step++) {
+        final x = size.width * step / 120;
+        final y = waveY(x, offset);
         if (step == 0) {
           path.moveTo(x, y);
         } else {
           path.lineTo(x, y);
         }
       }
-      final paint = Paint()
-        ..color = tokens.accent.withValues(
-          alpha: (tokens.isDark ? 0.23 : 0.17) - layer * 0.035,
-        )
+
+      final line = Paint()
+        ..shader = LinearGradient(
+          colors: [
+            blue.withValues(alpha: 0.0),
+            blue.withValues(alpha: layer == 0 ? 0.76 : 0.42),
+            cyan.withValues(alpha: layer == 0 ? 0.72 : 0.38),
+            blue.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 0.36, 0.72, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.55 : 1.05
+        ..strokeWidth = layer == 0 ? 1.9 : 1.25
         ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path, paint);
+      canvas.drawPath(path, line);
     }
   }
 

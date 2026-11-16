@@ -418,21 +418,21 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                 const SizedBox(height: NexoSpacing.sm),
               ],
             ),
-            const SizedBox(height: NexoSpacing.xl),
+            const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Teléfonos', onAdd: _addPhone),
             ..._phones.asMap().entries.map((e) => _PhoneRow(
               phone: e.value,
               onChanged: (p) => setState(() => _phones[e.key] = p),
               onRemove: () => _removePhone(e.key),
             )),
-            const SizedBox(height: NexoSpacing.xl),
+            const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Correos', onAdd: _addEmail),
             ..._emails.asMap().entries.map((e) => _EmailRow(
               email: e.value,
               onChanged: (em) => setState(() => _emails[e.key] = em),
               onRemove: () => _removeEmail(e.key),
             )),
-            const SizedBox(height: NexoSpacing.xl),
+            const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Direcciones', onAdd: _addAddress),
             ..._addresses.asMap().entries.map((e) => _AddressRow(
               address: e.value,
@@ -529,10 +529,10 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(14, 9, 8, 9),
+      padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(

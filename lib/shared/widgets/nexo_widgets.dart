@@ -193,12 +193,14 @@ class NexoPinKeypad extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onChanged;
   final int maxLength;
+  final bool enabled;
 
   const NexoPinKeypad({
     super.key,
     required this.controller,
     required this.onChanged,
     this.maxLength = 8,
+    this.enabled = true,
   });
 
   void _press(String value) {
@@ -227,7 +229,7 @@ class NexoPinKeypad extends StatelessWidget {
       crossAxisSpacing: 7,
       childAspectRatio: 2.0,
       children: keys.map((key) => OutlinedButton(
-        onPressed: () => _press(key),
+        onPressed: enabled ? () => _press(key) : null,
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -117,6 +117,11 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             return const NexoErrorState(message: 'Contacto no encontrado');
           }
           final c = cwr.contact;
+          final organizationLabel = cwr.organizations.isNotEmpty
+              ? [cwr.organizations.first.title, cwr.organizations.first.company]
+                  .where((value) => value != null && value.trim().isNotEmpty)
+                  .join(' · ')
+              : '';
           final birthdayDates = cwr.dates.where((d) => d.type == 'birthday').toList();
           final qa = ref.read(quickActionsServiceProvider);
           return ListView(
@@ -125,9 +130,23 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(22),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+                      Theme.of(context).colorScheme.surfaceContainerLow,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.045),
+                      blurRadius: 18,
+                      offset: const Offset(0, 7),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -144,6 +163,17 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                     if (c.nickname != null && c.nickname!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(c.nickname!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    ],
+                    if (organizationLabel.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      Text(
+                        organizationLabel,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                     const SizedBox(height: 14),
                     OutlinedButton.icon(

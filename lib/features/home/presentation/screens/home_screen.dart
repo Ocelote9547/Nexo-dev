@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -75,8 +77,17 @@ class _NexoBottomNav extends ConsumerWidget {
         children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: CustomPaint(
-                painter: _NexoBottomWavePainter(tokens, currentIndex, _destinations.length),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: currentIndex.toDouble()),
+                duration: const Duration(milliseconds: 620),
+                curve: Curves.easeInOutCubic,
+                builder: (context, selectedPosition, _) => CustomPaint(
+                  painter: _NexoBottomWavePainter(
+                    tokens,
+                    selectedPosition,
+                    _destinations.length,
+                  ),
+                ),
               ),
             ),
           ),
@@ -111,46 +122,57 @@ class _NexoBottomNav extends ConsumerWidget {
   }
 }
 
-/// Pequeñas ondas estáticas en las pestañas inactivas.
-/// La pestaña seleccionada queda limpia y visualmente despejada.
+/// Onda continua con una cresta elevada que se desliza hasta la pestaña activa.
 class _NexoBottomWavePainter extends CustomPainter {
   final NexoDesignTokens tokens;
-  final int selectedIndex;
+  final double selectedPosition;
   final int itemCount;
 
-  const _NexoBottomWavePainter(this.tokens, this.selectedIndex, this.itemCount);
+  const _NexoBottomWavePainter(this.tokens, this.selectedPosition, this.itemCount);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.24 : 0.19)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.15
-      ..strokeCap = StrokeCap.round;
+    if (itemCount < 2 || size.width <= 0) return;
 
-    final horizontalInset = 12.0;
-    final usableWidth = size.width - horizontalInset * 2;
+    final inset = 12.0;
+    final usableWidth = size.width - inset * 2;
+    final spacing = usableWidth / itemCount;
+    final peakX = inset + spacing * (selectedPosition + 0.5);
+    final baseY = 27.0;
+    final amplitude = 19.0;
+    final sigma = spacing * 0.48;
 
-    for (var index = 0; index < itemCount; index++) {
-      if (index == selectedIndex) continue;
-
-      final centerX = horizontalInset + usableWidth * (index + 0.5) / itemCount;
-      for (var line = 0; line < 3; line++) {
-        final y = 13.0 + line * 3.1;
-        final wave = Path()
-          ..moveTo(centerX - 12, y)
-          ..cubicTo(centerX - 6, y - 2.4, centerX + 6, y + 2.4, centerX + 12, y);
-        canvas.drawPath(wave, paint);
+    for (var layer = 0; layer < 3; layer++) {
+      final path = Path();
+      final offset = layer * 5.0;
+      for (var step = 0; step <= 100; step++) {
+        final x = size.width * step / 100;
+        final distance = (x - peakX) / sigma;
+        final crest = amplitude * math.exp(-0.5 * distance * distance);
+        final gentle = 1.7 * math.sin((x / size.width) * math.pi * 2 + layer * 0.35);
+        final y = baseY + offset - crest + gentle;
+        if (step == 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
       }
+      final paint = Paint()
+        ..color = tokens.accent.withValues(
+          alpha: (tokens.isDark ? 0.23 : 0.17) - layer * 0.035,
+        )
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = layer == 0 ? 1.55 : 1.05
+        ..strokeCap = StrokeCap.round;
+      canvas.drawPath(path, paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) {
-    return oldDelegate.tokens != tokens ||
-        oldDelegate.selectedIndex != selectedIndex ||
-        oldDelegate.itemCount != itemCount;
-  }
+  bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) =>
+      oldDelegate.tokens != tokens ||
+      oldDelegate.selectedPosition != selectedPosition ||
+      oldDelegate.itemCount != itemCount;
 }
 
 class _NavDestination {

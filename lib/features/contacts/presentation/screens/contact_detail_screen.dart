@@ -145,15 +145,16 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                       const SizedBox(height: 4),
                       Text(c.nickname!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                     ],
+                    const SizedBox(height: 14),
+                    OutlinedButton.icon(
+                      onPressed: _favoriteBusy ? null : () => _toggleFavorite(!c.isFavorite),
+                      icon: Icon(
+                        c.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+                        color: NexoColors.favorite,
+                      ),
+                      label: Text(c.isFavorite ? 'En favoritos' : 'Añadir a favoritos'),
+                    ),
                   ],
-                ),
-              ),
-              const SizedBox(height: NexoSpacing.md),
-              Center(
-                child: IconButton(
-                  icon: Icon(c.isFavorite ? Icons.star : Icons.star_border, color: NexoColors.favorite),
-                  onPressed: _favoriteBusy ? null : () => _toggleFavorite(!c.isFavorite),
-                  tooltip: c.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos',
                 ),
               ),
               const SizedBox(height: NexoSpacing.lg),

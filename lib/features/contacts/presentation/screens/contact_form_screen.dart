@@ -387,7 +387,37 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                       BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12), blurRadius: 18, offset: const Offset(0, 5)),
                     ],
                   ),
-                  child: NexoAvatar(displayName: _givenName.text.isEmpty ? '?' : _givenName.text, size: 80, photoPath: _photoPath),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      NexoAvatar(
+                        displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
+                        size: 80,
+                        photoPath: _photoPath,
+                      ),
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.surface,
+                              width: 2.5,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.camera_alt_rounded,
+                            size: 15,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

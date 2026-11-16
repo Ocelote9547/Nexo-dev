@@ -118,8 +118,7 @@ class NexoLoading extends StatelessWidget {
 
 /// ============================================================================
 /// NexoAvatar — Reusable avatar component showing photo or initials.
-/// Usa [tokens] para adaptarse al tema activo; si no se proveen, usa colores
-/// del tema oscuro por defecto (compatibilidad con otras pantallas).
+/// Usa [tokens] si se proporcionan; de lo contrario, sigue el brillo del tema activo.
 class NexoAvatar extends StatelessWidget {
   final String? photoPath;
   final String displayName;

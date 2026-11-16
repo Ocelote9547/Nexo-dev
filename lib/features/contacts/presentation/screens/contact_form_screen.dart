@@ -475,13 +475,25 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
               onRemove: () => _removeCustomField(e.key),
             )),
             const SizedBox(height: NexoSpacing.xl),
-            Text('Etiquetas', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: NexoSpacing.md),
+            Row(
+              children: [
+                Icon(Icons.sell_outlined, color: Theme.of(context).colorScheme.primary, size: 20),
+                const SizedBox(width: 9),
+                Text(
+                  'Etiquetas',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+            const SizedBox(height: NexoSpacing.sm),
             ref.watch(tagsListProvider).when(
               data: (tags) => Column(
                 children: tags.map((t) {
                   final id = t['id'] as String;
                   return CheckboxListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     title: Text(t['name'] as String),
                     value: _selectedTagIds.contains(id),
                     onChanged: (v) => setState(() {
@@ -494,13 +506,25 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
               error: (e, _) => Text('Error: $e'),
             ),
             const SizedBox(height: NexoSpacing.xl),
-            Text('Colecciones', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: NexoSpacing.md),
+            Row(
+              children: [
+                Icon(Icons.folder_outlined, color: Theme.of(context).colorScheme.primary, size: 20),
+                const SizedBox(width: 9),
+                Text(
+                  'Colecciones',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+            const SizedBox(height: NexoSpacing.sm),
             ref.watch(collectionsListProvider).when(
               data: (cols) => Column(
                 children: cols.map((c) {
                   final id = c['id'] as String;
                   return CheckboxListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     title: Text(c['name'] as String),
                     value: _selectedCollectionIds.contains(id),
                     onChanged: (v) => setState(() {

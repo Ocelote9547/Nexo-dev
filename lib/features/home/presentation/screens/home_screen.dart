@@ -69,21 +69,14 @@ class _NexoBottomNav extends ConsumerWidget {
     final tokens = ref.tokens(context);
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
-    // La onda decorativa queda únicamente en la parte inferior,
-    // detrás de la barra y separada del área de gestos de Android.
     return SizedBox(
       height: 72 + bottomInset + 18,
       child: Stack(
         children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(end: currentIndex.toDouble()),
-                duration: const Duration(milliseconds: 420),
-                curve: Curves.easeInOutCubic,
-                builder: (context, selected, child) => CustomPaint(
-                  painter: _NexoBottomWavePainter(tokens, selected),
-                ),
+              child: CustomPaint(
+                painter: _NexoBottomWavePainter(tokens, currentIndex, _destinations.length),
               ),
             ),
           ),
@@ -93,9 +86,7 @@ class _NexoBottomNav extends ConsumerWidget {
             bottom: bottomInset + 8,
             child: Container(
               height: 68,
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-              ),
+              color: Colors.transparent,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: Row(
@@ -120,82 +111,45 @@ class _NexoBottomNav extends ConsumerWidget {
   }
 }
 
+/// Pequeñas ondas estáticas en las pestañas inactivas.
+/// La pestaña seleccionada queda limpia y visualmente despejada.
 class _NexoBottomWavePainter extends CustomPainter {
   final NexoDesignTokens tokens;
-  final double selectedIndex;
+  final int selectedIndex;
+  final int itemCount;
 
-  const _NexoBottomWavePainter(this.tokens, this.selectedIndex);
+  const _NexoBottomWavePainter(this.tokens, this.selectedIndex, this.itemCount);
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.save();
-    canvas.clipRect(Offset.zero & size);
-    canvas.translate((selectedIndex - 1.5) * size.width * 0.025, 0);
-    final base = Paint()
-      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.30 : 0.18)
-      ..style = PaintingStyle.fill;
-    final highlight = Paint()
-      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.52 : 0.30)
+    final paint = Paint()
+      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.24 : 0.19)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2;
+      ..strokeWidth = 1.15
+      ..strokeCap = StrokeCap.round;
 
-    final wave = Path()
-      ..moveTo(0, size.height * 0.18)
-      ..cubicTo(
-        size.width * 0.22, size.height * 0.00,
-        size.width * 0.43, size.height * 0.42,
-        size.width * 0.66, size.height * 0.28,
-      )
-      ..cubicTo(
-        size.width * 0.82, size.height * 0.15,
-        size.width * 0.91, size.height * 0.12,
-        size.width, size.height * 0.20,
-      )
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(wave, base);
+    final horizontalInset = 12.0;
+    final usableWidth = size.width - horizontalInset * 2;
 
-    final crest = Path()
-      ..moveTo(0, size.height * 0.18)
-      ..cubicTo(
-        size.width * 0.22, size.height * 0.00,
-        size.width * 0.43, size.height * 0.42,
-        size.width * 0.66, size.height * 0.28,
-      )
-      ..cubicTo(
-        size.width * 0.82, size.height * 0.15,
-        size.width * 0.91, size.height * 0.12,
-        size.width, size.height * 0.20,
-      );
-    canvas.drawPath(crest, highlight);
+    for (var index = 0; index < itemCount; index++) {
+      if (index == selectedIndex) continue;
 
-    final lower = Path()
-      ..moveTo(0, size.height * 0.42)
-      ..cubicTo(
-        size.width * 0.24, size.height * 0.18,
-        size.width * 0.44, size.height * 0.62,
-        size.width * 0.70, size.height * 0.48,
-      )
-      ..cubicTo(
-        size.width * 0.84, size.height * 0.38,
-        size.width * 0.92, size.height * 0.34,
-        size.width, size.height * 0.44,
-      );
-    canvas.drawPath(
-      lower,
-      Paint()
-        ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.28 : 0.16)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
-    canvas.restore();
+      final centerX = horizontalInset + usableWidth * (index + 0.5) / itemCount;
+      for (var line = 0; line < 3; line++) {
+        final y = 13.0 + line * 3.1;
+        final wave = Path()
+          ..moveTo(centerX - 12, y)
+          ..cubicTo(centerX - 6, y - 2.4, centerX + 6, y + 2.4, centerX + 12, y);
+        canvas.drawPath(wave, paint);
+      }
+    }
   }
 
   @override
   bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) {
     return oldDelegate.tokens != tokens ||
-        oldDelegate.selectedIndex != selectedIndex;
+        oldDelegate.selectedIndex != selectedIndex ||
+        oldDelegate.itemCount != itemCount;
   }
 }
 

@@ -90,14 +90,23 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NexoColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(NexoSpacing.lg),
-          child: Column(
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+              ),
+            ),
+            child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.lock, size: 80, color: NexoColors.accent),
+              Icon(Icons.shield_lock_rounded, size: 66, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: NexoSpacing.lg),
               Text('NEXO', style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: NexoSpacing.sm),
@@ -165,6 +174,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                 textAlign: TextAlign.center,
               ),
             ],
+            ),
           ),
         ),
       ),

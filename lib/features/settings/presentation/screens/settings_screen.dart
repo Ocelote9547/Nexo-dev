@@ -414,10 +414,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   value: _birthdayNotifications,
                   onChanged: _setGlobal,
                 ),
-                if (_birthdayNotifications) ...[
-                  Divider(height: 1, color: tokens.border),
-                  ..._birthdayPreferences(),
-                ],
+                Divider(height: 1, color: tokens.border),
+                ..._birthdayPreferences(),
                 if (_permissionMessage != null)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),

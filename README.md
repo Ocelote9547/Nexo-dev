@@ -1,112 +1,63 @@
-# NEXO — Agenda de Contactos Premium
+# NEXO 1.2 — Agenda de Contactos Premium
 
-Agenda de contactos moderna, elegante y tecnológica con identidad visual propia basada en **azul noche (Night Blue)** y **azul eléctrico**. Diseñada como un producto comercial profesional, no una plantilla genérica.
+NEXO es una agenda de contactos para Android con diseño Night Blue, gestión local de información y herramientas para organizar contactos, favoritos, cumpleaños y colecciones.
 
----
-
-## 📱 Pantallas
-
-| Pantalla | Estado |
-|----------|--------|
-| **Inicio** | ✅ Rediseñada (BUILD 6.8.2.5) |
-| **Contactos** | ⏳ Pendiente |
-| **Colecciones** | ⏳ Pendiente |
-| **Ajustes** | ✅ Parcial (selector de apariencia) |
-| **Ficha de contacto** | ⏳ Pendiente |
+**Versión actual:** 1.2.0  
+**Build:** 12  
+**Plataforma:** Android  
+**Application ID (producción):** `com.nexo.nexo`
 
 ---
 
-## 🎨 Identidad Visual
+## Características
 
-### Tema Oscuro (Night Blue — predeterminado)
+- **Contactos:** creación, edición, fichas de contacto y fotografías.
+- **Favoritos y cumpleaños:** acceso rápido y vista de próximas fechas.
+- **Colecciones y etiquetas:** organización de contactos.
+- **Importación y exportación:** formatos VCF, CSV y JSON.
+- **Privacidad:** protección mediante PIN y opción de autenticación biométrica en dispositivos compatibles.
+- **Apariencia:** temas claro, oscuro y automático con identidad visual Night Blue.
+- **Navegación:** Inicio, Contactos, Colecciones y Ajustes.
 
-| Token | Valor |
-|-------|-------|
-| Fondo principal | `#071629` |
-| Superficie | `#0B1C30` |
-| Superficie elevada | `#10243C` |
-| Borde discreto | `#223A56` |
-| Azul eléctrico (acento) | `#438BFF` |
-| Texto principal | `#F1F5F9` |
-| Texto secundario | `#A8B8CC` |
-| Favoritos (estrella) | `#F4B942` |
+## Diseño
 
-### Tema Claro
+La identidad visual combina azul noche, superficies elevadas y acentos azules. Los favoritos y cumpleaños utilizan acentos dorados.
 
-| Token | Valor |
-|-------|-------|
-| Fondo principal | `#F3F6FB` |
-| Superficie | `#FFFFFF` |
-| Superficie elevada | `#EAF0F8` |
-| Borde discreto | `#DCE5F0` |
-| Azul NEXO (acento) | `#286FEA` |
-| Texto principal | `#14243A` |
-| Texto secundario | `#52647C` |
-| Favoritos (estrella) | `#D99A18` |
+## Arquitectura y tecnología
 
----
+- Flutter y Dart.
+- Riverpod para gestión de estado.
+- Drift sobre SQLite para almacenamiento local.
+- Arquitectura organizada por funcionalidades.
+- Identificadores UUID.
+- Almacenamiento privado de fotografías y archivos de respaldo.
 
-## 🚀 Características
+NEXO está planteada como una aplicación local: los datos de contactos se gestionan en el dispositivo.
 
-- **Sistema de temas**: Claro, Oscuro y Automático (sigue el sistema Android), con persistencia de preferencia.
-- **Pantalla de Inicio**: Encabezado NEXO, buscador integrado, favoritos con avatares, próximos cumpleaños en formato de agenda y contactos recientes en lista unificada.
-- **Barra de navegación inferior**: 4 pestañas (Inicio, Contactos, Colecciones, Ajustes) físicamente separada de la navegación del sistema Android.
-- **Detección de duplicados**: Importación inteligente con puntuación de confianza.
-- **Fotografías**: Límite de 5MB, validación de imagen y enriquecimiento de contactos existentes.
-- **Cumpleaños**: Cálculo de próximas fechas con política para 29 de febrero.
-- **Importación/Exportación**: VCF, CSV y JSON con detección de duplicados durante la misma importación.
+## Compilación
 
----
-
-## 🛠️ Arquitectura
-
-- **Framework**: Flutter
-- **Gestión de estado**: Riverpod
-- **Base de datos**: Drift (SQLite)
-- **Arquitectura**: Por features (capas de dominio, datos y presentación)
-- **ID de aplicación**: `com.nexo.nexo`
-
----
-
-## 📦 Builds
-
-| BUILD | Trabajo | Estado |
-|-------|---------|--------|
-| 6.8.1.7 | Integración QA → Producción | Cerrado |
-| 6.8.2.0 | Rediseño Inicio + navegación inferior | Superado |
-| 6.8.2.1 | Refinamiento visual | Rechazado |
-| 6.8.2.2 | Reconstrucción visual | Rechazado |
-| 6.8.2.3 | Diseño oficial + sistema claro/oscuro | Rechazado |
-| 6.8.2.4 | Auditoría y corrección temas | Superado |
-| 6.8.2.5 | Rediseño real Inicio + nav inferior | **En desarrollo** |
-
----
-
-## 🔧 Comandos Útiles
+Requisitos: Flutter instalado y SDK de Android configurado.
 
 ```bash
-# Análisis estático
+flutter pub get
 flutter analyze
-
-# Ejecutar pruebas
 flutter test
-
-# Construir APK de producción
 flutter build apk --release --flavor production
-
-# Ejecutar en modo debug
-flutter run
 ```
 
+El APK de producción utiliza el identificador `com.nexo.nexo`. El flavor QA utiliza `com.nexo.nexo.qa`.
+
+## Versión 1.2
+
+Esta versión reúne el refinamiento visual de las pantallas principales y de gestión de contactos, ajustes, privacidad, importación/exportación y navegación. También incorpora mejoras en la presentación del PIN y la navegación animada inferior.
+
+## Notas de seguridad y datos
+
+- No se debe borrar ni reinicializar la base de datos para actualizar la aplicación.
+- Mantener el mismo `applicationId` permite actualizar la instalación existente.
+- La autenticación biométrica debe validarse en un dispositivo Android real compatible.
+- La versión de la aplicación se define en `pubspec.yaml`; Flutter traslada esos valores a `versionName` y `versionCode` de Android.
+
 ---
 
-## 📄 Notas
-
-- No se modifica el esquema de base de datos ni se crean migraciones.
-- No se borran datos de usuario.
-- `applicationId` se mantiene como `com.nexo.nexo`.
-- El APK de producción se firma con la clave de depuración.
-
----
-
-*Desarrollado con Flutter y Riverpod. Diseño Night Blue premium.*
+*Desarrollado con Flutter. NEXO — tu agenda, organizada.*

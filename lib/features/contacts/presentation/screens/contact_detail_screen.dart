@@ -120,13 +120,13 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           final birthdayDates = cwr.dates.where((d) => d.type == 'birthday').toList();
           final qa = ref.read(quickActionsServiceProvider);
           return ListView(
-            padding: const EdgeInsets.all(NexoSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
                 ),
                 child: Column(
@@ -135,11 +135,11 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45), width: 2),
+                        border: Border.all(color: c.isFavorite ? NexoColors.favorite : Theme.of(context).colorScheme.primary.withValues(alpha: 0.45), width: 2),
                       ),
                       child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 88),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
                     Text(c.displayName, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
                     if (c.nickname != null && c.nickname!.isNotEmpty) ...[
                       const SizedBox(height: 4),

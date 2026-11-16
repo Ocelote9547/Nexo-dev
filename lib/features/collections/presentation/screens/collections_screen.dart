@@ -142,11 +142,30 @@ Future<void> _createCollection(BuildContext context, WidgetRef ref) async {
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Nueva colección'),
-      content: TextField(controller: controller, decoration: const InputDecoration(labelText: 'Nombre')),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      title: const Row(
+        children: [
+          Icon(Icons.folder_rounded, color: NexoColors.accent),
+          SizedBox(width: 10),
+          Text('Nueva colección'),
+        ],
+      ),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          labelText: 'Nombre',
+          hintText: 'Ej. Trabajo, Familia…',
+          prefixIcon: const Icon(Icons.drive_file_rename_outline),
+          filled: true,
+          fillColor: Theme.of(ctx).colorScheme.surfaceContainerLow,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        ),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear colección')),
       ],
     ),
   );
@@ -160,11 +179,23 @@ Future<void> _renameCollection(BuildContext context, WidgetRef ref, String id, S
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       title: const Text('Renombrar colección'),
-      content: TextField(controller: controller, decoration: const InputDecoration(labelText: 'Nombre')),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          labelText: 'Nombre',
+          prefixIcon: const Icon(Icons.drive_file_rename_outline),
+          filled: true,
+          fillColor: Theme.of(ctx).colorScheme.surfaceContainerLow,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        ),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Guardar')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Guardar')),
       ],
     ),
   );
@@ -273,11 +304,30 @@ Future<void> _createTag(BuildContext context, WidgetRef ref) async {
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Nueva etiqueta'),
-      content: TextField(controller: controller, decoration: const InputDecoration(labelText: 'Nombre')),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      title: const Row(
+        children: [
+          Icon(Icons.label_rounded, color: NexoColors.accent),
+          SizedBox(width: 10),
+          Text('Nueva etiqueta'),
+        ],
+      ),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          labelText: 'Nombre',
+          hintText: 'Ej. Prioridad, Personal…',
+          prefixIcon: const Icon(Icons.sell_outlined),
+          filled: true,
+          fillColor: Theme.of(ctx).colorScheme.surfaceContainerLow,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        ),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear etiqueta')),
       ],
     ),
   );
@@ -292,11 +342,23 @@ Future<void> _renameTag(BuildContext context, WidgetRef ref, String id, String c
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       title: const Text('Renombrar etiqueta'),
-      content: TextField(controller: controller, decoration: const InputDecoration(labelText: 'Nombre')),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          labelText: 'Nombre',
+          prefixIcon: const Icon(Icons.sell_outlined),
+          filled: true,
+          fillColor: Theme.of(ctx).colorScheme.surfaceContainerLow,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        ),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Guardar')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Guardar')),
       ],
     ),
   );

@@ -649,10 +649,10 @@ class _UpcomingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
-        borderRadius: BorderRadius.circular(24),
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
@@ -665,7 +665,7 @@ class _UpcomingSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: NexoDesignSpacing.lg),
+          const SizedBox(height: NexoDesignSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -682,6 +682,7 @@ class _UpcomingSection extends StatelessWidget {
                         'Próximos cumpleaños',
                         style: NexoDesignTypography.sectionTitle.copyWith(
                           color: tokens.textPrimary,
+                          fontSize: 16,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -889,10 +890,10 @@ class _RecentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
-        borderRadius: BorderRadius.circular(24),
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
@@ -905,7 +906,7 @@ class _RecentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: NexoDesignSpacing.lg),
+          const SizedBox(height: NexoDesignSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -913,7 +914,7 @@ class _RecentSection extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.access_time_outlined,
-                      color: tokens.accentSoft,
+                      color: tokens.accent,
                       size: 18,
                     ),
                     const SizedBox(width: NexoDesignSpacing.sm),
@@ -922,6 +923,7 @@ class _RecentSection extends StatelessWidget {
                         'Contactos recientes',
                         style: NexoDesignTypography.sectionTitle.copyWith(
                           color: tokens.textPrimary,
+                          fontSize: 16,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

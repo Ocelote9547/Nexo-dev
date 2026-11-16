@@ -53,14 +53,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final advance = await repo.getInt('birthday_advance_days', defaultValue: 0);
     final hour = await repo.getInt('birthday_notification_hour', defaultValue: 9);
     final sound = await repo.getBool('birthday_sound', defaultValue: true);
-    final themeNotifier = ref.read(nexoThemeModeProvider.notifier);
+    final themeMode = ref.read(nexoThemeModeProvider);
     if (mounted) {
       setState(() {
         _birthdayNotifications = on;
         _advanceDays = advance;
         _hour = hour;
         _sound = sound;
-        _themeMode = themeNotifier.state;
+        _themeMode = themeMode;
       });
       _permissionChecked = false;
     }

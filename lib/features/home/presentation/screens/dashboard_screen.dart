@@ -6,6 +6,8 @@ import '../../../../core/design/nexo_design_system.dart';
 import '../../../../shared/widgets/nexo_widgets.dart';
 import '../providers/dashboard_providers.dart';
 import '../../../contacts/presentation/screens/contact_detail_screen.dart';
+import '../../../contacts/presentation/screens/contact_form_screen.dart';
+import '../../../quick_actions/presentation/providers/quick_actions_providers.dart';
 import '../../../contacts/domain/entities/contact.dart';
 import '../../../contacts/presentation/providers/contact_providers.dart';
 import '../../../birthdays/domain/services/birthday_service.dart';
@@ -29,6 +31,17 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: tokens.background,
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'nexo_open_dialpad',
+        tooltip: 'Abrir teclado del teléfono',
+        backgroundColor: tokens.accent,
+        foregroundColor: Colors.white,
+        elevation: 6,
+        onPressed: () async {
+          await ref.read(quickActionsServiceProvider).call('');
+        },
+        child: const Icon(Icons.dialpad_rounded, size: 25),
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -37,12 +50,6 @@ class DashboardScreen extends ConsumerWidget {
             ),
             SliverToBoxAdapter(
               child: _WelcomeHero(tokens: tokens),
-            ),
-            SliverToBoxAdapter(
-              child: _SearchBar(
-                tokens: tokens,
-                onTap: () => onNavigate?.call(1),
-              ),
             ),
             SliverToBoxAdapter(
               child: _FavoritesSection(
@@ -145,9 +152,13 @@ class _Header extends ConsumerWidget {
           const SizedBox(width: NexoDesignSpacing.sm),
           _NavButton(
             tokens: tokens,
-            icon: Icons.search,
-            tooltip: 'Buscar',
-            onTap: () => onNavigate?.call(1),
+            icon: Icons.person_add_alt_1_rounded,
+            tooltip: 'Crear contacto',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const ContactFormScreen(),
+              ),
+            ),
             size: 40,
           ),
           const SizedBox(width: NexoDesignSpacing.sm),
@@ -354,58 +365,6 @@ class _WelcomeHero extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// Buscador — Campo de búsqueda real, integrado en la composición
-// ============================================================================
-
-class _SearchBar extends StatelessWidget {
-  final NexoDesignTokens tokens;
-  final VoidCallback onTap;
-
-  const _SearchBar({required this.tokens, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            height: 54,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: tokens.surfaceElevated,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: tokens.border),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.search_rounded, color: tokens.accent, size: 22),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Buscar entre tus contactos',
-                    style: TextStyle(
-                      color: tokens.textSecondary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Icon(Icons.arrow_forward_rounded,
-                    color: tokens.textTertiary, size: 18),
-              ],
-            ),
-          ),
         ),
       ),
     );

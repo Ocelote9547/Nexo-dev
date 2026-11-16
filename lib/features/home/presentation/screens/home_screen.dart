@@ -69,43 +69,133 @@ class _NexoBottomNav extends ConsumerWidget {
     final tokens = ref.tokens(context);
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
-    // La barra NEXO queda como una tarjeta flotante independiente.
-    // El espacio inferior mantiene separada la zona de gestos/botones Android.
-    return Container(
-      color: tokens.background,
-      padding: EdgeInsets.fromLTRB(12, 8, 12, bottomInset + 8),
-      child: Container(
-        height: 72,
-        decoration: BoxDecoration(
-          color: tokens.surface,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: tokens.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: tokens.isDark ? 0.30 : 0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
+    // La onda decorativa queda únicamente en la parte inferior,
+    // detrás de la barra y separada del área de gestos de Android.
+    return SizedBox(
+      height: 72 + bottomInset + 18,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _NexoBottomWavePainter(tokens),
+              ),
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: Row(
-            children: List.generate(
-              _destinations.length,
-              (index) => Expanded(
-                child: _NavItem(
-                  tokens: tokens,
-                  destination: _destinations[index],
-                  isSelected: currentIndex == index,
-                  onTap: () => onTap(index),
+          ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: bottomInset + 8,
+            child: Container(
+              height: 68,
+              decoration: BoxDecoration(
+                color: tokens.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: tokens.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: tokens.isDark ? 0.34 : 0.09,
+                    ),
+                    blurRadius: 22,
+                    offset: const Offset(0, 7),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Row(
+                  children: List.generate(
+                    _destinations.length,
+                    (index) => Expanded(
+                      child: _NavItem(
+                        tokens: tokens,
+                        destination: _destinations[index],
+                        isSelected: currentIndex == index,
+                        onTap: () => onTap(index),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
+  }
+}
+
+class _NexoBottomWavePainter extends CustomPainter {
+  final NexoDesignTokens tokens;
+
+  const _NexoBottomWavePainter(this.tokens);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = Paint()
+      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.30 : 0.18)
+      ..style = PaintingStyle.fill;
+    final highlight = Paint()
+      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.52 : 0.30)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2;
+
+    final wave = Path()
+      ..moveTo(0, size.height * 0.34)
+      ..cubicTo(
+        size.width * 0.22, size.height * 0.02,
+        size.width * 0.43, size.height * 0.70,
+        size.width * 0.66, size.height * 0.48,
+      )
+      ..cubicTo(
+        size.width * 0.82, size.height * 0.32,
+        size.width * 0.91, size.height * 0.24,
+        size.width, size.height * 0.36,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(wave, base);
+
+    final crest = Path()
+      ..moveTo(0, size.height * 0.34)
+      ..cubicTo(
+        size.width * 0.22, size.height * 0.02,
+        size.width * 0.43, size.height * 0.70,
+        size.width * 0.66, size.height * 0.48,
+      )
+      ..cubicTo(
+        size.width * 0.82, size.height * 0.32,
+        size.width * 0.91, size.height * 0.24,
+        size.width, size.height * 0.36,
+      );
+    canvas.drawPath(crest, highlight);
+
+    final lower = Path()
+      ..moveTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.24, size.height * 0.30,
+        size.width * 0.44, size.height * 0.92,
+        size.width * 0.70, size.height * 0.70,
+      )
+      ..cubicTo(
+        size.width * 0.84, size.height * 0.58,
+        size.width * 0.92, size.height * 0.54,
+        size.width, size.height * 0.64,
+      );
+    canvas.drawPath(
+      lower,
+      Paint()
+        ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.28 : 0.16)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) {
+    return oldDelegate.tokens != tokens;
   }
 }
 

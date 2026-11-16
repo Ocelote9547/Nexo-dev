@@ -88,19 +88,8 @@ class _NexoBottomNav extends ConsumerWidget {
             bottom: bottomInset + 8,
             child: Container(
               height: 68,
-              decoration: BoxDecoration(
-                color: tokens.surface.withValues(alpha: tokens.isDark ? 0.90 : 0.94),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: tokens.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: tokens.isDark ? 0.34 : 0.09,
-                    ),
-                    blurRadius: 22,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),

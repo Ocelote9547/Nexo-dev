@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/design/nexo_design_system.dart';
 import '../providers/import_export_providers.dart';
 import '../../domain/entities/import_export.dart';
 

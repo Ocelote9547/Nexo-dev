@@ -197,7 +197,41 @@ class _ImportExportScreenState extends ConsumerState<ImportExportScreen> {
       body: ListView(
         padding: const EdgeInsets.all(NexoDesignSpacing.lg),
         children: [
-          Text('Exportar', style: NexoDesignTypography.titleLarge),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Icon(Icons.swap_horiz_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 25),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Text(
+                    'Transfiere tus contactos entre NEXO y otros formatos compatibles.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: NexoDesignSpacing.xl),
+          Text('EXPORTAR',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0)),
           const SizedBox(height: NexoDesignSpacing.md),
           NexoCard(
             child: Column(
@@ -241,7 +275,11 @@ class _ImportExportScreenState extends ConsumerState<ImportExportScreen> {
             ),
           ),
           const SizedBox(height: NexoDesignSpacing.xl),
-          Text('Importar', style: NexoDesignTypography.titleLarge),
+          Text('IMPORTAR',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0)),
           const SizedBox(height: NexoDesignSpacing.md),
           NexoCard(
             child: Column(

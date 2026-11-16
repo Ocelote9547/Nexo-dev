@@ -126,9 +126,12 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(height: NexoDesignSpacing.xs),
                 Text(
-                  'Tus contactos, organizados.',
+                  'Inicio',
                   style: NexoDesignTypography.caption.copyWith(
-                    color: tokens.textTertiary,
+                    color: tokens.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.25,
                   ),
                 ),
               ],
@@ -766,23 +769,25 @@ class _RecentSection extends StatelessWidget {
                   subtitle: 'Tus contactos más recientes aparecerán aquí.',
                 );
               }
-              return Column(
-                children: List.generate(
-                  recent.length,
-                  (index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _RecentRow(
+              return SizedBox(
+                height: 148,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recent.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(width: NexoDesignSpacing.md),
+                  itemBuilder: (context, index) => _RecentRow(
                     tokens: tokens,
                     contact: recent[index],
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) =>
-                              ContactDetailScreen(contactId: recent[index].id),
+                          builder: (_) => ContactDetailScreen(
+                            contactId: recent[index].id,
+                          ),
                         ),
                       );
                     },
-                  ),
                   ),
                 ),
               );
@@ -804,6 +809,7 @@ class _RecentRow extends StatelessWidget {
   final NexoDesignTokens tokens;
   final Contact contact;
   final VoidCallback onTap;
+
   const _RecentRow({
     required this.tokens,
     required this.contact,
@@ -812,80 +818,70 @@ class _RecentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        height: 76,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: tokens.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: tokens.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: tokens.isDark ? 0.18 : 0.045),
-              blurRadius: 16,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Avatar circular
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: tokens.surfaceHigh,
-                borderRadius: BorderRadius.circular(NexoDesignRadii.full),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(NexoDesignRadii.full),
-                child: NexoAvatar(
-                  displayName: contact.displayName,
-                  photoPath: contact.photoPath,
-                  size: 44,
-                  tokens: tokens,
+    return Material(
+      color: tokens.surface,
+      elevation: tokens.isDark ? 3 : 1,
+      shadowColor: Colors.black.withValues(
+        alpha: tokens.isDark ? 0.22 : 0.06,
+      ),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 148,
+          height: 142,
+          padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: tokens.border),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: tokens.accent.withValues(alpha: 0.42),
+                    width: 1.5,
+                  ),
+                ),
+                child: ClipOval(
+                  child: NexoAvatar(
+                    displayName: contact.displayName,
+                    photoPath: contact.photoPath,
+                    size: 64,
+                    tokens: tokens,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: NexoDesignSpacing.md),
-            // Nombre e información secundaria
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    contact.displayName,
-                    style: NexoDesignTypography.contactNameMedium.copyWith(
-                      color: tokens.textPrimary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: NexoDesignSpacing.xs),
-                  Text(
-                    _subtitle(contact),
-                    style: NexoDesignTypography.contactCaption.copyWith(
-                      color: tokens.textSecondary,
-                      fontSize: 12,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              const SizedBox(height: 10),
+              Text(
+                contact.displayName,
+                textAlign: TextAlign.center,
+                style: NexoDesignTypography.contactNameMedium.copyWith(
+                  color: tokens.textPrimary,
+                  fontSize: 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            // Indicador de navegación pequeño
-            Icon(
-              Icons.chevron_right,
-              color: tokens.textTertiary,
-              size: 18,
-            ),
-            const SizedBox(width: NexoDesignSpacing.sm),
-          ],
+              const SizedBox(height: 3),
+              Text(
+                _subtitle(contact),
+                textAlign: TextAlign.center,
+                style: NexoDesignTypography.contactCaption.copyWith(
+                  color: tokens.textSecondary,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

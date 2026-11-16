@@ -82,13 +82,61 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Copias de seguridad')),
       body: ListView(
-        padding: const EdgeInsets.all(NexoSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
         children: [
-          Text('Una copia de seguridad conserva contactos, relaciones, etiquetas, colecciones y fotografias.',
-              style: Theme.of(context).textTheme.bodyMedium),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(Icons.cloud_done_outlined,
+                    color: Theme.of(context).colorScheme.primary, size: 26),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'Protege tu información. Las copias incluyen contactos, relaciones, etiquetas, colecciones y fotografías.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: NexoSpacing.xl),
-          Card(child: ListTile(title: const Text('Crear copia de seguridad'), trailing: const Icon(Icons.backup), onTap: _busy ? null : _createBackup)),
-          Card(child: ListTile(title: const Text('Restaurar copia de seguridad'), trailing: const Icon(Icons.restore), onTap: _busy ? null : _restoreBackup)),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              leading: const Icon(Icons.backup_outlined, size: 26),
+              title: const Text('Crear copia de seguridad'),
+              subtitle: const Text('Guardar una copia cifrada en formato NEXO.'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: _busy ? null : _createBackup,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              leading: const Icon(Icons.restore_rounded, size: 26),
+              title: const Text('Restaurar copia de seguridad'),
+              subtitle: const Text('Recuperar datos desde un archivo de copia.'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: _busy ? null : _restoreBackup,
+            ),
+          ),
           const SizedBox(height: NexoSpacing.xl),
           if (_busy) const NexoLoading(),
           if (_status.isNotEmpty) Text(_status, style: Theme.of(context).textTheme.bodyMedium),

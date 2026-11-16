@@ -233,7 +233,7 @@ class _NavItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: SizedBox(
-            height: 72,
+            height: 68,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

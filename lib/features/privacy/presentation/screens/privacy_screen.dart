@@ -331,7 +331,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                     color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(17),
                   ),
-                  child: Icon(Icons.shield_lock_outlined,
+                  child: Icon(Icons.security_rounded,
                     color: Theme.of(context).colorScheme.primary, size: 27),
                 ),
                 const SizedBox(width: 14),

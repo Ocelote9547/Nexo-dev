@@ -15,6 +15,7 @@ class PrivacyService {
   static const _storageKeyPinSalt = 'privacy_pin_salt';
   static const _storageKeyPinAttempts = 'privacy_pin_attempts';
   static const _storageKeyPinLockedUntil = 'privacy_pin_locked_until';
+  static const _storageKeyPinLength = 'privacy_pin_length';
 
   static const _iterations = 10000;
   static const _maxAttempts = 5;
@@ -23,6 +24,14 @@ class PrivacyService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   /// ¿Existe un PIN configurado?
+  /// Longitud del PIN configurado. Es metadato, no contiene el PIN.
+  /// Devuelve null para PIN creados antes de guardar esta información.
+  Future<int?> getPinLength() async {
+    final value = await _storage.read(key: _storageKeyPinLength);
+    final length = int.tryParse(value ?? '');
+    return length != null && length >= 4 && length <= 16 ? length : null;
+  }
+
   Future<bool> hasPin() async {
     final salt = await _storage.read(key: _storageKeyPinSalt);
     return salt != null && salt.isNotEmpty;
@@ -35,6 +44,7 @@ class PrivacyService {
     final hash = _derive(pin, salt);
     await _storage.write(key: _storageKeyPinSalt, value: salt);
     await _storage.write(key: _storageKeyPinHash, value: hash);
+    await _storage.write(key: _storageKeyPinLength, value: pin.length.toString());
     await _storage.delete(key: _storageKeyPinAttempts);
     await _storage.delete(key: _storageKeyPinLockedUntil);
     return true;
@@ -82,6 +92,7 @@ class PrivacyService {
   Future<void> removePin() async {
     await _storage.delete(key: _storageKeyPinHash);
     await _storage.delete(key: _storageKeyPinSalt);
+    await _storage.delete(key: _storageKeyPinLength);
     await _storage.delete(key: _storageKeyPinAttempts);
     await _storage.delete(key: _storageKeyPinLockedUntil);
   }

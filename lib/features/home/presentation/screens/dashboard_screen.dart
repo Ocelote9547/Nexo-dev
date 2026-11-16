@@ -628,7 +628,7 @@ class _UpcomingSection extends StatelessWidget {
                       const SizedBox(width: NexoDesignSpacing.md),
                   itemBuilder: (context, index) {
                     final matches = contactsAsync.asData?.value
-                        ?.where((contact) => contact.id == upcoming[index].contactId);
+                        .where((contact) => contact.id == upcoming[index].contactId);
                     final contact = matches == null || matches.isEmpty
                         ? null
                         : matches.first;

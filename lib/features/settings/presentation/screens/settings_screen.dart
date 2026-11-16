@@ -327,6 +327,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = ref.tokens(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Ajustes')),
       body: ListView(

@@ -360,8 +360,17 @@ class _ContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NexoCard(
+    return Container(
       margin: const EdgeInsets.only(bottom: NexoDesignSpacing.md),
+      padding: contact.isFavorite ? const EdgeInsets.all(1.5) : EdgeInsets.zero,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
+        border: contact.isFavorite
+            ? Border.all(color: NexoDesignColors.favorite, width: 1.5)
+            : null,
+      ),
+      child: NexoCard(
+      margin: EdgeInsets.zero,
       color: NexoDesignColors.surfaceElevated,
       borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
       onTap: () {
@@ -423,6 +432,7 @@ class _ContactTile extends StatelessWidget {
         trailing: contact.isFavorite
             ? const Icon(Icons.star, color: NexoDesignColors.favorite, size: 20)
             : null,
+      ),
       ),
     );
   }

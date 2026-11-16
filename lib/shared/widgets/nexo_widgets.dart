@@ -188,3 +188,55 @@ class NexoAvatar extends StatelessWidget {
     );
   }
 }
+
+/// Teclado numérico integrado para la entrada de PIN.
+class NexoPinKeypad extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onChanged;
+  final int maxLength;
+
+  const NexoPinKeypad({
+    super.key,
+    required this.controller,
+    required this.onChanged,
+    this.maxLength = 8,
+  });
+
+  void _press(String value) {
+    final current = controller.text;
+    if (value == '⌫') {
+      if (current.isNotEmpty) {
+        controller.text = current.substring(0, current.length - 1);
+      }
+    } else if (value == 'C') {
+      controller.clear();
+    } else if (current.length < maxLength) {
+      controller.text = '$current$value';
+    }
+    controller.selection = TextSelection.collapsed(offset: controller.text.length);
+    onChanged();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 7,
+      crossAxisSpacing: 7,
+      childAspectRatio: 2.0,
+      children: keys.map((key) => OutlinedButton(
+        onPressed: () => _press(key),
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: Text(key, style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+        )),
+      )).toList(),
+    );
+  }
+}

@@ -371,7 +371,7 @@ class _ContactTile extends StatelessWidget {
       ),
       child: NexoCard(
       margin: EdgeInsets.zero,
-      color: NexoDesignColors.surfaceElevated,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
       onTap: () {
         Navigator.of(context).push(
@@ -390,41 +390,21 @@ class _ContactTile extends StatelessWidget {
             MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
           );
         },
-        leading: contact.isFavorite
-            ? Container(
-                width: 50,
-                height: 50,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: NexoDesignColors.favorite,
-                    width: 2,
-                  ),
-                ),
-                child: ClipOval(
-                  child: NexoAvatar(
-                    displayName: contact.displayName,
-                    photoPath: contact.photoPath,
-                    size: 44,
-                  ),
-                ),
-              )
-            : NexoAvatar(
-                displayName: contact.displayName,
-                photoPath: contact.photoPath,
-                size: 44,
-              ),
+        leading: NexoAvatar(
+          displayName: contact.displayName,
+          photoPath: contact.photoPath,
+          size: 44,
+        ),
         title: Text(
           contact.displayName,
-          style: NexoDesignTypography.contactName,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: _secondaryInfo() != null
             ? Text(
                 _secondaryInfo()!,
-                style: NexoDesignTypography.contactSubtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               )

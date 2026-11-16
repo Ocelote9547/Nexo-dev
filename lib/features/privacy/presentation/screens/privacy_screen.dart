@@ -67,74 +67,140 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
     var activeController = controller;
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Crear PIN'),
-        content: StatefulBuilder(
-          builder: (ctx, setDialogState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                readOnly: true,
-                obscureText: true,
-                onTap: () => setDialogState(() => activeController = controller),
-                decoration: InputDecoration(
-                  labelText: 'PIN (4-8 dígitos)',
-                  suffixIcon: activeController == controller
-                      ? const Icon(Icons.edit, size: 18)
-                      : null,
+      builder: (ctx) => Dialog.fullscreen(
+        child: StatefulBuilder(
+          builder: (ctx, setDialogState) => Scaffold(
+            appBar: AppBar(
+              title: const Text('Crear PIN'),
+              leading: IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () => Navigator.pop(ctx, false),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Guardar'),
                 ),
-                maxLength: 8,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: confirm,
-                readOnly: true,
-                obscureText: true,
-                onTap: () => setDialogState(() => activeController = confirm),
-                decoration: InputDecoration(
-                  labelText: 'Confirmar PIN',
-                  suffixIcon: activeController == confirm
-                      ? const Icon(Icons.edit, size: 18)
-                      : null,
+                const SizedBox(width: 8),
+              ],
+            ),
+            body: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 440),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 76,
+                          height: 76,
+                          decoration: BoxDecoration(
+                            color: Theme.of(ctx).colorScheme.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Icon(Icons.lock_outline_rounded,
+                            size: 36, color: Theme.of(ctx).colorScheme.primary),
+                        ),
+                        const SizedBox(height: 20),
+                        Text('Protege tu NEXO',
+                          style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 8),
+                        Text('Elige un PIN de 4 a 8 dígitos y confírmalo.',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+                        const SizedBox(height: 28),
+                        _pinEntryCard(ctx, 'PIN nuevo', controller, activeController == controller,
+                          () => setDialogState(() => activeController = controller)),
+                        const SizedBox(height: 12),
+                        _pinEntryCard(ctx, 'Confirmar PIN', confirm, activeController == confirm,
+                          () => setDialogState(() => activeController = confirm)),
+                        const SizedBox(height: 22),
+                        NexoPinKeypad(
+                          controller: activeController,
+                          maxLength: 8,
+                          onChanged: () => setDialogState(() {}),
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          activeController == controller
+                            ? 'Introduce el PIN y después selecciona el campo de confirmación.'
+                            : 'Vuelve a introducir el mismo PIN.',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(ctx).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                maxLength: 8,
               ),
-              const SizedBox(height: 12),
-              NexoPinKeypad(
-                controller: activeController,
-                onChanged: () => setDialogState(() {}),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                activeController == controller
-                    ? 'Introduce el PIN y después selecciona Confirmar PIN.'
-                    : 'Repite el mismo PIN para confirmarlo.',
-                textAlign: TextAlign.center,
-                style: Theme.of(ctx).textTheme.bodySmall,
-              ),
-            ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Crear')),
-        ],
       ),
     );
-    if (ok != true) return;
+    if (ok != true) {
+      controller.dispose();
+      confirm.dispose();
+      return;
+    }
     if (controller.text != confirm.text) {
+      controller.dispose();
+      confirm.dispose();
       _showMessage('Los PIN no coinciden');
       return;
     }
     final privacy = ref.read(privacyServiceProvider);
     final success = await privacy.setPin(controller.text);
+    controller.dispose();
+    confirm.dispose();
     if (success) {
       setState(() => _hasPin = true);
       _showMessage('PIN configurado');
     } else {
       _showMessage('PIN inválido');
     }
+  }
+
+  Widget _pinEntryCard(BuildContext context, String label,
+      TextEditingController controller, bool selected, VoidCallback onTap) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineVariant,
+              width: selected ? 1.6 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                color: selected ? colors.primary : colors.onSurfaceVariant, size: 19),
+              const SizedBox(width: 12),
+              Expanded(child: Text(label,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600))),
+              Text(
+                '•' * controller.text.length,
+                style: TextStyle(color: colors.primary, letterSpacing: 5, fontSize: 19),
+              ),
+              if (controller.text.isEmpty)
+                Text('4–8', style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _changePin() async {

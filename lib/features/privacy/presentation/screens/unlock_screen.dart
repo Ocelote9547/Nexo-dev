@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -123,7 +124,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                 controller: _pinController,
                 obscureText: true,
                 keyboardType: TextInputType.number,
-                maxLength: 16,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                maxLength: 8,
                 enabled: !_busy,
                 decoration: const InputDecoration(
                   labelText: 'PIN',

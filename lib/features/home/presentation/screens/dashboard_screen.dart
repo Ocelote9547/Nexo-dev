@@ -76,13 +76,14 @@ class DashboardScreen extends ConsumerWidget {
 // Encabezado NEXO — Compacto, marca reconocible
 // ============================================================================
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   final NexoDesignTokens tokens;
   final void Function(int)? onNavigate;
   const _Header({required this.tokens, this.onNavigate});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.watch(nexoThemeModeProvider);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         NexoDesignSpacing.lg,
@@ -146,12 +147,32 @@ class _Header extends StatelessWidget {
             size: 40,
           ),
           const SizedBox(width: NexoDesignSpacing.sm),
-          _NavButton(
-            tokens: tokens,
-            icon: Icons.person_add_outlined,
-            tooltip: 'Nuevo contacto',
-            onTap: () => onNavigate?.call(1),
-            size: 40,
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: tokens.surfaceElevated,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: tokens.border),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _ThemeChoice(
+                  icon: Icons.wb_sunny_outlined,
+                  selected: currentMode == NexoThemeMode.light,
+                  tokens: tokens,
+                  onTap: () => ref.read(nexoThemeModeProvider.notifier)
+                      .setMode(NexoThemeMode.light),
+                ),
+                _ThemeChoice(
+                  icon: Icons.nightlight_round,
+                  selected: currentMode == NexoThemeMode.dark,
+                  tokens: tokens,
+                  onTap: () => ref.read(nexoThemeModeProvider.notifier)
+                      .setMode(NexoThemeMode.dark),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -160,6 +181,42 @@ class _Header extends StatelessWidget {
 }
 
 /// Botón circular de acción en el encabezado.
+class _ThemeChoice extends StatelessWidget {
+  final IconData icon;
+  final bool selected;
+  final NexoDesignTokens tokens;
+  final VoidCallback onTap;
+
+  const _ThemeChoice({
+    required this.icon,
+    required this.selected,
+    required this.tokens,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: selected ? tokens.accentSelected : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: selected ? tokens.textPrimary : tokens.textSecondary,
+        ),
+      ),
+    );
+  }
+}
+
 class _NavButton extends StatelessWidget {
   final NexoDesignTokens tokens;
   final IconData icon;

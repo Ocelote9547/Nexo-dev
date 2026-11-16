@@ -120,7 +120,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
               leading: const Icon(Icons.backup_outlined, size: 26),
               title: const Text('Crear copia de seguridad'),
-              subtitle: const Text('Guardar una copia cifrada en formato NEXO.'),
+              subtitle: const Text('Guardar una copia en formato NEXO.'),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: _busy ? null : _createBackup,
             ),

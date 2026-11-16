@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../contacts/presentation/screens/contacts_screen.dart';
@@ -19,6 +20,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = ref.tokens(context);
     final screens = [
       DashboardScreen(onNavigate: (i) => setState(() => _index = i)),
       const ContactsScreen(),
@@ -26,117 +28,191 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       const SettingsScreen(),
     ];
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _index,
-        children: screens,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: tokens.background,
+        systemNavigationBarDividerColor: tokens.background,
+        systemNavigationBarIconBrightness:
+            tokens.isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarContrastEnforced: false,
       ),
-      bottomNavigationBar: _NexoBottomNav(
-        currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+      child: Scaffold(
+        backgroundColor: tokens.background,
+        body: IndexedStack(index: _index, children: screens),
+        bottomNavigationBar: _NexoBottomNav(
+          currentIndex: _index,
+          onTap: (i) => setState(() => _index = i),
+        ),
       ),
     );
   }
 }
 
-/// Barra de navegación inferior reconstruida — Estética premium Night Blue.
-///
-/// - Superficie navy integrada con el fondo.
-/// - Borde superior discreto.
-/// - Cuatro apartados: Inicio, Contactos, Colecciones, Ajustes.
-/// - Iconos lineales de 22 dp.
-/// - Etiquetas de 12 dp, siempre visibles.
-/// - Selección en azul eléctrico (#438BFF).
-/// - Animación discreta (200 ms).
-/// - Altura de contenido 74dp + insets inferiores de Android.
-/// - La navegación propia de NEXO está físicamente separada de la navegación
-///   del sistema Android: no se solapan ni se mezclan visualmente.
-/// - Adapta colores al tema activo (claro/oscuro/sistema).
 class _NexoBottomNav extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+
   const _NexoBottomNav({
     required this.currentIndex,
     required this.onTap,
   });
 
+  static const List<_NavDestination> _destinations = [
+    _NavDestination(Icons.home_outlined, Icons.home, 'Inicio'),
+    _NavDestination(Icons.people_outline, Icons.people, 'Contactos'),
+    _NavDestination(Icons.folder_outlined, Icons.folder, 'Colecciones'),
+    _NavDestination(Icons.settings_outlined, Icons.settings, 'Ajustes'),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = ref.tokens(context);
-    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
-    return Container(
-      height: 74 + bottomInset,
-      decoration: BoxDecoration(
-        color: tokens.surface,
-        border: Border(
-          top: BorderSide(
-            color: tokens.border,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(
-            _destinations.length,
-            (index) => Expanded(
-              child: _NavItem(
-                tokens: tokens,
-                destination: _destinations[index],
-                isSelected: currentIndex == index,
-                onTap: () => onTap(index),
+    // La onda decorativa queda únicamente en la parte inferior,
+    // detrás de la barra y separada del área de gestos de Android.
+    return SizedBox(
+      height: 72 + bottomInset + 18,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _NexoBottomWavePainter(tokens),
               ),
             ),
           ),
-        ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: bottomInset + 8,
+            child: Container(
+              height: 68,
+              decoration: BoxDecoration(
+                color: tokens.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: tokens.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: tokens.isDark ? 0.34 : 0.09,
+                    ),
+                    blurRadius: 22,
+                    offset: const Offset(0, 7),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Row(
+                  children: List.generate(
+                    _destinations.length,
+                    (index) => Expanded(
+                      child: _NavItem(
+                        tokens: tokens,
+                        destination: _destinations[index],
+                        isSelected: currentIndex == index,
+                        onTap: () => onTap(index),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  static const List<_NavDestination> _destinations = [
-    _NavDestination(
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
-      label: 'Inicio',
-    ),
-    _NavDestination(
-      icon: Icons.people_outline,
-      selectedIcon: Icons.people,
-      label: 'Contactos',
-    ),
-    _NavDestination(
-      icon: Icons.folder_outlined,
-      selectedIcon: Icons.folder,
-      label: 'Colecciones',
-    ),
-    _NavDestination(
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
-      label: 'Ajustes',
-    ),
-  ];
+class _NexoBottomWavePainter extends CustomPainter {
+  final NexoDesignTokens tokens;
+
+  const _NexoBottomWavePainter(this.tokens);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = Paint()
+      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.30 : 0.18)
+      ..style = PaintingStyle.fill;
+    final highlight = Paint()
+      ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.52 : 0.30)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2;
+
+    final wave = Path()
+      ..moveTo(0, size.height * 0.34)
+      ..cubicTo(
+        size.width * 0.22, size.height * 0.02,
+        size.width * 0.43, size.height * 0.70,
+        size.width * 0.66, size.height * 0.48,
+      )
+      ..cubicTo(
+        size.width * 0.82, size.height * 0.32,
+        size.width * 0.91, size.height * 0.24,
+        size.width, size.height * 0.36,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(wave, base);
+
+    final crest = Path()
+      ..moveTo(0, size.height * 0.34)
+      ..cubicTo(
+        size.width * 0.22, size.height * 0.02,
+        size.width * 0.43, size.height * 0.70,
+        size.width * 0.66, size.height * 0.48,
+      )
+      ..cubicTo(
+        size.width * 0.82, size.height * 0.32,
+        size.width * 0.91, size.height * 0.24,
+        size.width, size.height * 0.36,
+      );
+    canvas.drawPath(crest, highlight);
+
+    final lower = Path()
+      ..moveTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.24, size.height * 0.30,
+        size.width * 0.44, size.height * 0.92,
+        size.width * 0.70, size.height * 0.70,
+      )
+      ..cubicTo(
+        size.width * 0.84, size.height * 0.58,
+        size.width * 0.92, size.height * 0.54,
+        size.width, size.height * 0.64,
+      );
+    canvas.drawPath(
+      lower,
+      Paint()
+        ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.28 : 0.16)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) {
+    return oldDelegate.tokens != tokens;
+  }
 }
 
 class _NavDestination {
   final IconData icon;
   final IconData selectedIcon;
   final String label;
-  const _NavDestination({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-  });
+
+  const _NavDestination(this.icon, this.selectedIcon, this.label);
 }
 
-/// Elemento individual de la barra inferior.
 class _NavItem extends StatelessWidget {
   final NexoDesignTokens tokens;
   final _NavDestination destination;
   final bool isSelected;
   final VoidCallback onTap;
+
   const _NavItem({
     required this.tokens,
     required this.destination,
@@ -146,39 +222,55 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                isSelected ? destination.selectedIcon : destination.icon,
-                size: 18,
-                color: isSelected
-                    ? tokens.accent
-                    : tokens.textTertiary,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                destination.label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected
-                      ? tokens.accent
-                      : tokens.textTertiary,
-                  height: 1.2,
+    final activeColor = tokens.accent;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: destination.label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 68,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  width: 58,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? activeColor.withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    isSelected ? destination.selectedIcon : destination.icon,
+                    size: 24,
+                    color: isSelected ? activeColor : tokens.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 180),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.1,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? activeColor : tokens.textSecondary,
+                  ),
+                  child: Text(
+                    destination.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

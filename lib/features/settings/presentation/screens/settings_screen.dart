@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/nexo_theme.dart';
@@ -503,20 +502,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             tokens,
             child: Column(
               children: [
-                _SettingsActionTile(
-                  icon: Icons.auto_awesome_outlined,
-                  title: 'Volver a ver la bienvenida',
-                  subtitle: 'Repasa cómo empezar a usar NEXO',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => OnboardingScreen(
-                        onCompleted: () async {
-                          if (mounted) Navigator.of(context).pop();
-                        },
-                      ),
-                    ),
-                  ),
-                ),
                 Divider(height: 1, indent: 58, color: tokens.border),
                 const ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),

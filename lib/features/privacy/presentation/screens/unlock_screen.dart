@@ -122,16 +122,19 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
               if (_error != null) const SizedBox(height: NexoSpacing.md),
               TextField(
                 controller: _pinController,
+                readOnly: true,
                 obscureText: true,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 8,
                 enabled: !_busy,
                 decoration: const InputDecoration(
                   labelText: 'PIN',
                   prefixIcon: Icon(Icons.lock),
                 ),
-                onSubmitted: (_) => _unlock(),
+              ),
+              const SizedBox(height: NexoSpacing.sm),
+              NexoPinKeypad(
+                controller: _pinController,
+                onChanged: () => setState(() => _error = null),
               ),
               const SizedBox(height: NexoSpacing.md),
               Row(

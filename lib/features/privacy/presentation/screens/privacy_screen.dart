@@ -222,10 +222,16 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: controller,
+              readOnly: true,
               obscureText: true,
               decoration: const InputDecoration(labelText: 'PIN actual'),
-              keyboardType: TextInputType.number,
               maxLength: 16,
+            ),
+            const SizedBox(height: 10),
+            NexoPinKeypad(
+              controller: controller,
+              maxLength: 16,
+              onChanged: () {},
             ),
           ],
         ),
@@ -253,12 +259,23 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Desbloquear'),
-        content: TextField(
-          controller: controller,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'PIN'),
-          keyboardType: TextInputType.number,
-          maxLength: 16,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              readOnly: true,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'PIN'),
+              maxLength: 16,
+            ),
+            const SizedBox(height: 10),
+            NexoPinKeypad(
+              controller: controller,
+              maxLength: 16,
+              onChanged: () {},
+            ),
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),

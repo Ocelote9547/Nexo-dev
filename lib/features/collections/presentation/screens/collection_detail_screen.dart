@@ -51,12 +51,23 @@ class _CollectionDetailScreenState extends ConsumerState<CollectionDetailScreen>
   @override
   Widget build(BuildContext context) {
     final repo = ref.read(collectionRepositoryProvider);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(widget.name)),
-      floatingActionButton: FloatingActionButton(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(widget.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
         heroTag: null,
         onPressed: _busy ? null : _addContact,
-        child: const Icon(Icons.person_add),
+        icon: _busy
+            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+            : const Icon(Icons.person_add_alt_1_rounded),
+        label: Text(_busy ? 'Añadiendo…' : 'Añadir contacto'),
       ),
       body: FutureBuilder<List<String>>(
         future: repo.getContactIdsForCollection(widget.collectionId),
@@ -64,39 +75,214 @@ class _CollectionDetailScreenState extends ConsumerState<CollectionDetailScreen>
           if (snap.connectionState == ConnectionState.waiting) {
             return const NexoLoading();
           }
-          final ids = snap.data ?? [];
-          if (ids.isEmpty) {
-            return const NexoEmptyState(
-              icon: Icons.people_outline,
-              title: 'Sin contactos',
-              subtitle: 'Añade contactos a esta colección.',
-            );
+          if (snap.hasError) {
+            return NexoErrorState(message: 'Error: ${snap.error}');
           }
+          final ids = snap.data ?? [];
           final contactsAsync = ref.watch(contactsListProvider);
           return contactsAsync.when(
             data: (all) {
-              final inCol = all.where((c) => ids.contains(c.id)).toList();
-              return ListView.builder(
-                padding: const EdgeInsets.all(NexoSpacing.lg),
-                itemCount: inCol.length,
-                itemBuilder: (context, index) {
-                  final c = inCol[index];
-                  return Card(
-                    child: ListTile(
-                      leading: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath),
-                      title: Text(c.displayName, style: Theme.of(context).textTheme.titleMedium),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.remove_circle_outline),
-                        onPressed: () => _remove(c.id),
+              final inCollection = all.where((c) => ids.contains(c.id)).toList();
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 104),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          colors.primary.withValues(alpha: 0.15),
+                          colors.surfaceContainerLow,
+                        ],
                       ),
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => ContactDetailScreen(contactId: c.id),
-                        ));
-                      },
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: colors.outlineVariant.withValues(alpha: 0.65),
+                      ),
                     ),
-                  );
-                },
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 54,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            color: colors.primary.withValues(alpha: 0.13),
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          child: Icon(
+                            Icons.folder_special_rounded,
+                            size: 27,
+                            color: colors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Contactos organizados en esta colección',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'CONTACTOS',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: colors.primary.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          '${inCollection.length}',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 11),
+                  if (inCollection.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(22, 28, 22, 28),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 62,
+                            height: 62,
+                            decoration: BoxDecoration(
+                              color: colors.primary.withValues(alpha: 0.10),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.person_add_alt_1_rounded,
+                              size: 29,
+                              color: colors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            'Todavía no hay contactos',
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Añade contactos a esta colección para tenerlos reunidos en un mismo lugar.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 15),
+                          OutlinedButton.icon(
+                            onPressed: _busy ? null : _addContact,
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Añadir contacto'),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ...inCollection.map((c) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Material(
+                        color: colors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(19),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(19),
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => ContactDetailScreen(contactId: c.id),
+                            ));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(19),
+                              border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.55)),
+                            ),
+                            child: Row(
+                              children: [
+                                NexoAvatar(
+                                  displayName: c.displayName,
+                                  photoPath: c.photoPath,
+                                  size: 48,
+                                ),
+                                const SizedBox(width: 13),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        c.displayName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        'Ver ficha del contacto',
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Quitar de colección',
+                                  onPressed: () => _remove(c.id),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: colors.error.withValues(alpha: 0.08),
+                                    foregroundColor: colors.error,
+                                  ),
+                                  icon: const Icon(Icons.remove_rounded, size: 20),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(Icons.chevron_right_rounded, color: colors.onSurfaceVariant),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )),
+                ],
               );
             },
             loading: () => const NexoLoading(),

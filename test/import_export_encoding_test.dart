@@ -508,7 +508,7 @@ void main() {
       expect(contacts[0].familyName, isNull);
       final rel = await contactRepo.getContactWithRelations(contacts[0].id);
             expect(rel!.emails.length, 1);
-      expect(rel!.emails[0].value, 'contacto001@example.invalid');
+      expect(rel.emails[0].value, 'contacto001@example.invalid');
     });
 
     test('re-import email-only contact is skipped as duplicate', () async {
@@ -655,7 +655,7 @@ void main() {
       expect(contacts[0].familyName, isNull);
       final rel = await contactRepo.getContactWithRelations(contacts[0].id);
       expect(rel!.phones.isEmpty, isTrue);
-      expect(rel!.emails.isEmpty, isTrue);
+      expect(rel.emails.isEmpty, isTrue);
     });
 
     test('contact with email-only gets photo imported', () async {
@@ -687,7 +687,7 @@ void main() {
       expect(contacts.length, 1);
       final rel = await contactRepo.getContactWithRelations(contacts[0].id);
       expect(rel!.contact.photoPath, isNotNull);
-      expect(rel!.contact.photoPath, isNotEmpty);
+      expect(rel.contact.photoPath, isNotEmpty);
     });
   });
     late adb.AppDatabase db;
@@ -759,7 +759,7 @@ void main() {
       expect(contacts[0].displayName, 'Contacto sin nombre');
       final rel = await contactRepo.getContactWithRelations(contacts[0].id);
       expect(rel!.emails.length, 1);
-      expect(rel!.emails[0].value, 'test@example.com');
+      expect(rel.emails[0].value, 'test@example.com');
     });
 
     test('very long givenName and familyName are preserved', () async {
@@ -888,7 +888,7 @@ void main() {
       expect(contacts.length, 1);
       final rel = await contactRepo.getContactWithRelations(contacts[0].id);
       expect(rel!.contact.photoPath, isNotNull);
-      expect(rel!.contact.photoPath, isNotEmpty);
+      expect(rel.contact.photoPath, isNotEmpty);
 
       // Verificar que el archivo existe
       final media = MediaService(baseDirectory: tempDir);

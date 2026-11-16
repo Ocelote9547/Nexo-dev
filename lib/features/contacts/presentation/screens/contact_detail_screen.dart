@@ -163,7 +163,13 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                 subtitle: p.label,
                 actions: [
                   _Action(icon: Icons.call, tooltip: 'Llamar', onTap: () => qa.call(p.valueRaw)),
-                  _Action(icon: Icons.sms, tooltip: 'SMS', onTap: () => qa.sendSms(p.valueRaw)),
+                  _Action(
+                    icon: Icons.chat_rounded,
+                    tooltip: 'WhatsApp',
+                    onTap: () => qa.openWhatsApp(
+                      p.valueRaw.replaceAll(RegExp(r'\\D'), ''),
+                    ),
+                  ),
                   _Action(icon: Icons.copy, tooltip: 'Copiar', onTap: () => Clipboard.setData(ClipboardData(text: p.valueRaw))),
                 ],
               )).toList()),

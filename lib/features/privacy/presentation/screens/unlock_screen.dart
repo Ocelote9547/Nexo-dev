@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 
 import '../../../../core/theme/nexo_theme.dart';
 import '../../../../core/providers/database_provider.dart';
+import '../../../../shared/widgets/nexo_widgets.dart';
 import '../../../settings/data/repositories/settings_repository_impl.dart';
 import 'package:nexo/features/privacy/presentation/providers/privacy_providers.dart';
 

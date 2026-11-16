@@ -25,6 +25,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   bool _busy = false;
   bool _biometricsAvailable = false;
   bool _useBiometrics = false;
+  int? _pinLength;
+  bool _legacyPinLength = false;
 
   final LocalAuthentication _auth = LocalAuthentication();
 
@@ -35,6 +37,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   }
 
   Future<void> _checkBiometrics() async {
+    final privacy = ref.read(privacyServiceProvider);
+    final pinLength = await privacy.getPinLength();
     final bio = await _auth.canCheckBiometrics;
     final settings = SettingsRepositoryImpl(ref.read(appDatabaseProvider));
     final useBio = await settings.getBool('privacy_use_biometrics', defaultValue: false);
@@ -42,6 +46,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       setState(() {
         _biometricsAvailable = bio;
         _useBiometrics = useBio && bio;
+        _pinLength = pinLength ?? 16;
+        _legacyPinLength = pinLength == null;
       });
     }
   }
@@ -56,6 +62,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       if (valid) {
         widget.onUnlocked();
       } else {
+        _pinController.clear();
         setState(() => _error = 'PIN incorrecto');
       }
     } on PinLockedException catch (e) {
@@ -129,37 +136,24 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                   ),
                 ),
               if (_error != null) const SizedBox(height: NexoSpacing.md),
-              TextField(
-                controller: _pinController,
-                readOnly: true,
-                obscureText: true,
-                maxLength: 16,
-                enabled: !_busy,
-                decoration: const InputDecoration(
-                  labelText: 'PIN',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-              ),
-              const SizedBox(height: NexoSpacing.sm),
               NexoPinKeypad(
                 controller: _pinController,
-                maxLength: 16,
+                maxLength: _pinLength ?? 16,
                 enabled: !_busy,
-                onChanged: () => setState(() => _error = null),
+                onChanged: () {
+                  setState(() => _error = null);
+                  if (!_legacyPinLength && _pinLength != null &&
+                      _pinController.text.length == _pinLength) {
+                    _unlock();
+                  }
+                },
               ),
-              const SizedBox(height: NexoSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _busy ? null : _unlock,
-                      child: _busy
-                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                          : const Text('Desbloquear'),
-                    ),
-                  ),
-                ],
-              ),
+              if (_legacyPinLength) ...[
+                const SizedBox(height: NexoSpacing.md),
+                Text('Este PIN se creó antes de guardar su longitud. Introdúcelo y pulsa Desbloquear; al cambiarlo se activará el desbloqueo automático.', textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: NexoSpacing.sm),
+                FilledButton(onPressed: _busy ? null : _unlock, child: const Text('Desbloquear')),
+              ],
               if (_biometricsAvailable && _useBiometrics) ...[
                 const SizedBox(height: NexoSpacing.md),
                 OutlinedButton.icon(

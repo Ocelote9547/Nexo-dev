@@ -106,7 +106,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
             child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.shield_lock_rounded, size: 66, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.security_rounded, size: 66, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: NexoSpacing.lg),
               Text('NEXO', style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: NexoSpacing.sm),

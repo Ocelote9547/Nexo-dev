@@ -34,9 +34,13 @@ class _CollectionsScreenState extends ConsumerState<CollectionsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Colecciones'),
+        centerTitle: false,
         bottom: TabBar(
+          dividerColor: Colors.transparent,
+          indicatorSize: TabBarIndicatorSize.label,
           controller: _tabController,
           tabs: const [
             Tab(text: 'Colecciones'),
@@ -77,14 +81,23 @@ class _CollectionsTab extends ConsumerWidget {
             );
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(NexoSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
             itemCount: list.length,
             itemBuilder: (context, index) {
               final c = list[index];
               final id = c['id'] as String;
               return Card(
+                margin: const EdgeInsets.only(bottom: 10),
+                elevation: 0,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(17),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                ),
                 child: ListTile(
-                  leading: const Icon(Icons.folder, color: NexoColors.accent),
+                  dense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                  leading: const Icon(Icons.folder_rounded, color: NexoColors.accent),
                   title: Text(c['name'] as String,
                       style: Theme.of(context).textTheme.titleMedium),
                   subtitle: FutureBuilder<List<String>>(
@@ -201,14 +214,23 @@ class _TagsTab extends ConsumerWidget {
             );
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(NexoSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
             itemCount: list.length,
             itemBuilder: (context, index) {
               final t = list[index];
               final id = t['id'] as String;
               return Card(
+                margin: const EdgeInsets.only(bottom: 10),
+                elevation: 0,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(17),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                ),
                 child: ListTile(
-                  leading: const Icon(Icons.label, color: NexoColors.accent),
+                  dense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                  leading: const Icon(Icons.label_rounded, color: NexoColors.accent),
                   title: Text(t['name'] as String,
                       style: Theme.of(context).textTheme.titleMedium),
                   subtitle: FutureBuilder<List<String>>(

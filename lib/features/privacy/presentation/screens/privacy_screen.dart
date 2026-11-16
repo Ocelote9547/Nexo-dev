@@ -191,7 +191,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600))),
               Text(
-                '•' * controller.text.length,
+                List.filled(controller.text.length, '•').join(),
                 style: TextStyle(color: colors.primary, letterSpacing: 5, fontSize: 19),
               ),
               if (controller.text.isEmpty)

@@ -124,7 +124,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                 controller: _pinController,
                 readOnly: true,
                 obscureText: true,
-                maxLength: 8,
+                maxLength: 16,
                 enabled: !_busy,
                 decoration: const InputDecoration(
                   labelText: 'PIN',
@@ -134,6 +134,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
               const SizedBox(height: NexoSpacing.sm),
               NexoPinKeypad(
                 controller: _pinController,
+                maxLength: 16,
                 onChanged: () => setState(() => _error = null),
               ),
               const SizedBox(height: NexoSpacing.md),

@@ -141,14 +141,16 @@ class NexoAvatar extends StatelessWidget {
     return (parts.first[0] + parts.last[0]).toUpperCase();
   }
 
-  NexoDesignTokens get _effectiveTokens {
+  NexoDesignTokens _effectiveTokens(BuildContext context) {
     if (tokens != null) return tokens!;
-    return const NexoDesignTokens(isDark: true);
+    return NexoDesignTokens(
+      isDark: Theme.of(context).brightness == Brightness.dark,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = _effectiveTokens;
+    final t = _effectiveTokens(context);
     if (photoPath == null || photoPath!.isEmpty) {
       return CircleAvatar(
         radius: size / 2,

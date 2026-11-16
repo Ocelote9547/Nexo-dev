@@ -103,7 +103,7 @@ class _Header extends ConsumerWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: tokens.accentSelected,
+              color: tokens.accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(NexoDesignRadii.md),
               border: Border.all(
                 color: tokens.border,
@@ -131,7 +131,7 @@ class _Header extends ConsumerWidget {
                 ),
                 const SizedBox(height: NexoDesignSpacing.xs),
                 Text(
-                  'Inicio',
+                  'Tu agenda, siempre cerca.',
                   style: NexoDesignTypography.caption.copyWith(
                     color: tokens.textSecondary,
                     fontSize: 13,
@@ -274,7 +274,7 @@ class _WelcomeHero extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(20, 19, 20, 20),
+        padding: const EdgeInsets.fromLTRB(17, 15, 17, 16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -286,9 +286,9 @@ class _WelcomeHero extends StatelessWidget {
               tokens.surface,
             ],
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: tokens.accent.withValues(alpha: tokens.isDark ? 0.42 : 0.28),
+            color: tokens.accent.withValues(alpha: tokens.isDark ? 0.42 : 0.32),
           ),
           boxShadow: [
             BoxShadow(
@@ -315,10 +315,10 @@ class _WelcomeHero extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tu agenda, siempre cerca.',
+                    'Todo lo importante, en un solo lugar.',
                     style: TextStyle(
                       color: tokens.textPrimary,
-                      fontSize: 21,
+                      fontSize: 19,
                       fontWeight: FontWeight.w700,
                       height: 1.15,
                       letterSpacing: -0.35,
@@ -430,10 +430,10 @@ class _FavoritesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.82 : 0.96),
-        borderRadius: BorderRadius.circular(24),
+        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
@@ -446,7 +446,7 @@ class _FavoritesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: NexoDesignSpacing.lg),
+          const SizedBox(height: NexoDesignSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -569,8 +569,8 @@ class _FavoriteItem extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  width: 88,
-                  height: 88,
+                  width: 68,
+                  height: 68,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -589,7 +589,7 @@ class _FavoriteItem extends StatelessWidget {
                     child: NexoAvatar(
                       displayName: contact.displayName,
                       photoPath: contact.photoPath,
-                      size: 84,
+                      size: 66,
                       tokens: tokens,
                     ),
                   ),
@@ -673,7 +673,7 @@ class _UpcomingSection extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.calendar_today_outlined,
-                      color: tokens.accentSoft,
+                      color: tokens.accent,
                       size: 18,
                     ),
                     const SizedBox(width: NexoDesignSpacing.sm),
@@ -723,7 +723,7 @@ class _UpcomingSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 222,
+                height: 190,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: upcoming.length,
@@ -788,8 +788,8 @@ class _BirthdayRow extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          width: 154,
-          padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+          width: 136,
+          padding: const EdgeInsets.fromLTRB(8, 9, 8, 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: tokens.border),
@@ -805,25 +805,25 @@ class _BirthdayRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 72,
-                height: 72,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: tokens.accentSelected,
+                  color: tokens.accent.withValues(alpha: 0.10),
                   border: Border.all(color: tokens.accent.withValues(alpha: 0.35)),
                 ),
                 child: ClipOval(
                   child: contact == null
-                      ? Icon(Icons.cake_outlined, color: tokens.accent, size: 34)
+                      ? Icon(Icons.cake_outlined, color: tokens.accent, size: 28)
                       : NexoAvatar(
                           displayName: contact!.displayName,
                           photoPath: contact!.photoPath,
-                          size: 72,
+                          size: 58,
                           tokens: tokens,
                         ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 7),
               Text(
                 name,
                 textAlign: TextAlign.center,
@@ -840,7 +840,7 @@ class _BirthdayRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: NexoDesignTypography.birthdayDays.copyWith(
                   color: tokens.favorite,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -962,26 +962,25 @@ class _RecentSection extends StatelessWidget {
                   subtitle: 'Tus contactos más recientes aparecerán aquí.',
                 );
               }
-              return SizedBox(
-                height: 148,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: recent.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(width: NexoDesignSpacing.md),
-                  itemBuilder: (context, index) => _RecentRow(
-                    tokens: tokens,
-                    contact: recent[index],
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ContactDetailScreen(
-                            contactId: recent[index].id,
-                          ),
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                itemCount: recent.length,
+                separatorBuilder: (_, _) =>
+                    const SizedBox(height: NexoDesignSpacing.sm),
+                itemBuilder: (context, index) => _RecentRow(
+                  tokens: tokens,
+                  contact: recent[index],
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ContactDetailScreen(
+                          contactId: recent[index].id,
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               );
             },
@@ -1012,66 +1011,70 @@ class _RecentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: tokens.surface,
-      elevation: tokens.isDark ? 3 : 1,
-      shadowColor: Colors.black.withValues(
-        alpha: tokens.isDark ? 0.22 : 0.06,
-      ),
-      borderRadius: BorderRadius.circular(20),
+      color: tokens.surfaceElevated,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          width: 148,
-          height: 142,
-          padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+          height: 72,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: tokens.border),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
               Container(
-                width: 66,
-                height: 66,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: tokens.accent.withValues(alpha: 0.42),
-                    width: 1.5,
+                    color: tokens.accent.withValues(alpha: 0.35),
                   ),
                 ),
                 child: ClipOval(
                   child: NexoAvatar(
                     displayName: contact.displayName,
                     photoPath: contact.photoPath,
-                    size: 64,
+                    size: 48,
                     tokens: tokens,
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                contact.displayName,
-                textAlign: TextAlign.center,
-                style: NexoDesignTypography.contactNameMedium.copyWith(
-                  color: tokens.textPrimary,
-                  fontSize: 13,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      contact.displayName,
+                      style: NexoDesignTypography.contactNameMedium.copyWith(
+                        color: tokens.textPrimary,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      _subtitle(contact),
+                      style: NexoDesignTypography.contactCaption.copyWith(
+                        color: tokens.textSecondary,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 3),
-              Text(
-                _subtitle(contact),
-                textAlign: TextAlign.center,
-                style: NexoDesignTypography.contactCaption.copyWith(
-                  color: tokens.textSecondary,
-                  fontSize: 11,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Icon(
+                Icons.chevron_right_rounded,
+                color: tokens.textTertiary,
+                size: 21,
               ),
             ],
           ),

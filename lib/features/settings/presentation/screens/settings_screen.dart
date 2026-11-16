@@ -328,143 +328,251 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final tokens = ref.tokens(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Ajustes')),
+      appBar: AppBar(
+        title: const Text('Ajustes'),
+        centerTitle: false,
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(NexoSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
         children: [
-          Text('Preferencias', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: NexoSpacing.md),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(18, 19, 18, 18),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  tokens.accent.withValues(alpha: 0.18),
+                  tokens.accent.withValues(alpha: tokens.isDark ? 0.22 : 0.13),
                   tokens.surface,
                 ],
               ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: tokens.accent.withValues(alpha: 0.38)),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: tokens.accent.withValues(alpha: 0.28)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.waving_hand_rounded, color: tokens.accent),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: Text(
-                        'Conoce NEXO',
-                        style: TextStyle(
-                          color: tokens.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Vuelve a recorrer la bienvenida y consulta cómo empezar, sin modificar tus contactos.',
-                  style: TextStyle(
-                    color: tokens.textSecondary,
-                    fontSize: 13,
-                    height: 1.4,
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: tokens.accent.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(15),
                   ),
+                  child: Icon(Icons.tune_rounded, color: tokens.accent, size: 24),
                 ),
-                const SizedBox(height: 13),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.play_circle_outline_rounded),
-                    label: const Text('Ver bienvenida'),
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => OnboardingScreen(
-                          onCompleted: () async {
-                            if (mounted) Navigator.of(context).pop();
-                          },
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Personaliza NEXO',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: tokens.textPrimary,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Apariencia, avisos, datos y seguridad en un solo lugar.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: tokens.textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: NexoSpacing.xl),
-          ..._appearancePreferences(),
-          const SizedBox(height: NexoSpacing.md),
-          Card(
+          const SizedBox(height: 25),
+
+          _SettingsSectionHeading(
+            title: 'Apariencia',
+            subtitle: 'Adapta NEXO a tu forma de usarlo',
+            icon: Icons.palette_outlined,
+          ),
+          const SizedBox(height: 10),
+          _settingsPanel(
+            tokens,
+            child: Column(children: _appearancePreferences()),
+          ),
+          const SizedBox(height: 24),
+
+          _SettingsSectionHeading(
+            title: 'Notificaciones',
+            subtitle: 'No te pierdas fechas importantes',
+            icon: Icons.notifications_none_rounded,
+          ),
+          const SizedBox(height: 10),
+          _settingsPanel(
+            tokens,
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('Notificaciones de cumpleaños'),
-                  subtitle: const Text(
-                    'Avisos locales de cumpleaños (activado por defecto)',
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  title: const Text('Cumpleaños'),
+                  subtitle: const Text('Avisos locales de cumpleaños'),
+                  secondary: Icon(Icons.cake_outlined, color: tokens.accent),
                   value: _birthdayNotifications,
                   onChanged: _setGlobal,
                 ),
-                ..._birthdayPreferences(),
-                // ignore: curly_braces_in_flow_control_structures
+                if (_birthdayNotifications) ...[
+                  Divider(height: 1, color: tokens.border),
+                  ..._birthdayPreferences(),
+                ],
                 if (_permissionMessage != null)
                   Padding(
-                    padding: const EdgeInsets.all(NexoSpacing.md),
-                    child: Text(
-                      _permissionMessage!,
-                      style: TextStyle(color: NexoColors.error),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline_rounded, color: NexoColors.error, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _permissionMessage!,
+                            style: TextStyle(color: NexoColors.error, fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _openAppSettingsAndRefresh,
+                          child: const Text('Ajustes'),
+                        ),
+                      ],
                     ),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: NexoSpacing.xl),
-          Text('Datos', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: NexoSpacing.md),
-          Card(
-            child: ListTile(
-              title: const Text('Importar y exportar'),
-              trailing: const Icon(Icons.import_export),
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => const ImportExportScreen())),
+          const SizedBox(height: 24),
+
+          _SettingsSectionHeading(
+            title: 'Tus datos',
+            subtitle: 'Importación, exportación y copias',
+            icon: Icons.folder_open_outlined,
+          ),
+          const SizedBox(height: 10),
+          _settingsPanel(
+            tokens,
+            child: Column(
+              children: [
+                _SettingsActionTile(
+                  icon: Icons.import_export_rounded,
+                  title: 'Importar y exportar',
+                  subtitle: 'Mover tus contactos y archivos',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ImportExportScreen()),
+                  ),
+                ),
+                Divider(height: 1, indent: 58, color: tokens.border),
+                _SettingsActionTile(
+                  icon: Icons.backup_outlined,
+                  title: 'Copias de seguridad',
+                  subtitle: 'Crear o restaurar una copia',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const BackupScreen()),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: NexoSpacing.xl),
-          Card(
-            child: ListTile(
-              title: const Text('Copias de seguridad'),
-              trailing: const Icon(Icons.backup),
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => const BackupScreen())),
-            ),
+          const SizedBox(height: 24),
+
+          _SettingsSectionHeading(
+            title: 'Seguridad',
+            subtitle: 'Protege tu información personal',
+            icon: Icons.shield_outlined,
           ),
-          Card(
-            child: ListTile(
-              title: const Text('Privacidad y seguridad'),
-              trailing: const Icon(Icons.lock),
+          const SizedBox(height: 10),
+          _settingsPanel(
+            tokens,
+            child: _SettingsActionTile(
+              icon: Icons.lock_outline_rounded,
+              title: 'Privacidad y seguridad',
+              subtitle: 'Bloqueo y opciones de protección',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PrivacyScreen()),
               ),
             ),
           ),
-          Text('Acerca de', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: NexoSpacing.md),
-          Card(
-            child: ListTile(
-              title: const Text('NEXO'),
-              subtitle: const Text('Gestor personal de contactos · v1.0'),
+          const SizedBox(height: 24),
+
+          _SettingsSectionHeading(
+            title: 'Ayuda y acerca de',
+            subtitle: 'Información sobre NEXO',
+            icon: Icons.info_outline_rounded,
+          ),
+          const SizedBox(height: 10),
+          _settingsPanel(
+            tokens,
+            child: Column(
+              children: [
+                _SettingsActionTile(
+                  icon: Icons.auto_awesome_outlined,
+                  title: 'Volver a ver la bienvenida',
+                  subtitle: 'Repasa cómo empezar a usar NEXO',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => OnboardingScreen(
+                        onCompleted: () async {
+                          if (mounted) Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(height: 1, indent: 58, color: tokens.border),
+                const ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                  leading: Icon(Icons.hub_outlined),
+                  title: Text('NEXO'),
+                  subtitle: Text('Agenda personal · v1.0'),
+                  trailing: Icon(Icons.verified_outlined, size: 19),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              'NEXO · Tu espacio de contactos',
+              style: theme.textTheme.labelSmall?.copyWith(color: tokens.textSecondary),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _settingsPanel(
+    NexoDesignTokens tokens, {
+    required Widget child,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: tokens.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: tokens.border.withValues(alpha: 0.85)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: child,
+      ),
+    );
+  }
+
 }
 
 /// Fila de selección de modo de tema en Ajustes.
@@ -554,5 +662,85 @@ class _AppearanceRow extends StatelessWidget {
       case NexoThemeMode.system:
         return Icons.device_unknown;
     }
+  }
+}
+
+class _SettingsSectionHeading extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const _SettingsSectionHeading({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.findAncestorWidgetOfExactType<Theme>() == null
+        ? null
+        : null;
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 19, color: theme.colorScheme.primary),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SettingsActionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _SettingsActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(13),
+        ),
+        child: Icon(icon, color: color, size: 21),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w650)),
+      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+      trailing: const Icon(Icons.chevron_right_rounded, size: 21),
+      onTap: onTap,
+    );
   }
 }

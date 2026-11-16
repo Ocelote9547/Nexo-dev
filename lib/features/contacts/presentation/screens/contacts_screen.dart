@@ -381,11 +381,31 @@ class _ContactTile extends StatelessWidget {
             MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
           );
         },
-        leading: NexoAvatar(
-          displayName: contact.displayName,
-          photoPath: contact.photoPath,
-          size: 44,
-        ),
+        leading: contact.isFavorite
+            ? Container(
+                width: 50,
+                height: 50,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: NexoDesignColors.favorite,
+                    width: 2,
+                  ),
+                ),
+                child: ClipOval(
+                  child: NexoAvatar(
+                    displayName: contact.displayName,
+                    photoPath: contact.photoPath,
+                    size: 44,
+                  ),
+                ),
+              )
+            : NexoAvatar(
+                displayName: contact.displayName,
+                photoPath: contact.photoPath,
+                size: 44,
+              ),
         title: Text(
           contact.displayName,
           style: NexoDesignTypography.contactName,

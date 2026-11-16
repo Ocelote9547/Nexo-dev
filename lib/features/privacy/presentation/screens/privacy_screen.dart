@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -76,7 +77,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               obscureText: true,
               decoration: const InputDecoration(labelText: 'PIN (4-16 dígitos)'),
               keyboardType: TextInputType.number,
-              maxLength: 16,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 8,
             ),
             const SizedBox(height: 12),
             TextField(
@@ -247,10 +249,60 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Privacidad y seguridad')),
       body: ListView(
-        padding: const EdgeInsets.all(NexoSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
         children: [
-          Text('Protección de acceso', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: NexoSpacing.md),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.16),
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(17),
+                  ),
+                  child: Icon(Icons.shield_lock_outlined,
+                    color: Theme.of(context).colorScheme.primary, size: 27),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tu privacidad, protegida',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 4),
+                      Text('Controla el acceso a tus contactos y datos guardados en NEXO.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: NexoSpacing.xl),
+          Text('PROTECCIÓN DE ACCESO',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0)),
+          const SizedBox(height: NexoSpacing.sm),
           Card(
             child: Column(
               children: [
@@ -300,8 +352,12 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             ),
           ),
           const SizedBox(height: NexoSpacing.xl),
-          Text('Biometría', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: NexoSpacing.md),
+          Text('BIOMETRÍA',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0)),
+          const SizedBox(height: NexoSpacing.sm),
           Card(
             child: Column(
               children: [

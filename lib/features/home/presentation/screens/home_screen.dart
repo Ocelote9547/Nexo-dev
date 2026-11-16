@@ -89,7 +89,7 @@ class _NexoBottomNav extends ConsumerWidget {
             child: Container(
               height: 68,
               decoration: BoxDecoration(
-                color: tokens.surface,
+                color: tokens.surface.withValues(alpha: tokens.isDark ? 0.90 : 0.94),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: tokens.border),
                 boxShadow: [
@@ -142,16 +142,16 @@ class _NexoBottomWavePainter extends CustomPainter {
       ..strokeWidth = 2.2;
 
     final wave = Path()
-      ..moveTo(0, size.height * 0.34)
+      ..moveTo(0, size.height * 0.18)
       ..cubicTo(
-        size.width * 0.22, size.height * 0.02,
-        size.width * 0.43, size.height * 0.70,
-        size.width * 0.66, size.height * 0.48,
+        size.width * 0.22, size.height * 0.00,
+        size.width * 0.43, size.height * 0.42,
+        size.width * 0.66, size.height * 0.28,
       )
       ..cubicTo(
-        size.width * 0.82, size.height * 0.32,
-        size.width * 0.91, size.height * 0.24,
-        size.width, size.height * 0.36,
+        size.width * 0.82, size.height * 0.15,
+        size.width * 0.91, size.height * 0.12,
+        size.width, size.height * 0.20,
       )
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
@@ -173,16 +173,16 @@ class _NexoBottomWavePainter extends CustomPainter {
     canvas.drawPath(crest, highlight);
 
     final lower = Path()
-      ..moveTo(0, size.height * 0.62)
+      ..moveTo(0, size.height * 0.42)
       ..cubicTo(
-        size.width * 0.24, size.height * 0.30,
-        size.width * 0.44, size.height * 0.92,
-        size.width * 0.70, size.height * 0.70,
+        size.width * 0.24, size.height * 0.18,
+        size.width * 0.44, size.height * 0.62,
+        size.width * 0.70, size.height * 0.48,
       )
       ..cubicTo(
-        size.width * 0.84, size.height * 0.58,
-        size.width * 0.92, size.height * 0.54,
-        size.width, size.height * 0.64,
+        size.width * 0.84, size.height * 0.38,
+        size.width * 0.92, size.height * 0.34,
+        size.width, size.height * 0.44,
       );
     canvas.drawPath(
       lower,

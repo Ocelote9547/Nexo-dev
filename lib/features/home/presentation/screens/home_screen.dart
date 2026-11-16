@@ -77,8 +77,13 @@ class _NexoBottomNav extends ConsumerWidget {
         children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: CustomPaint(
-                painter: _NexoBottomWavePainter(tokens),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: currentIndex.toDouble()),
+                duration: const Duration(milliseconds: 420),
+                curve: Curves.easeInOutCubic,
+                builder: (context, selected, child) => CustomPaint(
+                  painter: _NexoBottomWavePainter(tokens, selected),
+                ),
               ),
             ),
           ),
@@ -117,11 +122,15 @@ class _NexoBottomNav extends ConsumerWidget {
 
 class _NexoBottomWavePainter extends CustomPainter {
   final NexoDesignTokens tokens;
+  final double selectedIndex;
 
-  const _NexoBottomWavePainter(this.tokens);
+  const _NexoBottomWavePainter(this.tokens, this.selectedIndex);
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    canvas.translate((selectedIndex - 1.5) * size.width * 0.025, 0);
     final base = Paint()
       ..color = tokens.accent.withValues(alpha: tokens.isDark ? 0.30 : 0.18)
       ..style = PaintingStyle.fill;
@@ -180,11 +189,13 @@ class _NexoBottomWavePainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5,
     );
+    canvas.restore();
   }
 
   @override
   bool shouldRepaint(covariant _NexoBottomWavePainter oldDelegate) {
-    return oldDelegate.tokens != tokens;
+    return oldDelegate.tokens != tokens ||
+        oldDelegate.selectedIndex != selectedIndex;
   }
 }
 

@@ -159,16 +159,16 @@ class _NexoBottomWavePainter extends CustomPainter {
     canvas.drawPath(wave, base);
 
     final crest = Path()
-      ..moveTo(0, size.height * 0.34)
+      ..moveTo(0, size.height * 0.18)
       ..cubicTo(
-        size.width * 0.22, size.height * 0.02,
-        size.width * 0.43, size.height * 0.70,
-        size.width * 0.66, size.height * 0.48,
+        size.width * 0.22, size.height * 0.00,
+        size.width * 0.43, size.height * 0.42,
+        size.width * 0.66, size.height * 0.28,
       )
       ..cubicTo(
-        size.width * 0.82, size.height * 0.32,
-        size.width * 0.91, size.height * 0.24,
-        size.width, size.height * 0.36,
+        size.width * 0.82, size.height * 0.15,
+        size.width * 0.91, size.height * 0.12,
+        size.width, size.height * 0.20,
       );
     canvas.drawPath(crest, highlight);
 

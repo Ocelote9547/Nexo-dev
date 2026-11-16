@@ -23,7 +23,6 @@ class PrivacyService {
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  /// ¿Existe un PIN configurado?
   /// Longitud del PIN configurado. Es metadato, no contiene el PIN.
   /// Devuelve null para PIN creados antes de guardar esta información.
   Future<int?> getPinLength() async {
@@ -32,6 +31,7 @@ class PrivacyService {
     return length != null && length >= 4 && length <= 16 ? length : null;
   }
 
+  /// Indica si hay un PIN configurado.
   Future<bool> hasPin() async {
     final salt = await _storage.read(key: _storageKeyPinSalt);
     return salt != null && salt.isNotEmpty;

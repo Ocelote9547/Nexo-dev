@@ -71,7 +71,7 @@ class NexoDesignLightColors {
   static const Color accent = Color(0xFF286FEA); // Main electric blue
   static const Color accentBright = Color(0xFF3B82F6); // Light electric blue
   static const Color accentSelected = Color(0xFF1E5BD9); // Selection blue
-  static const Color accentSoft = Color(0xFF93C5FD); // Soft blue
+  static const Color accentSoft = Color(0xFF477FCE); // Soft blue with readable contrast
 
   // Text — Light
   static const Color textPrimary = Color(0xFF14243A); // Primary text

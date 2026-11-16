@@ -725,7 +725,7 @@ class _SettingsActionTile extends StatelessWidget {
         ),
         child: Icon(icon, color: color, size: 21),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w650)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       trailing: const Icon(Icons.chevron_right_rounded, size: 21),
       onTap: onTap,

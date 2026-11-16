@@ -48,6 +48,7 @@ class DashboardScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: _Header(tokens: tokens, onNavigate: onNavigate),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
               child: _FavoritesSection(
                 tokens: tokens,
@@ -55,6 +56,7 @@ class DashboardScreen extends ConsumerWidget {
                 onNavigate: onNavigate,
               ),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
               child: _UpcomingSection(
                 tokens: tokens,
@@ -63,6 +65,7 @@ class DashboardScreen extends ConsumerWidget {
                 onNavigate: onNavigate,
               ),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
               child: _RecentSection(
                 tokens: tokens,
@@ -126,11 +129,26 @@ class _Header extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'NEXO',
-                  style: NexoDesignTypography.nexoName.copyWith(
-                    color: tokens.textPrimary,
-                    fontSize: 27,
+                SizedBox(
+                  height: 38,
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _NexoHeaderWavesPainter(
+                            color: tokens.accent.withValues(alpha: 0.22),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'NEXO',
+                        style: NexoDesignTypography.nexoName.copyWith(
+                          color: tokens.textPrimary,
+                          fontSize: 27,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: NexoDesignSpacing.xs),
@@ -268,6 +286,41 @@ class _NavButton extends StatelessWidget {
   }
 }
 
+/// Ondas decorativas sutiles detrás de la marca NEXO.
+class _NexoHeaderWavesPainter extends CustomPainter {
+  final Color color;
+  const _NexoHeaderWavesPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.35
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 3; i++) {
+      final y = size.height * (0.38 + i * 0.16);
+      final path = Path()
+        ..moveTo(size.width * 0.34, y)
+        ..cubicTo(
+          size.width * 0.48, y - 9,
+          size.width * 0.60, y + 9,
+          size.width * 0.76, y,
+        )
+        ..cubicTo(
+          size.width * 0.86, y - 5,
+          size.width * 0.93, y + 4,
+          size.width, y - 1,
+        );
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NexoHeaderWavesPainter oldDelegate) =>
+      oldDelegate.color != color;
+}
+
 // ============================================================================
 // Sección Favoritos — Fila horizontal de agenda, sin tarjetas
 // ============================================================================
@@ -361,12 +414,12 @@ class _FavoritesSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 108,
+                height: 103,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: favs.length > 5 ? 5 : favs.length,
                   separatorBuilder: (_, _) =>
-                      const SizedBox(width: NexoDesignSpacing.md),
+                      const SizedBox(width: 10),
                   itemBuilder: (context, index) {
                     final c = favs[index];
                     return _FavoriteItem(
@@ -417,7 +470,7 @@ class _FavoriteItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: SizedBox(
-        width: 88,
+        width: 83,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -425,8 +478,8 @@ class _FavoriteItem extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  width: 58,
-                  height: 58,
+                  width: 53,
+                  height: 53,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -445,7 +498,7 @@ class _FavoriteItem extends StatelessWidget {
                     child: NexoAvatar(
                       displayName: contact.displayName,
                       photoPath: contact.photoPath,
-                      size: 56,
+                      size: 51,
                       tokens: tokens,
                     ),
                   ),
@@ -580,12 +633,12 @@ class _UpcomingSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 154,
+                height: 149,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: upcoming.length,
                   separatorBuilder: (_, _) =>
-                      const SizedBox(width: NexoDesignSpacing.md),
+                      const SizedBox(width: 10),
                   itemBuilder: (context, index) {
                     final matches = contactsAsync.asData?.value
                         .where((contact) => contact.id == upcoming[index].contactId);
@@ -645,7 +698,7 @@ class _BirthdayRow extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          width: 120,
+          width: 115,
           padding: const EdgeInsets.fromLTRB(7, 7, 7, 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -662,8 +715,8 @@ class _BirthdayRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 41,
+                height: 41,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: tokens.accent.withValues(alpha: 0.10),
@@ -675,7 +728,7 @@ class _BirthdayRow extends StatelessWidget {
                       : NexoAvatar(
                           displayName: contact!.displayName,
                           photoPath: contact!.photoPath,
-                          size: 46,
+                          size: 41,
                           tokens: tokens,
                         ),
                 ),
@@ -875,8 +928,8 @@ class _RecentRow extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          height: 62,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          height: 57,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: tokens.border),
@@ -884,8 +937,8 @@ class _RecentRow extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 37,
+                height: 37,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -896,7 +949,7 @@ class _RecentRow extends StatelessWidget {
                   child: NexoAvatar(
                     displayName: contact.displayName,
                     photoPath: contact.photoPath,
-                    size: 42,
+                    size: 37,
                     tokens: tokens,
                   ),
                 ),

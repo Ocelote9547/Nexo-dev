@@ -375,68 +375,111 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
           children: [
-            Center(
-              child: GestureDetector(
-                onTap: _pickPhoto,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55), width: 2),
-                    boxShadow: [
-                      BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12), blurRadius: 18, offset: const Offset(0, 5)),
-                    ],
-                  ),
-                  child: Stack(
-                    clipBehavior: Clip.none,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.11),
+                    Theme.of(context).colorScheme.surfaceContainerLow,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(23),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      NexoAvatar(
-                        displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
-                        size: 80,
-                        photoPath: _photoPath,
-                      ),
-                      Positioned(
-                        right: -2,
-                        bottom: -2,
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.surface,
-                              width: 2.5,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            size: 15,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                      Icon(Icons.account_circle_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                      const SizedBox(width: 9),
+                      Text(
+                        'Perfil del contacto',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: GestureDetector(
+                      onTap: _pickPhoto,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55),
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                              blurRadius: 18,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            NexoAvatar(
+                              displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
+                              size: 82,
+                              photoPath: _photoPath,
+                            ),
+                            Positioned(
+                              right: -2,
+                              bottom: -2,
+                              child: Container(
+                                width: 31,
+                                height: 31,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Theme.of(context).colorScheme.surface,
+                                    width: 2.5,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt_rounded,
+                                  size: 16,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _photoPath == null ? 'Toca la cámara para añadir una foto' : 'Foto del contacto',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (_photoPath != null)
+                    TextButton.icon(
+                      onPressed: () => setState(() {
+                        _photoPath = null;
+                        _photoHash = null;
+                      }),
+                      icon: const Icon(Icons.delete_outline, size: 18),
+                      label: const Text('Eliminar foto'),
+                    ),
+                ],
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              _photoPath == null ? 'Toca la cámara para añadir una foto' : 'Foto del contacto',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (_photoPath != null)
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => setState(() { _photoPath = null; _photoHash = null; }),
-                  icon: const Icon(Icons.delete_outline, size: 18),
-                  label: const Text('Eliminar foto'),
-                ),
-              ),
             const SizedBox(height: NexoSpacing.xl),
             Text(
               'INFORMACIÓN PRINCIPAL',

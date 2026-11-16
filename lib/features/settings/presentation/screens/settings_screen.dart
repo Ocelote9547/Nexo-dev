@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../onboarding/presentation/screens/onboarding_screen.dart';
+import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/nexo_theme.dart';

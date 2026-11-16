@@ -262,7 +262,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       );
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg, vertical: NexoDesignSpacing.sm),
+                      padding: const EdgeInsets.fromLTRB(NexoDesignSpacing.lg, NexoDesignSpacing.sm, NexoDesignSpacing.lg + 18, NexoDesignSpacing.lg),
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {
                         final c = filtered[index];
@@ -361,7 +361,7 @@ class _ContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NexoCard(
-      margin: const EdgeInsets.only(bottom: NexoDesignSpacing.sm),
+      margin: const EdgeInsets.only(bottom: NexoDesignSpacing.md),
       color: NexoDesignColors.surfaceElevated,
       borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
       onTap: () {
@@ -372,8 +372,10 @@ class _ContactTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: NexoDesignSpacing.md,
-          vertical: NexoDesignSpacing.xs,
+          vertical: 2,
         ),
+        dense: true,
+        visualDensity: const VisualDensity(vertical: -1),
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
@@ -382,7 +384,7 @@ class _ContactTile extends StatelessWidget {
         leading: NexoAvatar(
           displayName: contact.displayName,
           photoPath: contact.photoPath,
-          size: 48,
+          size: 44,
         ),
         title: Text(
           contact.displayName,

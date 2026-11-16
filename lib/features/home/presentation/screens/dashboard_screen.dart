@@ -363,7 +363,7 @@ class _FavoritesSection extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.star,
-                      color: tokens.accent,
+                      color: tokens.favorite,
                       size: 18,
                     ),
                     const SizedBox(width: NexoDesignSpacing.sm),
@@ -392,7 +392,7 @@ class _FavoritesSection extends StatelessWidget {
                 child: Text(
                   'Ver todos',
                   style: TextStyle(
-                    color: tokens.accent,
+                    color: tokens.favorite,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),

@@ -373,12 +373,22 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(NexoSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
           children: [
             Center(
               child: GestureDetector(
                 onTap: _pickPhoto,
-                child: NexoAvatar(displayName: _givenName.text.isEmpty ? '?' : _givenName.text, size: 80, photoPath: _photoPath),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55), width: 2),
+                    boxShadow: [
+                      BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12), blurRadius: 18, offset: const Offset(0, 5)),
+                    ],
+                  ),
+                  child: NexoAvatar(displayName: _givenName.text.isEmpty ? '?' : _givenName.text, size: 80, photoPath: _photoPath),
+                ),
               ),
             ),
             if (_photoPath != null)
@@ -517,12 +527,21 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleLarge),
-        TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add, size: 18), label: const Text('Añadir')),
-      ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(14, 9, 8, 9),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+          TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add, size: 18), label: const Text('Añadir')),
+        ],
+      ),
     );
   }
 }

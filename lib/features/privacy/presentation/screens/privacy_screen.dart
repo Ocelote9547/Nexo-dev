@@ -142,39 +142,49 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
     final oldController = TextEditingController();
     final newController = TextEditingController();
     final confirmController = TextEditingController();
+    var activeController = oldController;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Cambiar PIN'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: oldController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'PIN actual'),
-              keyboardType: TextInputType.number,
-              maxLength: 16,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: newController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Nuevo PIN (4-8 dígitos)'),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: 8,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: confirmController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Confirmar nuevo PIN'),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: 8,
-            ),
-          ],
+        content: StatefulBuilder(
+          builder: (ctx, setDialogState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldController,
+                readOnly: true,
+                obscureText: true,
+                onTap: () => setDialogState(() => activeController = oldController),
+                decoration: const InputDecoration(labelText: 'PIN actual'),
+                maxLength: 16,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: newController,
+                readOnly: true,
+                obscureText: true,
+                onTap: () => setDialogState(() => activeController = newController),
+                decoration: const InputDecoration(labelText: 'Nuevo PIN (4-8 dígitos)'),
+                maxLength: 8,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: confirmController,
+                readOnly: true,
+                obscureText: true,
+                onTap: () => setDialogState(() => activeController = confirmController),
+                decoration: const InputDecoration(labelText: 'Confirmar nuevo PIN'),
+                maxLength: 8,
+              ),
+              const SizedBox(height: 10),
+              NexoPinKeypad(
+                controller: activeController,
+                maxLength: activeController == oldController ? 16 : 8,
+                onChanged: () => setDialogState(() {}),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),

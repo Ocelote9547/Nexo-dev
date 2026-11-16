@@ -421,14 +421,32 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            Text(
+              _photoPath == null ? 'Toca la cámara para añadir una foto' : 'Foto del contacto',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
             if (_photoPath != null)
               Center(
-                child: TextButton(
+                child: TextButton.icon(
                   onPressed: () => setState(() { _photoPath = null; _photoHash = null; }),
-                  child: const Text('Eliminar foto'),
+                  icon: const Icon(Icons.delete_outline, size: 18),
+                  label: const Text('Eliminar foto'),
                 ),
               ),
-            const SizedBox(height: NexoSpacing.lg),
+            const SizedBox(height: NexoSpacing.xl),
+            Text(
+              'INFORMACIÓN PRINCIPAL',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: NexoSpacing.md),
             Text('Nombre', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: NexoSpacing.md),
             TextField(controller: _givenName, decoration: const InputDecoration(labelText: 'Nombre')),

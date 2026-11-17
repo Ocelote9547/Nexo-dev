@@ -32,7 +32,7 @@ La identidad visual combina azul noche, superficies elevadas y acentos azules. L
 - Identificadores UUID.
 - Almacenamiento privado de fotografías y archivos de respaldo.
 
-NEXO está planteada como una aplicación local: los datos de contactos se gestionan en el dispositivo.
+NEXO está planteada como una aplicación local: los datos de contactos se gestionan en el dispositivo. La única función que consulta Internet es el autocompletado opcional de direcciones mediante Photon (OpenStreetMap); solo se envía el texto de la dirección que se está buscando. La dirección también puede introducirse manualmente.
 
 ## Compilación
 
@@ -50,6 +50,10 @@ El APK de producción utiliza el identificador `com.nexo.nexo`. El flavor QA uti
 ## Versión 1.2
 
 Esta versión reúne el refinamiento visual de las pantallas principales y de gestión de contactos, ajustes, privacidad, importación/exportación y navegación. También incorpora mejoras en la presentación del PIN y la navegación animada inferior.
+
+## Búsqueda de direcciones
+
+El autocompletado utiliza el servicio público Photon de Komoot, basado en datos de OpenStreetMap. El servicio puede limitar peticiones o no estar disponible; por eso la introducción manual sigue funcionando. Se muestran resultados con atribución a OpenStreetMap.
 
 ## Notas de seguridad y datos
 

@@ -301,42 +301,48 @@ class _NexoHeaderWavesPainter extends CustomPainter {
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       colors: [
+        color.withValues(alpha: 0.02),
+        color.withValues(alpha: 0.42),
+        cyan.withValues(alpha: 0.34),
         color.withValues(alpha: 0.04),
-        color.withValues(alpha: 0.58),
-        cyan.withValues(alpha: 0.48),
-        color.withValues(alpha: 0.08),
       ],
       stops: const [0.0, 0.38, 0.72, 1.0],
     ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    for (var layer = 0; layer < 4; layer++) {
-      final path = Path();
-      for (var step = 0; step <= 72; step++) {
-        final x = size.width * step / 72;
-        final progress = x / size.width;
-        final centerLine = size.height * (0.30 + layer * 0.19);
-        final amplitude = 3.2 + layer * 0.45;
-        final y = centerLine +
-            math.sin(progress * math.pi * 2.15 + layer * 0.72) * amplitude;
-        if (step == 0) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
-      }
+    // Dos curvas amplias y discretas: evocan la onda del ejemplo sin
+    // competir con el nombre ni convertir el encabezado en una ilustración.
+    for (var layer = 0; layer < 3; layer++) {
+      final path = Path()
+        ..moveTo(-size.width * 0.08, size.height * (0.76 + layer * 0.10))
+        ..cubicTo(
+          size.width * 0.24,
+          size.height * (0.92 + layer * 0.08),
+          size.width * 0.46,
+          size.height * (0.02 + layer * 0.10),
+          size.width * 0.72,
+          size.height * (0.30 + layer * 0.08),
+        )
+        ..cubicTo(
+          size.width * 0.86,
+          size.height * (0.46 + layer * 0.08),
+          size.width * 1.02,
+          size.height * (0.20 + layer * 0.10),
+          size.width * 1.10,
+          size.height * (0.12 + layer * 0.10),
+        );
 
       final glow = Paint()
         ..shader = shader
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 3.8 : 2.8
+        ..strokeWidth = layer == 0 ? 4.2 : 2.8
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.2);
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
       canvas.drawPath(path, glow);
 
       final line = Paint()
         ..shader = shader
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.25 : 0.95
+        ..strokeWidth = layer == 0 ? 1.25 : 0.85
         ..strokeCap = StrokeCap.round;
       canvas.drawPath(path, line);
     }

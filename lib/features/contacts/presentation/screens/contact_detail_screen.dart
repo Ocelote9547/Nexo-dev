@@ -65,6 +65,11 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        toolbarHeight: 64,
         title: const Text('Detalle'),
         actions: [
           IconButton(
@@ -128,7 +133,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -138,7 +143,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                       Theme.of(context).colorScheme.surfaceContainerLow,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(26),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
                   boxShadow: [
                     BoxShadow(
@@ -156,7 +161,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: c.isFavorite ? NexoColors.favorite : Theme.of(context).colorScheme.primary.withValues(alpha: 0.45), width: 2),
                       ),
-                      child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 88),
+                      child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 96),
                     ),
                     const SizedBox(height: 10),
                     Text(c.displayName, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
@@ -295,10 +300,10 @@ class _Section extends StatelessWidget {
     if (children.isEmpty) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.only(bottom: NexoSpacing.md),
-      padding: const EdgeInsets.fromLTRB(15, 13, 11, 7),
+      padding: const EdgeInsets.fromLTRB(17, 15, 13, 9),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(21),
         border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: Column(

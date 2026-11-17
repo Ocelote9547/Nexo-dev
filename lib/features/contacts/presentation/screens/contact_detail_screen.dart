@@ -64,7 +64,12 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
     }));
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text('Detalle'),
         actions: [
           IconButton(
@@ -125,7 +130,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           final birthdayDates = cwr.dates.where((d) => d.type == 'birthday').toList();
           final qa = ref.read(quickActionsServiceProvider);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 36),
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -298,8 +303,15 @@ class _Section extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(15, 13, 11, 7),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.38)),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.055),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

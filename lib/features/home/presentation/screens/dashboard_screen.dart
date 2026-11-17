@@ -131,7 +131,7 @@ class _Header extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: 38,
+                  height: 44,
                   child: Stack(
                     alignment: Alignment.centerLeft,
                     children: [
@@ -297,54 +297,63 @@ class _NexoHeaderWavesPainter extends CustomPainter {
     if (size.width <= 0 || size.height <= 0) return;
 
     const cyan = Color(0xFF39C6E8);
-    final shader = LinearGradient(
+    final gradient = LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       colors: [
-        color.withValues(alpha: 0.02),
-        color.withValues(alpha: 0.52),
-        cyan.withValues(alpha: 0.42),
-        color.withValues(alpha: 0.05),
+        color.withValues(alpha: 0.025),
+        color.withValues(alpha: 0.30),
+        cyan.withValues(alpha: 0.24),
+        color.withValues(alpha: 0.035),
       ],
-      stops: const [0.0, 0.32, 0.72, 1.0],
-    ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+      stops: const [0, 0.34, 0.72, 1],
+    ).createShader(Offset.zero & size);
 
-    // Capas de ondas amplias y fluidas que recorren el logotipo.
-    for (var layer = 0; layer < 4; layer++) {
-      final phase = layer * 0.13;
-      final path = Path()
-        ..moveTo(-size.width * 0.08, size.height * (0.58 + phase))
+    // Tres olas completas superpuestas, con cuerpo translúcido y cresta luminosa.
+    for (var layer = 0; layer < 3; layer++) {
+      final phase = layer * 0.72;
+      final upper = Path()..moveTo(-size.width * 0.08, size.height * (0.54 + layer * 0.08));
+      upper.cubicTo(
+        size.width * 0.16, size.height * (0.02 + layer * 0.12),
+        size.width * 0.34, size.height * (1.04 - layer * 0.10),
+        size.width * 0.54, size.height * (0.46 + layer * 0.08),
+      );
+      upper.cubicTo(
+        size.width * 0.72, size.height * (0.00 + layer * 0.10),
+        size.width * 0.90, size.height * (0.94 - layer * 0.10),
+        size.width * 1.08, size.height * (0.32 + layer * 0.08),
+      );
+
+      final lower = Path()
+        ..moveTo(size.width * 1.08, size.height * (0.32 + layer * 0.08 + 0.16))
         ..cubicTo(
-          size.width * 0.18,
-          size.height * (0.06 + phase),
-          size.width * 0.34,
-          size.height * (1.02 - phase),
-          size.width * 0.55,
-          size.height * (0.48 + phase),
+          size.width * 0.88, size.height * (0.94 - layer * 0.10 + 0.16),
+          size.width * 0.70, size.height * (0.00 + layer * 0.10 + 0.16),
+          size.width * 0.54, size.height * (0.46 + layer * 0.08 + 0.16),
         )
         ..cubicTo(
-          size.width * 0.72,
-          size.height * (0.04 + phase),
-          size.width * 0.88,
-          size.height * (0.92 - phase),
-          size.width * 1.08,
-          size.height * (0.30 + phase),
+          size.width * 0.34, size.height * (1.04 - layer * 0.10 + 0.16),
+          size.width * 0.16, size.height * (0.02 + layer * 0.12 + 0.16),
+          -size.width * 0.08, size.height * (0.54 + layer * 0.08 + 0.16),
         );
+      upper.addPath(lower, Offset.zero);
+      upper.close();
 
-      final glow = Paint()
-        ..shader = shader
+      final fill = Paint()
+        ..shader = gradient
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(
+        upper,
+        Paint()
+          ..shader = gradient
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
+      );
+      final crest = Paint()
+        ..shader = gradient
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 3.6 : 2.3
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.2);
-      canvas.drawPath(path, glow);
-
-      final line = Paint()
-        ..shader = shader
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.35 : 0.9
+        ..strokeWidth = layer == 0 ? 1.45 : 0.85
         ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path, line);
+      canvas.drawPath(upper, crest);
     }
   }
 

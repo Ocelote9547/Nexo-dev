@@ -5,6 +5,7 @@ import '../providers/database_provider.dart';
 import '../../database/app_database.dart';
 import '../../shared/widgets/nexo_widgets.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../services/notifications/notification_providers.dart';
 import '../../features/settings/data/repositories/settings_repository_impl.dart';
 import '../../features/privacy/presentation/screens/unlock_screen.dart';
@@ -21,6 +22,7 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
   bool _ready = false;
   bool _locked = false;
   bool _unlocked = false;
+  bool _onboardingCompleted = false;
   Object? _error;
 
   @override
@@ -34,12 +36,40 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
       final db = ref.read(appDatabaseProvider);
       await db.customSelect('SELECT 1').get();
       await _reconcileBirthdayNotifications(db);
+
       final privacy = ref.read(privacyServiceProvider);
+      final settings = SettingsRepositoryImpl(db);
       _locked = await privacy.hasPin();
+      _onboardingCompleted =
+          await settings.getBool('onboarding_completed', defaultValue: false);
+
+      // Instalaciones anteriores con datos o PIN se consideran ya configuradas.
+      // Así la bienvenida no interrumpe agendas existentes ni el bloqueo de acceso.
+      if (!_onboardingCompleted) {
+        final legacyData = await db.customSelect('''
+          SELECT
+            (SELECT COUNT(*) FROM contacts) +
+            (SELECT COUNT(*) FROM app_settings) +
+            (SELECT COUNT(*) FROM collections) +
+            (SELECT COUNT(*) FROM tags) AS total
+        ''').getSingle();
+        final hasExistingData = legacyData.read<int>('total') > 0;
+        if (_locked || hasExistingData) {
+          await settings.setBool('onboarding_completed', true);
+          _onboardingCompleted = true;
+        }
+      }
+
       if (mounted) setState(() => _ready = true);
     } catch (e) {
       if (mounted) setState(() => _error = e);
     }
+  }
+
+  Future<void> _completeOnboarding() async {
+    final settings = SettingsRepositoryImpl(ref.read(appDatabaseProvider));
+    await settings.setBool('onboarding_completed', true);
+    if (mounted) setState(() => _onboardingCompleted = true);
   }
 
   Future<void> _reconcileBirthdayNotifications(AppDatabase db) async {
@@ -93,6 +123,9 @@ class _AppInitializerState extends ConsumerState<AppInitializer> {
       return UnlockScreen(onUnlocked: () {
         setState(() => _unlocked = true);
       });
+    }
+    if (!_onboardingCompleted && !_locked) {
+      return OnboardingScreen(onCompleted: _completeOnboarding);
     }
     return const HomeScreen();
   }

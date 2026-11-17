@@ -507,7 +507,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                   leading: Icon(Icons.hub_outlined),
                   title: Text('NEXO'),
-                  subtitle: Text('Agenda personal · v1.0'),
+                  subtitle: Text('Agenda personal · v1.2.0'),
                   trailing: Icon(Icons.verified_outlined, size: 19),
                 ),
               ],

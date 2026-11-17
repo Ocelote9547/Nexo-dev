@@ -124,7 +124,7 @@ class _NexoBottomNav extends ConsumerWidget {
   }
 }
 
-/// Onda continua con una cresta elevada y capas de color que siguen la pestaña activa.
+/// Ondas transparentes con un halo circular que envuelve la pestaña activa.
 class _NexoBottomWavePainter extends CustomPainter {
   final NexoDesignTokens tokens;
   final double selectedPosition;
@@ -139,57 +139,41 @@ class _NexoBottomWavePainter extends CustomPainter {
     const inset = 12.0;
     final usableWidth = size.width - inset * 2;
     final spacing = usableWidth / itemCount;
-    final peakX = inset + spacing * (selectedPosition + 0.5);
-    const baseY = 67.0;
-    const amplitude = 39.0;
-    final sigma = spacing * 0.92;
-    final cyan = const Color(0xFF39C6E8);
+    final selectedX = inset + spacing * (selectedPosition + 0.5);
+    const centerY = 38.0;
+    const radius = 25.0;
     final blue = tokens.accent;
+    const cyan = Color(0xFF39C6E8);
 
-    // La curva crea una elevación ancha que abraza el destino activo,
-    // en lugar de una pequeña cresta aislada sobre una línea horizontal.
-    double waveY(double x, double offset) {
-      final distance = (x - peakX) / sigma;
-      final shoulder = math.exp(-0.5 * distance * distance);
-      final broadShoulder = math.exp(-0.5 * math.pow(distance / 1.65, 2));
-      final crest = amplitude * shoulder * 0.78 + amplitude * broadShoulder * 0.22;
-      return baseY + offset - crest;
-    }
-
-    final area = Path();
-    for (var step = 0; step <= 120; step++) {
-      final x = size.width * step / 120;
-      final y = waveY(x, 0);
-      if (step == 0) {
-        area.moveTo(x, y);
-      } else {
-        area.lineTo(x, y);
-      }
-    }
-    area
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-
-    final fill = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+    // Halo circular suave: el centro permanece transparente, sin banda ni tarjeta.
+    final haloRect = Rect.fromCircle(
+      center: Offset(selectedX, centerY),
+      radius: radius,
+    );
+    final haloPaint = Paint()
+      ..shader = RadialGradient(
         colors: [
-          blue.withValues(alpha: tokens.isDark ? 0.17 : 0.12),
-          cyan.withValues(alpha: tokens.isDark ? 0.075 : 0.055),
-          blue.withValues(alpha: 0.015),
+          blue.withValues(alpha: tokens.isDark ? 0.13 : 0.085),
+          cyan.withValues(alpha: tokens.isDark ? 0.09 : 0.055),
+          blue.withValues(alpha: 0.0),
         ],
-        stops: const [0.0, 0.48, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawPath(area, fill);
+        stops: const [0.0, 0.68, 1.0],
+      ).createShader(haloRect);
+    canvas.drawCircle(Offset(selectedX, centerY), radius, haloPaint);
 
+    // Ondas continuas: se elevan y se curvan alrededor del halo seleccionado.
     for (var layer = 0; layer < 3; layer++) {
       final path = Path();
-      final offset = layer * 4.0;
-      for (var step = 0; step <= 120; step++) {
-        final x = size.width * step / 120;
-        final y = waveY(x, offset);
+      final baseY = 58.0 + layer * 5.0;
+      final lift = 17.0 - layer * 2.5;
+      final sigma = spacing * (0.62 + layer * 0.08);
+
+      for (var step = 0; step <= 180; step++) {
+        final x = size.width * step / 180;
+        final distance = (x - selectedX) / sigma;
+        final envelope = math.exp(-0.5 * distance * distance);
+        final gentleFlow = math.sin((x / size.width * math.pi * 2.0) + layer * 0.72) * 1.7;
+        final y = baseY - lift * envelope + gentleFlow;
         if (step == 0) {
           path.moveTo(x, y);
         } else {
@@ -197,21 +181,33 @@ class _NexoBottomWavePainter extends CustomPainter {
         }
       }
 
-      final line = Paint()
+      final linePaint = Paint()
         ..shader = LinearGradient(
           colors: [
             blue.withValues(alpha: 0.0),
-            blue.withValues(alpha: layer == 0 ? 0.76 : 0.42),
-            cyan.withValues(alpha: layer == 0 ? 0.72 : 0.38),
+            blue.withValues(alpha: layer == 0 ? 0.62 : 0.34),
+            cyan.withValues(alpha: layer == 0 ? 0.58 : 0.30),
             blue.withValues(alpha: 0.0),
           ],
-          stops: const [0.0, 0.36, 0.72, 1.0],
+          stops: const [0.0, 0.34, 0.70, 1.0],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.65 : 1.05
+        ..strokeWidth = layer == 0 ? 1.7 : 1.0
         ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path, line);
+      canvas.drawPath(path, linePaint);
     }
+
+    final ringPaint = Paint()
+      ..color = cyan.withValues(alpha: tokens.isDark ? 0.46 : 0.34)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.15;
+    canvas.drawCircle(Offset(selectedX, centerY), radius - 1.0, ringPaint);
+
+    final innerRingPaint = Paint()
+      ..color = blue.withValues(alpha: tokens.isDark ? 0.26 : 0.20)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawCircle(Offset(selectedX, centerY), radius - 4.0, innerRingPaint);
   }
 
   @override
@@ -262,13 +258,13 @@ class _NavItem extends StatelessWidget {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   curve: Curves.easeOut,
-                  width: 58,
-                  height: 34,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
+                    shape: BoxShape.circle,
                     color: isSelected
-                        ? activeColor.withValues(alpha: 0.15)
+                        ? activeColor.withValues(alpha: 0.045)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Icon(
                     isSelected ? destination.selectedIcon : destination.icon,

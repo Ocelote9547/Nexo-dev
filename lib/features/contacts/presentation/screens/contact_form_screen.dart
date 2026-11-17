@@ -370,6 +370,10 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(_isEditing ? 'Editar contacto' : 'Nuevo contacto'),
         actions: [
           TextButton(
@@ -383,7 +387,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 40),
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -654,11 +658,18 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
+      padding: const EdgeInsets.fromLTRB(15, 9, 9, 9),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.38)),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.045),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

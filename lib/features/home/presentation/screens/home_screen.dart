@@ -79,8 +79,8 @@ class _NexoBottomNav extends ConsumerWidget {
             child: IgnorePointer(
               child: TweenAnimationBuilder<double>(
                 tween: Tween<double>(end: currentIndex.toDouble()),
-                duration: const Duration(milliseconds: 620),
-                curve: Curves.easeInOutCubic,
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
                 builder: (context, selectedPosition, _) => RepaintBoundary(
                   child: CustomPaint(
                   painter: _NexoBottomWavePainter(
@@ -140,16 +140,16 @@ class _NexoBottomWavePainter extends CustomPainter {
     final usableWidth = size.width - inset * 2;
     final spacing = usableWidth / itemCount;
     final peakX = inset + spacing * (selectedPosition + 0.5);
-    const baseY = 39.0;
-    const amplitude = 27.0;
-    final sigma = spacing * 0.62;
+    const baseY = 49.0;
+    const amplitude = 12.0;
+    final sigma = spacing * 0.72;
     final cyan = const Color(0xFF39C6E8);
     final blue = tokens.accent;
 
     double waveY(double x, double offset) {
       final distance = (x - peakX) / sigma;
       final crest = amplitude * math.exp(-0.5 * distance * distance);
-      final ripple = 1.15 * math.sin((x / size.width) * math.pi * 2 - 0.35);
+      final ripple = 0.35 * math.sin((x / size.width) * math.pi * 2 - 0.35);
       return baseY + offset - crest + ripple;
     }
 
@@ -183,7 +183,7 @@ class _NexoBottomWavePainter extends CustomPainter {
 
     for (var layer = 0; layer < 3; layer++) {
       final path = Path();
-      final offset = layer * 5.2;
+      final offset = layer * 3.2;
       for (var step = 0; step <= 120; step++) {
         final x = size.width * step / 120;
         final y = waveY(x, offset);
@@ -205,7 +205,7 @@ class _NexoBottomWavePainter extends CustomPainter {
           stops: const [0.0, 0.36, 0.72, 1.0],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.9 : 1.25
+        ..strokeWidth = layer == 0 ? 1.55 : 1.0
         ..strokeCap = StrokeCap.round;
       canvas.drawPath(path, line);
     }

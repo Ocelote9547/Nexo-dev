@@ -172,7 +172,6 @@ class _NexoBottomWavePainter extends CustomPainter {
     // no una simple línea decorativa ni un panel opaco bajo los iconos.
     for (var layer = 0; layer < 3; layer++) {
       final top = Path();
-      final bottom = Path();
       final baseY = 52.0 + layer * 5.0;
       final lift = 18.0 - layer * 3.0;
       final sigma = spacing * (0.72 + layer * 0.10);
@@ -188,10 +187,8 @@ class _NexoBottomWavePainter extends CustomPainter {
         final y = waveY(x);
         if (i == 0) {
           top.moveTo(x, y);
-          bottom.moveTo(x, y + 7.0 + layer * 1.5);
         } else {
           top.lineTo(x, y);
-          bottom.lineTo(x, y + 7.0 + layer * 1.5);
         }
       }
       final ribbon = Path()..addPath(top, Offset.zero);

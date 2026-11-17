@@ -214,7 +214,8 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                 ],
               )).toList()),
               _Section(title: 'Direcciones', children: cwr.addresses.map((a) {
-                final text = [a.street, a.city, a.country].where((e) => e != null && e.isNotEmpty).join(', ');
+                final streetLine = [a.street, a.number, a.apartment].where((e) => e != null && e.trim().isNotEmpty).join(' ');
+                final text = [streetLine, a.postalCode, a.city, a.region, a.country].where((e) => e != null && e.trim().isNotEmpty).join(', ');
                 return _ActionLine(
                   icon: Icons.location_on,
                   text: text,
@@ -229,7 +230,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
               _Section(title: 'Redes sociales', children: cwr.socialLinks.map((s) => _ActionLine(
                 icon: Icons.link,
                 text: s.value,
-                subtitle: s.type,
+                subtitle: (s.label?.trim().isNotEmpty ?? false) ? s.label : s.type,
                 actions: [
                   if (s.url != null && s.url!.isNotEmpty) _Action(icon: Icons.open_in_new, tooltip: 'Abrir', onTap: () => qa.openUrl(s.url!)),
                   _Action(icon: Icons.copy, tooltip: 'Copiar', onTap: () => Clipboard.setData(ClipboardData(text: s.value))),

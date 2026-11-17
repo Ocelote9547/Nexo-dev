@@ -295,56 +295,64 @@ class _NexoHeaderWavesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
-
     const cyan = Color(0xFF39C6E8);
-    final shader = LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: [
-        color.withValues(alpha: 0.02),
-        color.withValues(alpha: 0.52),
-        cyan.withValues(alpha: 0.42),
-        color.withValues(alpha: 0.05),
-      ],
-      stops: const [0.0, 0.32, 0.72, 1.0],
-    ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    // Capas de ondas amplias y fluidas que recorren el logotipo.
-    for (var layer = 0; layer < 4; layer++) {
-      final phase = layer * 0.13;
-      final path = Path()
-        ..moveTo(-size.width * 0.08, size.height * (0.58 + phase))
+    // Tres cintas de agua superpuestas con cresta, valle y volumen translúcido.
+    for (var layer = 0; layer < 3; layer++) {
+      final shift = layer * 0.11;
+      final top = Path()
+        ..moveTo(-size.width * 0.08, size.height * (0.58 + shift))
         ..cubicTo(
-          size.width * 0.18,
-          size.height * (0.06 + phase),
-          size.width * 0.34,
-          size.height * (1.02 - phase),
-          size.width * 0.55,
-          size.height * (0.48 + phase),
+          size.width * 0.15, size.height * (0.02 + shift),
+          size.width * 0.34, size.height * (1.02 - shift),
+          size.width * 0.53, size.height * (0.43 + shift),
         )
         ..cubicTo(
-          size.width * 0.72,
-          size.height * (0.04 + phase),
-          size.width * 0.88,
-          size.height * (0.92 - phase),
-          size.width * 1.08,
-          size.height * (0.30 + phase),
+          size.width * 0.70, size.height * (0.00 + shift),
+          size.width * 0.88, size.height * (0.92 - shift),
+          size.width * 1.08, size.height * (0.30 + shift),
         );
+      final ribbon = Path()
+        ..addPath(top, Offset.zero)
+        ..cubicTo(
+          size.width * 0.89, size.height * (0.66 + shift),
+          size.width * 0.72, size.height * (0.27 + shift),
+          size.width * 0.53, size.height * (0.67 + shift),
+        )
+        ..cubicTo(
+          size.width * 0.33, size.height * (1.10 - shift),
+          size.width * 0.15, size.height * (0.30 + shift),
+          -size.width * 0.08, size.height * (0.83 + shift),
+        )
+        ..close();
 
-      final glow = Paint()
-        ..shader = shader
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 3.6 : 2.3
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.2);
-      canvas.drawPath(path, glow);
+      final shader = LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          color.withValues(alpha: 0.015),
+          color.withValues(alpha: layer == 0 ? 0.23 : 0.13),
+          cyan.withValues(alpha: layer == 0 ? 0.20 : 0.11),
+          color.withValues(alpha: 0.015),
+        ],
+        stops: const [0.0, 0.34, 0.70, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-      final line = Paint()
-        ..shader = shader
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.35 : 0.9
-        ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path, line);
+      canvas.drawPath(
+        ribbon,
+        Paint()
+          ..shader = shader
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.8),
+      );
+      canvas.drawPath(ribbon, Paint()..shader = shader);
+      canvas.drawPath(
+        top,
+        Paint()
+          ..color = cyan.withValues(alpha: layer == 0 ? 0.28 : 0.15)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = layer == 0 ? 0.9 : 0.65
+          ..strokeCap = StrokeCap.round,
+      );
     }
   }
 

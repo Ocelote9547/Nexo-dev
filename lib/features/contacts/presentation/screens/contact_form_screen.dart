@@ -558,7 +558,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             _SectionHeader(title: 'Fechas importantes', onAdd: _addDate),
             ..._dates.asMap().entries.map((e) => _DateRow(
               date: e.value,
-              onChanged: (d) => _dates[e.key] = d,
+              onChanged: (d) => setState(() => _dates[e.key] = d),
               onRemove: () => _removeDate(e.key),
             )),
             const SizedBox(height: NexoSpacing.xl),

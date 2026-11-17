@@ -140,17 +140,20 @@ class _NexoBottomWavePainter extends CustomPainter {
     final usableWidth = size.width - inset * 2;
     final spacing = usableWidth / itemCount;
     final peakX = inset + spacing * (selectedPosition + 0.5);
-    const baseY = 49.0;
-    const amplitude = 12.0;
-    final sigma = spacing * 0.72;
+    const baseY = 67.0;
+    const amplitude = 39.0;
+    final sigma = spacing * 0.92;
     final cyan = const Color(0xFF39C6E8);
     final blue = tokens.accent;
 
+    // La curva crea una elevación ancha que abraza el destino activo,
+    // en lugar de una pequeña cresta aislada sobre una línea horizontal.
     double waveY(double x, double offset) {
       final distance = (x - peakX) / sigma;
-      final crest = amplitude * math.exp(-0.5 * distance * distance);
-      final ripple = 0.35 * math.sin((x / size.width) * math.pi * 2 - 0.35);
-      return baseY + offset - crest + ripple;
+      final shoulder = math.exp(-0.5 * distance * distance);
+      final broadShoulder = math.exp(-0.5 * math.pow(distance / 1.65, 2));
+      final crest = amplitude * shoulder * 0.78 + amplitude * broadShoulder * 0.22;
+      return baseY + offset - crest;
     }
 
     final area = Path();
@@ -183,7 +186,7 @@ class _NexoBottomWavePainter extends CustomPainter {
 
     for (var layer = 0; layer < 3; layer++) {
       final path = Path();
-      final offset = layer * 3.2;
+      final offset = layer * 4.0;
       for (var step = 0; step <= 120; step++) {
         final x = size.width * step / 120;
         final y = waveY(x, offset);
@@ -205,7 +208,7 @@ class _NexoBottomWavePainter extends CustomPainter {
           stops: const [0.0, 0.36, 0.72, 1.0],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.55 : 1.0
+        ..strokeWidth = layer == 0 ? 1.65 : 1.05
         ..strokeCap = StrokeCap.round;
       canvas.drawPath(path, line);
     }

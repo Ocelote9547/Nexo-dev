@@ -370,6 +370,11 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        toolbarHeight: 64,
         title: Text(_isEditing ? 'Editar contacto' : 'Nuevo contacto'),
         actions: [
           TextButton(
@@ -383,7 +388,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 36),
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -396,7 +401,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                     Theme.of(context).colorScheme.surfaceContainerLow,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(23),
+                borderRadius: BorderRadius.circular(26),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
                 ),

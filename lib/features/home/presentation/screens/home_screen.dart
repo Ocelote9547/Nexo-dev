@@ -81,12 +81,14 @@ class _NexoBottomNav extends ConsumerWidget {
                 tween: Tween<double>(end: currentIndex.toDouble()),
                 duration: const Duration(milliseconds: 620),
                 curve: Curves.easeInOutCubic,
-                builder: (context, selectedPosition, _) => CustomPaint(
+                builder: (context, selectedPosition, _) => RepaintBoundary(
+                  child: CustomPaint(
                   painter: _NexoBottomWavePainter(
                     tokens,
                     selectedPosition,
                     _destinations.length,
                   ),
+                ),
                 ),
               ),
             ),

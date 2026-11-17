@@ -1126,13 +1126,29 @@ class _SocialRow extends StatelessWidget {
             onChanged: (value) {
               final raw = value.trim();
               final parsed = Uri.tryParse(raw);
+              final platformHosts = <String, String>{
+                'instagram': 'instagram.com/',
+                'facebook': 'facebook.com/',
+                'tiktok': 'tiktok.com/@',
+                'x': 'x.com/',
+                'linkedin': 'linkedin.com/in/',
+                'youtube': 'youtube.com/@',
+                'telegram': 't.me/',
+                'twitch': 'twitch.tv/',
+                'github': 'github.com/',
+                'whatsapp': 'wa.me/',
+              };
+              final host = platformHosts[link.type.toLowerCase()];
+              final handle = raw.startsWith('@') ? raw.substring(1) : raw;
               final target = raw.isEmpty
                   ? raw
                   : (parsed != null && parsed.hasScheme)
                       ? raw
                       : raw.contains('.')
                           ? 'https://$raw'
-                          : raw;
+                          : host != null
+                              ? 'https://$host$handle'
+                              : raw;
               onChanged(link.copyWith(url: target, value: raw));
             },
           ),

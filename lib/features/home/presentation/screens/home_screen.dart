@@ -32,14 +32,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        systemNavigationBarColor: tokens.background,
-        systemNavigationBarDividerColor: tokens.background,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
         systemNavigationBarIconBrightness:
             tokens.isDark ? Brightness.light : Brightness.dark,
         systemNavigationBarContrastEnforced: false,
       ),
       child: Scaffold(
         backgroundColor: tokens.background,
+        extendBody: true,
         body: IndexedStack(index: _index, children: screens),
         bottomNavigationBar: _NexoBottomNav(
           currentIndex: _index,
@@ -141,73 +142,102 @@ class _NexoBottomWavePainter extends CustomPainter {
     final spacing = usableWidth / itemCount;
     final selectedX = inset + spacing * (selectedPosition + 0.5);
     const centerY = 38.0;
-    const radius = 25.0;
     final blue = tokens.accent;
     const cyan = Color(0xFF39C6E8);
 
-    // Halo circular suave: el centro permanece transparente, sin banda ni tarjeta.
+    // Luz difusa alrededor del elemento activo; el lienzo permanece transparente.
     final haloRect = Rect.fromCircle(
       center: Offset(selectedX, centerY),
-      radius: radius,
+      radius: 34,
     );
-    final haloPaint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          blue.withValues(alpha: tokens.isDark ? 0.13 : 0.085),
-          cyan.withValues(alpha: tokens.isDark ? 0.09 : 0.055),
-          blue.withValues(alpha: 0.0),
-        ],
-        stops: const [0.0, 0.68, 1.0],
-      ).createShader(haloRect);
-    canvas.drawCircle(Offset(selectedX, centerY), radius, haloPaint);
+    canvas.drawCircle(
+      Offset(selectedX, centerY),
+      34,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            cyan.withValues(alpha: tokens.isDark ? 0.19 : 0.12),
+            blue.withValues(alpha: tokens.isDark ? 0.12 : 0.075),
+            Colors.transparent,
+          ],
+          stops: const [0, 0.58, 1],
+        ).createShader(haloRect),
+    );
 
-    // Ondas continuas: se elevan y se curvan alrededor del halo seleccionado.
-    for (var layer = 0; layer < 3; layer++) {
+    // Cintas de agua cerradas: cada ola tiene superficie y volumen, no solo trazos.
+    for (var layer = 0; layer < 4; layer++) {
+      final phase = layer * 0.78;
+      final baseY = 58.0 + layer * 4.0;
+      final amplitude = 10.0 - layer * 1.25;
+      final sigma = spacing * (0.72 + layer * 0.10);
+      final thickness = 5.0 + layer * 1.2;
       final path = Path();
-      final baseY = 58.0 + layer * 5.0;
-      final lift = 17.0 - layer * 2.5;
-      final sigma = spacing * (0.62 + layer * 0.08);
 
-      for (var step = 0; step <= 180; step++) {
-        final x = size.width * step / 180;
+      for (var step = 0; step <= 120; step++) {
+        final x = size.width * step / 120;
         final distance = (x - selectedX) / sigma;
-        final envelope = math.exp(-0.5 * distance * distance);
-        final gentleFlow = math.sin((x / size.width * math.pi * 2.0) + layer * 0.72) * 1.7;
-        final y = baseY - lift * envelope + gentleFlow;
+        final focus = math.exp(-0.5 * distance * distance);
+        final swell = math.sin((x / size.width * math.pi * 2.0) + phase) * 2.2;
+        final y = baseY - amplitude * focus + swell;
         if (step == 0) {
           path.moveTo(x, y);
         } else {
           path.lineTo(x, y);
         }
       }
+      for (var step = 120; step >= 0; step--) {
+        final x = size.width * step / 120;
+        final distance = (x - selectedX) / sigma;
+        final focus = math.exp(-0.5 * distance * distance);
+        final swell = math.sin((x / size.width * math.pi * 2.0) + phase) * 2.2;
+        final y = baseY - amplitude * focus + swell + thickness;
+        path.lineTo(x, y);
+      }
+      path.close();
 
-      final linePaint = Paint()
+      final fill = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            (layer.isEven ? cyan : blue).withValues(
+              alpha: layer == 0 ? 0.25 : 0.12,
+            ),
+            blue.withValues(alpha: layer == 0 ? 0.10 : 0.045),
+          ],
+        ).createShader(Rect.fromLTWH(0, baseY - 14, size.width, 32));
+      canvas.drawPath(path, fill);
+
+      final crest = Paint()
         ..shader = LinearGradient(
           colors: [
-            blue.withValues(alpha: 0.0),
-            blue.withValues(alpha: layer == 0 ? 0.62 : 0.34),
-            cyan.withValues(alpha: layer == 0 ? 0.58 : 0.30),
-            blue.withValues(alpha: 0.0),
+            blue.withValues(alpha: 0),
+            blue.withValues(alpha: layer == 0 ? 0.66 : 0.30),
+            cyan.withValues(alpha: layer == 0 ? 0.72 : 0.34),
+            blue.withValues(alpha: 0),
           ],
-          stops: const [0.0, 0.34, 0.70, 1.0],
+          stops: const [0, 0.32, 0.68, 1],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.7 : 1.0
+        ..strokeWidth = layer == 0 ? 1.35 : 0.8
         ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path, linePaint);
+      final crestPath = Path();
+      for (var step = 0; step <= 120; step++) {
+        final x = size.width * step / 120;
+        final distance = (x - selectedX) / sigma;
+        final focus = math.exp(-0.5 * distance * distance);
+        final swell = math.sin((x / size.width * math.pi * 2.0) + phase) * 2.2;
+        final y = baseY - amplitude * focus + swell;
+        if (step == 0) crestPath.moveTo(x, y); else crestPath.lineTo(x, y);
+      }
+      canvas.drawPath(crestPath, crest);
     }
 
     final ringPaint = Paint()
-      ..color = cyan.withValues(alpha: tokens.isDark ? 0.46 : 0.34)
+      ..color = cyan.withValues(alpha: tokens.isDark ? 0.48 : 0.34)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.15;
-    canvas.drawCircle(Offset(selectedX, centerY), radius - 1.0, ringPaint);
-
-    final innerRingPaint = Paint()
-      ..color = blue.withValues(alpha: tokens.isDark ? 0.26 : 0.20)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
-    canvas.drawCircle(Offset(selectedX, centerY), radius - 4.0, innerRingPaint);
+      ..strokeWidth = 1.0;
+    canvas.drawCircle(Offset(selectedX, centerY), 25, ringPaint);
   }
 
   @override

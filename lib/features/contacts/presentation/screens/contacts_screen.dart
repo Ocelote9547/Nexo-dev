@@ -140,8 +140,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         elevation: 0,
+        toolbarHeight: 66,
         title: Text(
           'Contactos',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -365,15 +368,26 @@ class _ContactTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: NexoDesignSpacing.md),
       padding: contact.isFavorite ? const EdgeInsets.all(1.5) : EdgeInsets.zero,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
+        borderRadius: BorderRadius.circular(20),
         border: contact.isFavorite
-            ? Border.all(color: NexoDesignColors.favorite, width: 1.5)
-            : null,
+            ? Border.all(color: NexoDesignColors.favorite, width: 1.35)
+            : Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.42),
+              ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.dark ? 0.16 : 0.035,
+            ),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: NexoCard(
       margin: EdgeInsets.zero,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
@@ -382,7 +396,7 @@ class _ContactTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: NexoDesignSpacing.md,
-          vertical: 2,
+          vertical: 5,
         ),
         dense: true,
         visualDensity: const VisualDensity(vertical: -1),
@@ -394,7 +408,7 @@ class _ContactTile extends StatelessWidget {
         leading: NexoAvatar(
           displayName: contact.displayName,
           photoPath: contact.photoPath,
-          size: 44,
+          size: 48,
         ),
         title: Text(
           contact.displayName,

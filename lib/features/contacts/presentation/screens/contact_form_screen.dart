@@ -329,7 +329,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
 
   void _addSocialLink() {
     setState(() {
-      _socialLinks = [..._socialLinks, SocialLink(contactId: widget.contactId ?? '', type: 'web', value: '')];
+      _socialLinks = [..._socialLinks, SocialLink(contactId: widget.contactId ?? '', type: 'Website', value: '')];
     });
   }
 
@@ -1079,7 +1079,7 @@ class _SocialRow extends StatelessWidget {
   String get _selectedPlatform {
     final value = link.type.toLowerCase();
     for (final platform in _platforms) {
-      if (platform.toLowerCase() == value) return platform;
+      if (platform.toLowerCase() == value || (value == 'web' && platform == 'Website')) return platform;
     }
     return 'Otro';
   }
@@ -1123,7 +1123,18 @@ class _SocialRow extends StatelessWidget {
               hintText: 'https://...',
               prefixIcon: Icon(Icons.link),
             ),
-            onChanged: (value) => onChanged(link.copyWith(url: value, value: value)),
+            onChanged: (value) {
+              final raw = value.trim();
+              final parsed = Uri.tryParse(raw);
+              final target = raw.isEmpty
+                  ? raw
+                  : (parsed != null && parsed.hasScheme)
+                      ? raw
+                      : raw.contains('.')
+                          ? 'https://$raw'
+                          : raw;
+              onChanged(link.copyWith(url: target, value: raw));
+            },
           ),
           const SizedBox(height: NexoSpacing.sm),
           TextFormField(

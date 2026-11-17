@@ -296,53 +296,53 @@ class _NexoHeaderWavesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
 
-    final cyan = const Color(0xFF39C6E8);
+    const cyan = Color(0xFF39C6E8);
     final shader = LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       colors: [
         color.withValues(alpha: 0.02),
-        color.withValues(alpha: 0.42),
-        cyan.withValues(alpha: 0.34),
-        color.withValues(alpha: 0.04),
+        color.withValues(alpha: 0.52),
+        cyan.withValues(alpha: 0.42),
+        color.withValues(alpha: 0.05),
       ],
-      stops: const [0.0, 0.38, 0.72, 1.0],
+      stops: const [0.0, 0.32, 0.72, 1.0],
     ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    // Dos curvas amplias y discretas: evocan la onda del ejemplo sin
-    // competir con el nombre ni convertir el encabezado en una ilustración.
-    for (var layer = 0; layer < 3; layer++) {
+    // Capas de ondas amplias y fluidas que recorren el logotipo.
+    for (var layer = 0; layer < 4; layer++) {
+      final phase = layer * 0.13;
       final path = Path()
-        ..moveTo(-size.width * 0.08, size.height * (0.76 + layer * 0.10))
+        ..moveTo(-size.width * 0.08, size.height * (0.58 + phase))
         ..cubicTo(
-          size.width * 0.24,
-          size.height * (0.92 + layer * 0.08),
-          size.width * 0.46,
-          size.height * (0.02 + layer * 0.10),
-          size.width * 0.72,
-          size.height * (0.30 + layer * 0.08),
+          size.width * 0.18,
+          size.height * (0.06 + phase),
+          size.width * 0.34,
+          size.height * (1.02 - phase),
+          size.width * 0.55,
+          size.height * (0.48 + phase),
         )
         ..cubicTo(
-          size.width * 0.86,
-          size.height * (0.46 + layer * 0.08),
-          size.width * 1.02,
-          size.height * (0.20 + layer * 0.10),
-          size.width * 1.10,
-          size.height * (0.12 + layer * 0.10),
+          size.width * 0.72,
+          size.height * (0.04 + phase),
+          size.width * 0.88,
+          size.height * (0.92 - phase),
+          size.width * 1.08,
+          size.height * (0.30 + phase),
         );
 
       final glow = Paint()
         ..shader = shader
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 4.2 : 2.8
+        ..strokeWidth = layer == 0 ? 3.6 : 2.3
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.2);
       canvas.drawPath(path, glow);
 
       final line = Paint()
         ..shader = shader
         ..style = PaintingStyle.stroke
-        ..strokeWidth = layer == 0 ? 1.25 : 0.85
+        ..strokeWidth = layer == 0 ? 1.35 : 0.9
         ..strokeCap = StrokeCap.round;
       canvas.drawPath(path, line);
     }

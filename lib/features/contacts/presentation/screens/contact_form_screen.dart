@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter/material.dart';
@@ -533,7 +537,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             _SectionHeader(title: 'Direcciones', onAdd: _addAddress),
             ..._addresses.asMap().entries.map((e) => _AddressRow(
               address: e.value,
-              onChanged: (a) => setState(() => _addresses[e.key] = a),
+              onChanged: (a) => _addresses[e.key] = a,
               onRemove: () => _removeAddress(e.key),
             )),
             const SizedBox(height: NexoSpacing.xl),
@@ -749,43 +753,287 @@ class _NoteRow extends StatelessWidget {
   }
 }
 
-class _AddressRow extends StatelessWidget {
+class _AddressRow extends StatefulWidget {
   final Address address;
   final ValueChanged<Address> onChanged;
   final VoidCallback onRemove;
-  const _AddressRow({required this.address, required this.onChanged, required this.onRemove});
+
+  const _AddressRow({
+    required this.address,
+    required this.onChanged,
+    required this.onRemove,
+  });
+
+  @override
+  State<_AddressRow> createState() => _AddressRowState();
+}
+
+class _AddressRowState extends State<_AddressRow> {
+  static final Map<String, List<_AddressSuggestion>> _cache = {};
+  final TextEditingController _controller = TextEditingController();
+  Timer? _debounce;
+  List<_AddressSuggestion> _suggestions = [];
+  bool _searching = false;
+  String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = _formatAddress(widget.address);
+  }
+
+  String _formatAddress(Address address) {
+    final street = [
+      address.street,
+      if ((address.number ?? '').trim().isNotEmpty) address.number,
+      if ((address.apartment ?? '').trim().isNotEmpty) address.apartment,
+    ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' ');
+    return [
+      street,
+      address.postalCode,
+      address.city,
+      address.region,
+      address.country,
+    ].whereType<String>().where((part) => part.trim().isNotEmpty).join(', ');
+  }
+
+  void _onQueryChanged(String value) {
+    _query = value.trim();
+    widget.onChanged(Address(
+      id: widget.address.id,
+      contactId: widget.address.contactId,
+      label: widget.address.label,
+      street: value.trim(),
+      sortOrder: widget.address.sortOrder,
+    ));
+    _debounce?.cancel();
+    if (_query.length < 4) {
+      setState(() {
+        _suggestions = [];
+        _searching = false;
+      });
+      return;
+    }
+    setState(() => _searching = true);
+    _debounce = Timer(const Duration(milliseconds: 1100), _search);
+  }
+
+  Future<void> _search() async {
+    final query = _query;
+    if (query.length < 4 || !mounted) return;
+    final key = query.toLowerCase();
+    final cached = _cache[key];
+    if (cached != null) {
+      if (mounted && query == _query) {
+        setState(() {
+          _suggestions = cached;
+          _searching = false;
+        });
+      }
+      return;
+    }
+
+    HttpClient? client;
+    try {
+      client = HttpClient()
+        ..connectionTimeout = const Duration(seconds: 7)
+        ..userAgent = 'NEXO/1.2 (https://github.com/Ocelote9547/Nexo-dev)';
+      final uri = Uri.https('photon.komoot.io', '/api/', {
+        'q': query,
+        'limit': '5',
+        'lang': 'es',
+      });
+      final request = await client.getUrl(uri).timeout(const Duration(seconds: 8));
+      final response = await request.close().timeout(const Duration(seconds: 8));
+      if (response.statusCode != HttpStatus.ok) {
+        throw HttpException('Photon HTTP ${response.statusCode}');
+      }
+      final body = await response.transform(utf8.decoder).join();
+      final decoded = jsonDecode(body) as Map<String, dynamic>;
+      final features = decoded['features'] as List<dynamic>? ?? [];
+      final results = features.map((feature) {
+        final item = feature as Map<String, dynamic>;
+        final properties = item['properties'] as Map<String, dynamic>? ?? {};
+        final geometry = item['geometry'] as Map<String, dynamic>? ?? {};
+        final coordinates = geometry['coordinates'] as List<dynamic>? ?? [];
+        return _AddressSuggestion(
+          name: (properties['name'] ?? '').toString(),
+          street: (properties['street'] ?? '').toString(),
+          number: (properties['housenumber'] ?? '').toString(),
+          postalCode: (properties['postcode'] ?? '').toString(),
+          city: (properties['city'] ?? properties['locality'] ?? properties['district'] ?? '').toString(),
+          region: (properties['state'] ?? '').toString(),
+          country: (properties['country'] ?? '').toString(),
+          latitude: coordinates.length > 1 ? (coordinates[1] as num).toDouble() : null,
+          longitude: coordinates.isNotEmpty ? (coordinates[0] as num).toDouble() : null,
+        );
+      }).where((item) => item.display.isNotEmpty).toList();
+      _cache[key] = results;
+      if (mounted && query == _query) {
+        setState(() {
+          _suggestions = results;
+          _searching = false;
+        });
+      }
+    } catch (_) {
+      if (mounted && query == _query) {
+        setState(() {
+          _suggestions = [];
+          _searching = false;
+        });
+      }
+    } finally {
+      client?.close(force: true);
+    }
+  }
+
+  void _selectSuggestion(_AddressSuggestion suggestion) {
+    final street = suggestion.street.isNotEmpty
+        ? suggestion.street
+        : suggestion.name;
+    final address = Address(
+      id: widget.address.id,
+      contactId: widget.address.contactId,
+      label: widget.address.label,
+      street: street,
+      number: suggestion.number.isEmpty ? null : suggestion.number,
+      postalCode: suggestion.postalCode.isEmpty ? null : suggestion.postalCode,
+      city: suggestion.city.isEmpty ? null : suggestion.city,
+      region: suggestion.region.isEmpty ? null : suggestion.region,
+      country: suggestion.country.isEmpty ? null : suggestion.country,
+      latitude: suggestion.latitude,
+      longitude: suggestion.longitude,
+      sortOrder: widget.address.sortOrder,
+    );
+    _controller.text = suggestion.display;
+    widget.onChanged(address);
+    FocusScope.of(context).unfocus();
+    setState(() => _suggestions = []);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: NexoSpacing.sm),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  initialValue: address.street,
-                  decoration: const InputDecoration(labelText: 'Calle'),
-                  onChanged: (v) => onChanged(address.copyWith(street: v)),
-                ),
+          TextField(
+            controller: _controller,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              labelText: 'Buscar dirección',
+              hintText: 'Número, calle, localidad y país',
+              prefixIcon: const Icon(Icons.location_on_outlined),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_searching)
+                    const Padding(
+                      padding: EdgeInsets.all(14),
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  IconButton(
+                    tooltip: 'Eliminar dirección',
+                    onPressed: widget.onRemove,
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ],
               ),
-              const SizedBox(width: NexoSpacing.sm),
-              IconButton(onPressed: onRemove, icon: const Icon(Icons.delete_outline)),
-            ],
+            ),
+            onChanged: _onQueryChanged,
           ),
-          const SizedBox(height: NexoSpacing.sm),
-          Row(
-            children: [
-              Expanded(child: TextFormField(initialValue: address.city, decoration: const InputDecoration(labelText: 'Ciudad'), onChanged: (v) => onChanged(address.copyWith(city: v)))),
-              const SizedBox(width: NexoSpacing.sm),
-              Expanded(child: TextFormField(initialValue: address.country, decoration: const InputDecoration(labelText: 'País'), onChanged: (v) => onChanged(address.copyWith(country: v)))),
-            ],
+          if (_suggestions.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 6),
+              decoration: BoxDecoration(
+                color: colors.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.outlineVariant),
+              ),
+              child: Column(
+                children: [
+                  for (var i = 0; i < _suggestions.length; i++)
+                    ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.place_outlined),
+                      title: Text(_suggestions[i].display, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      onTap: () => _selectSuggestion(_suggestions[i]),
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(12, 0, 12, 9),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Resultados de Photon · © OpenStreetMap contributors',
+                        style: TextStyle(fontSize: 10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 4),
+          Text(
+            'La búsqueda envía únicamente el texto de esta dirección al servicio de mapas. También puedes escribirla manualmente.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: NexoSpacing.md),
         ],
       ),
     );
+  }
+}
+
+class _AddressSuggestion {
+  final String name;
+  final String street;
+  final String number;
+  final String postalCode;
+  final String city;
+  final String region;
+  final String country;
+  final double? latitude;
+  final double? longitude;
+
+  const _AddressSuggestion({
+    required this.name,
+    required this.street,
+    required this.number,
+    required this.postalCode,
+    required this.city,
+    required this.region,
+    required this.country,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  String get display {
+    final streetLine = [
+      if (number.isNotEmpty) number,
+      if (street.isNotEmpty) street else name,
+    ].join(' ');
+    return [
+      streetLine,
+      postalCode,
+      city,
+      region,
+      country,
+    ].where((part) => part.trim().isNotEmpty).join(', ');
   }
 }
 
@@ -816,19 +1064,78 @@ class _SocialRow extends StatelessWidget {
   final SocialLink link;
   final ValueChanged<SocialLink> onChanged;
   final VoidCallback onRemove;
-  const _SocialRow({required this.link, required this.onChanged, required this.onRemove});
+
+  const _SocialRow({
+    required this.link,
+    required this.onChanged,
+    required this.onRemove,
+  });
+
+  static const _platforms = [
+    'Instagram', 'Facebook', 'TikTok', 'X', 'LinkedIn', 'YouTube',
+    'Telegram', 'WhatsApp', 'Discord', 'Twitch', 'GitHub', 'Website', 'Otro',
+  ];
+
+  String get _selectedPlatform {
+    final value = link.type.toLowerCase();
+    for (final platform in _platforms) {
+      if (platform.toLowerCase() == value) return platform;
+    }
+    return 'Otro';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: NexoSpacing.sm),
-      child: Row(
+      padding: const EdgeInsets.only(bottom: NexoSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(flex: 1, child: TextFormField(initialValue: link.type, decoration: const InputDecoration(labelText: 'Tipo'), onChanged: (v) => onChanged(link.copyWith(type: v)))),
-          const SizedBox(width: NexoSpacing.sm),
-          Expanded(flex: 2, child: TextFormField(initialValue: link.value, decoration: const InputDecoration(labelText: 'Valor'), onChanged: (v) => onChanged(link.copyWith(value: v)))),
-          const SizedBox(width: NexoSpacing.sm),
-          IconButton(onPressed: onRemove, icon: const Icon(Icons.delete_outline)),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedPlatform,
+                  decoration: const InputDecoration(labelText: 'Plataforma'),
+                  items: _platforms.map((platform) => DropdownMenuItem(
+                    value: platform,
+                    child: Text(platform),
+                  )).toList(),
+                  onChanged: (value) {
+                    if (value != null) onChanged(link.copyWith(type: value));
+                  },
+                ),
+              ),
+              IconButton(
+                tooltip: 'Eliminar enlace',
+                onPressed: onRemove,
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ],
+          ),
+          const SizedBox(height: NexoSpacing.sm),
+          TextFormField(
+            key: ValueKey('social-url-${link.id}'),
+            initialValue: link.url ?? link.value,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              labelText: 'URL o perfil',
+              hintText: 'https://...',
+              prefixIcon: Icon(Icons.link),
+            ),
+            onChanged: (value) => onChanged(link.copyWith(url: value, value: value)),
+          ),
+          const SizedBox(height: NexoSpacing.sm),
+          TextFormField(
+            key: ValueKey('social-label-${link.id}'),
+            initialValue: link.label ?? '',
+            decoration: const InputDecoration(
+              labelText: 'Etiqueta (opcional)',
+              hintText: 'Ej. Trabajo, personal, portfolio',
+              prefixIcon: Icon(Icons.label_outline),
+            ),
+            onChanged: (value) => onChanged(link.copyWith(label: value)),
+          ),
         ],
       ),
     );

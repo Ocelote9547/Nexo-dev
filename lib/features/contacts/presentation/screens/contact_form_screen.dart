@@ -27,6 +27,8 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
   bool _saving = false;
   String? _photoPath;
   String? _photoHash;
+  bool _isFavorite = false;
+  DateTime? _favoriteMarkedAt;
 
   final _givenName = TextEditingController();
   final _middleName = TextEditingController();
@@ -69,6 +71,8 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         _nickname.text = c.nickname ?? '';
         _photoPath = c.photoPath;
         _photoHash = c.photoHash;
+        _isFavorite = c.isFavorite;
+        _favoriteMarkedAt = c.favoriteMarkedAt;
         _phones = List.of(cwr.phones);
         _emails = List.of(cwr.emails);
         _addresses = List.of(cwr.addresses);
@@ -153,6 +157,8 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         nickname: _nickname.text.trim().isEmpty ? null : _nickname.text.trim(),
         photoPath: _photoPath,
         photoHash: _photoHash,
+        isFavorite: _isFavorite,
+        favoriteMarkedAt: _favoriteMarkedAt,
       );
 
       String savedId;

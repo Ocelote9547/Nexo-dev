@@ -140,8 +140,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 66,
         title: Text(
           'Contactos',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -374,6 +377,8 @@ class _ContactTile extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       borderRadius: BorderRadius.circular(NexoDesignRadii.lg),
+      elevation: 2,
+      shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
@@ -382,7 +387,7 @@ class _ContactTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: NexoDesignSpacing.md,
-          vertical: 2,
+          vertical: 6,
         ),
         dense: true,
         visualDensity: const VisualDensity(vertical: -1),

@@ -385,7 +385,34 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
           ),
         ],
       ),
-      body: Form(
+      body: Theme(
+        data: Theme.of(context).copyWith(
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.48),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.48),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
+        child: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 36),
@@ -644,6 +671,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             ),
             const SizedBox(height: NexoSpacing.xxl),
           ],
+        ),
         ),
       ),
     );

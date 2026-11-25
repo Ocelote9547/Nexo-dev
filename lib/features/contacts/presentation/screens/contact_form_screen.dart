@@ -606,7 +606,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
               field: e.value,
               onChanged: (f) => _customFields[e.key] = f,
               onRemove: () => _removeCustomField(e.key),
-            )))
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             Row(
               children: [

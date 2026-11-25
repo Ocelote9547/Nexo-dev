@@ -33,18 +33,6 @@ android {
         }
     }
 
-    flavorDimensions += "tier"
-    productFlavors {
-        create("production") {
-            dimension = "tier"
-            applicationId = "com.nexo.nexo"
-        }
-        create("qa") {
-            dimension = "tier"
-            applicationId = "com.nexo.nexo.qa"
-        }
-    }
-
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.

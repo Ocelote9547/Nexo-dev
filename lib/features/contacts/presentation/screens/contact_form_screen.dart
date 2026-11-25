@@ -829,6 +829,7 @@ class _AddressRowState extends State<_AddressRow> {
   List<_AddressSuggestion> _suggestions = [];
   bool _searching = false;
   bool _searched = false;
+  bool _manualSearchDone = false;
   bool _searchError = false;
   String _query = '';
 
@@ -868,11 +869,12 @@ class _AddressRowState extends State<_AddressRow> {
         _suggestions = [];
         _searching = false;
         _searched = false;
+        _manualSearchDone = false;
         _searchError = false;
       });
       return;
     }
-    setState(() { _searching = true; _searched = false; _searchError = false; });
+    setState(() { _searching = true; _searched = false; _manualSearchDone = false; _searchError = false; });
     _debounce = Timer(const Duration(milliseconds: 1100), _search);
   }
 
@@ -889,7 +891,8 @@ class _AddressRowState extends State<_AddressRow> {
         setState(() {
           _suggestions = cached;
           _searching = false;
-          _searched = explicitSearch;
+          _searched = cached.isEmpty;
+          _manualSearchDone = explicitSearch;
         });
       }
       if (cached.isNotEmpty || !explicitSearch) return;
@@ -922,7 +925,8 @@ class _AddressRowState extends State<_AddressRow> {
       setState(() {
         _suggestions = results;
         _searching = false;
-        _searched = explicitSearch && results.isEmpty;
+        _searched = results.isEmpty;
+        _manualSearchDone = explicitSearch;
         _searchError = explicitSearch && results.isEmpty && photonFailed && nominatimFailed;
       });
     }
@@ -1061,7 +1065,12 @@ class _AddressRowState extends State<_AddressRow> {
     _controller.text = suggestion.display;
     widget.onChanged(address);
     FocusScope.of(context).unfocus();
-    setState(() => _suggestions = []);
+    setState(() {
+      _suggestions = [];
+      _searched = false;
+      _manualSearchDone = false;
+      _searchError = false;
+    });
   }
 
   @override
@@ -1098,6 +1107,16 @@ class _AddressRowState extends State<_AddressRow> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     ),
+                  IconButton(
+                    tooltip: 'Buscar dirección',
+                    onPressed: _searching
+                        ? null
+                        : () {
+                            _debounce?.cancel();
+                            _search(explicitSearch: true);
+                          },
+                    icon: const Icon(Icons.search_rounded),
+                  ),
                   IconButton(
                     tooltip: 'Eliminar dirección',
                     onPressed: widget.onRemove,
@@ -1148,7 +1167,9 @@ class _AddressRowState extends State<_AddressRow> {
               child: Text(
                 _searchError
                     ? 'No se pudo conectar con los servicios de mapas. Comprueba la conexión e inténtalo de nuevo.'
-                    : 'No se encontraron coincidencias. Puedes modificar la búsqueda o guardar la dirección como texto manual.',
+                    : _manualSearchDone
+                        ? 'No se encontraron coincidencias. Puedes modificar la búsqueda o guardar la dirección como texto manual.'
+                        : 'No hay sugerencias automáticas. Pulsa la lupa o Buscar en el teclado para realizar una búsqueda completa.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
             ),

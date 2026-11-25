@@ -40,7 +40,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Scaffold(
         backgroundColor: tokens.background,
-        extendBody: true,
+        // El contenido de cada pestaña termina antes de la navegación inferior.
+        // La barra sigue siendo transparente, pero ya no tapa los FAB internos.
+        extendBody: false,
         body: IndexedStack(index: _index, children: screens),
         bottomNavigationBar: Material(
           type: MaterialType.transparency,
@@ -172,8 +174,8 @@ class _NexoBottomWavePainter extends CustomPainter {
     // no una simple línea decorativa ni un panel opaco bajo los iconos.
     for (var layer = 0; layer < 3; layer++) {
       final top = Path();
-      final baseY = 52.0 + layer * 5.0;
-      final lift = 18.0 - layer * 3.0;
+      final baseY = 49.0 + layer * 8.0;
+      final lift = 19.0 - layer * 2.5;
       final sigma = spacing * (0.72 + layer * 0.10);
       double waveY(double x) {
         final d = (x - selectedX) / sigma;
@@ -194,7 +196,7 @@ class _NexoBottomWavePainter extends CustomPainter {
       final ribbon = Path()..addPath(top, Offset.zero);
       for (var i = 160; i >= 0; i--) {
         final x = size.width * i / 160;
-        ribbon.lineTo(x, waveY(x) + 7.0 + layer * 1.5);
+        ribbon.lineTo(x, waveY(x) + 15.0 + layer * 2.0);
       }
       ribbon.close();
 
@@ -213,7 +215,7 @@ class _NexoBottomWavePainter extends CustomPainter {
         ribbon,
         Paint()
           ..shader = gradient
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.7),
       );
       canvas.drawPath(ribbon, Paint()..shader = gradient);
     }

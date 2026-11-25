@@ -1023,7 +1023,7 @@ class _AddressRowState extends State<_AddressRow> {
         return _AddressSuggestion(
           name: (item['name'] ?? city ?? '').toString(),
           displayName: (item['display_name'] ?? '').toString(),
-          street: street.isEmpty ? null : street,
+          street: street,
           number: firstValue(address, ['house_number']),
           postalCode: firstValue(address, ['postcode']),
           city: city,

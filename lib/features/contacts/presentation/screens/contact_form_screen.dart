@@ -929,7 +929,7 @@ class _AddressRowState extends State<_AddressRow> {
       return;
     }
     setState(() { _searching = true; _searched = false; _manualSearchDone = false; _searchError = false; });
-    _debounce = Timer(const Duration(milliseconds: 450), _search);
+    _debounce = Timer(const Duration(milliseconds: 650), _search);
   }
 
 

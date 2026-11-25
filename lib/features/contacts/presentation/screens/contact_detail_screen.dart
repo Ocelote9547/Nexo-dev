@@ -130,10 +130,10 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           final birthdayDates = cwr.dates.where((d) => d.type == 'birthday').toList();
           final qa = ref.read(quickActionsServiceProvider);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 34),
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 25),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -226,7 +226,15 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                   text: text,
                   subtitle: a.label,
                   actions: [
-                    if (text.isNotEmpty) _Action(icon: Icons.map, tooltip: 'Mapa', onTap: () => qa.openMap(text)),
+                    if (text.isNotEmpty) _Action(
+                      icon: Icons.map,
+                      tooltip: 'Mapa',
+                      onTap: () => qa.openMap(
+                        a.latitude != null && a.longitude != null
+                            ? '${a.latitude},${a.longitude}'
+                            : text,
+                      ),
+                    ),
                     _Action(icon: Icons.copy, tooltip: 'Copiar', onTap: () => Clipboard.setData(ClipboardData(text: text))),
                   ],
                 );
@@ -300,10 +308,10 @@ class _Section extends StatelessWidget {
     if (children.isEmpty) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.only(bottom: NexoSpacing.md),
-      padding: const EdgeInsets.fromLTRB(17, 15, 13, 9),
+      padding: const EdgeInsets.fromLTRB(18, 16, 15, 11),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(23),
         border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: Column(

@@ -981,7 +981,7 @@ class _AddressRowState extends State<_AddressRow> {
         _searching = false;
         _searched = results.isEmpty;
         _manualSearchDone = explicitSearch;
-        _searchError = explicitSearch && results.isEmpty && photonFailed && nominatimFailed;
+        _searchError = explicitSearch && results.isEmpty && nominatimFailed;
       });
     }
   }

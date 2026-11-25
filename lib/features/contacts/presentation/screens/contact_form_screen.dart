@@ -553,60 +553,60 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             ),
             const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Teléfonos', onAdd: _addPhone),
-            ..._phones.asMap().entries.map((e) => _PhoneRow(
+            ..._phones.asMap().entries.map((e) => _FormItemSurface(child: _PhoneRow(
               phone: e.value,
               onChanged: (p) => _phones[e.key] = p,
               onRemove: () => _removePhone(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Correos', onAdd: _addEmail),
-            ..._emails.asMap().entries.map((e) => _EmailRow(
+            ..._emails.asMap().entries.map((e) => _FormItemSurface(child: _EmailRow(
               email: e.value,
               onChanged: (em) => _emails[e.key] = em,
               onRemove: () => _removeEmail(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Direcciones', onAdd: _addAddress),
-            ..._addresses.asMap().entries.map((e) => _AddressRow(
+            ..._addresses.asMap().entries.map((e) => _FormItemSurface(child: _AddressRow(
               address: e.value,
               onChanged: (a) => _addresses[e.key] = a,
               onRemove: () => _removeAddress(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             _SectionHeader(title: 'Organizaciones', onAdd: _addOrganization),
-            ..._organizations.asMap().entries.map((e) => _OrganizationRow(
+            ..._organizations.asMap().entries.map((e) => _FormItemSurface(child: _OrganizationRow(
               organization: e.value,
               onChanged: (o) => _organizations[e.key] = o,
               onRemove: () => _removeOrganization(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             _SectionHeader(title: 'Redes sociales', onAdd: _addSocialLink),
-            ..._socialLinks.asMap().entries.map((e) => _SocialRow(
+            ..._socialLinks.asMap().entries.map((e) => _FormItemSurface(child: _SocialRow(
               link: e.value,
               onChanged: (s) => setState(() => _socialLinks[e.key] = s),
               onRemove: () => _removeSocialLink(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             _SectionHeader(title: 'Fechas importantes', onAdd: _addDate),
-            ..._dates.asMap().entries.map((e) => _DateRow(
+            ..._dates.asMap().entries.map((e) => _FormItemSurface(child: _DateRow(
               date: e.value,
               onChanged: (d) => setState(() => _dates[e.key] = d),
               onRemove: () => _removeDate(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             _SectionHeader(title: 'Notas', onAdd: _addNote),
-            ..._notes.asMap().entries.map((e) => _NoteRow(
+            ..._notes.asMap().entries.map((e) => _FormItemSurface(child: _NoteRow(
               note: e.value,
               onChanged: (n) => _notes[e.key] = n,
               onRemove: () => _removeNote(e.key),
-            )),
+            ))),
             const SizedBox(height: NexoSpacing.xl),
             _SectionHeader(title: 'Campos personalizados', onAdd: _addCustomField),
-            ..._customFields.asMap().entries.map((e) => _CustomFieldRow(
+            ..._customFields.asMap().entries.map((e) => _FormItemSurface(child: _CustomFieldRow(
               field: e.value,
               onChanged: (f) => _customFields[e.key] = f,
               onRemove: () => _removeCustomField(e.key),
-            )),
+            )))
             const SizedBox(height: NexoSpacing.xl),
             Row(
               children: [
@@ -674,6 +674,27 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         ),
         ),
       ),
+    );
+  }
+}
+
+
+class _FormItemSurface extends StatelessWidget {
+  final Widget child;
+  const _FormItemSurface({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.fromLTRB(10, 10, 8, 4),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.38)),
+      ),
+      child: child,
     );
   }
 }

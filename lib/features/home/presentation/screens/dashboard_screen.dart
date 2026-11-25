@@ -108,8 +108,8 @@ class _Header extends ConsumerWidget {
         children: [
           // Logotipo NEXO — círculo con fondo navy y borde fino
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: tokens.accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(NexoDesignRadii.md),
@@ -146,7 +146,7 @@ class _Header extends ConsumerWidget {
                         'NEXO',
                         style: NexoDesignTypography.nexoName.copyWith(
                           color: tokens.textPrimary,
-                          fontSize: 27,
+                          fontSize: 29,
                         ),
                       ),
                     ],
@@ -379,16 +379,16 @@ class _FavoritesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.fromLTRB(13, 10, 13, 12),
       decoration: BoxDecoration(
         color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(23),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
+            blurRadius: 20,
+            offset: const Offset(0, 7),
           ),
         ],
       ),
@@ -598,7 +598,7 @@ class _UpcomingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(13, 10, 13, 13),
       decoration: BoxDecoration(
         color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
         borderRadius: BorderRadius.circular(20),
@@ -673,7 +673,7 @@ class _UpcomingSection extends StatelessWidget {
                 );
               }
               return SizedBox(
-                height: 149,
+                height: 142,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: upcoming.length,

@@ -918,7 +918,7 @@ class _AddressRowState extends State<_AddressRow> {
       sortOrder: widget.address.sortOrder,
     ));
     _debounce?.cancel();
-    if (_query.length < 4) {
+    if (_query.length < 3) {
       setState(() {
         _suggestions = [];
         _searching = false;
@@ -929,7 +929,7 @@ class _AddressRowState extends State<_AddressRow> {
       return;
     }
     setState(() { _searching = true; _searched = false; _manualSearchDone = false; _searchError = false; });
-    _debounce = Timer(const Duration(milliseconds: 1100), _search);
+    _debounce = Timer(const Duration(milliseconds: 450), _search);
   }
 
 
@@ -994,8 +994,9 @@ class _AddressRowState extends State<_AddressRow> {
         ..userAgent = 'NEXO/1.2 (https://github.com/Ocelote9547/Nexo-dev)';
       final uri = Uri.https('photon.komoot.io', '/api/', {
         'q': query,
-        'limit': '5',
+        'limit': '10',
         'lang': 'es',
+        'zoom': '12',
       });
       final request = await client.getUrl(uri).timeout(const Duration(seconds: 8));
       final response = await request.close().timeout(const Duration(seconds: 8));
@@ -1229,7 +1230,7 @@ class _AddressRowState extends State<_AddressRow> {
             ),
           const SizedBox(height: 4),
           Text(
-            'Selecciona un resultado para asociar la dirección a una ubicación reconocida. También puedes guardarla manualmente. La búsqueda envía el texto al servicio de mapas.',
+            'Sugerencias automáticas de Photon. Si no aparece el lugar, utiliza Buscar para consultar el índice completo.', para asociar la dirección a una ubicación reconocida. También puedes guardarla manualmente. La búsqueda envía el texto al servicio de mapas.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),

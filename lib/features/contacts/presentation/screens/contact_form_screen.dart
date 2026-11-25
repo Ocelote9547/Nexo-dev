@@ -1230,7 +1230,7 @@ class _AddressRowState extends State<_AddressRow> {
             ),
           const SizedBox(height: 4),
           Text(
-            'Sugerencias automáticas de Photon. Si no aparece el lugar, utiliza Buscar para localizar una ubicación y asociarla a la dirección. También puedes guardarla manualmente.'
+            'Sugerencias automáticas de Photon. Si no aparece el lugar, utiliza Buscar para localizar una ubicación y asociarla a la dirección. También puedes guardarla manualmente.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),

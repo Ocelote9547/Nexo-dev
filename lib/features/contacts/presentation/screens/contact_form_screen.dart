@@ -418,107 +418,107 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 42),
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 21),
+              padding: const EdgeInsets.all(17),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.11),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.13),
                     Theme.of(context).colorScheme.surfaceContainerLow,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(23),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
                 ),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.account_circle_outlined,
-                        color: Theme.of(context).colorScheme.primary, size: 20),
-                      const SizedBox(width: 9),
-                      Text(
-                        'Perfil del contacto',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: GestureDetector(
-                      onTap: _pickPhoto,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55),
-                            width: 2,
+                  GestureDetector(
+                    onTap: _pickPhoto,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55),
+                              width: 2,
+                            ),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                              blurRadius: 18,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                          child: NexoAvatar(
+                            displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
+                            size: 76,
+                            photoPath: _photoPath,
+                          ),
                         ),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            NexoAvatar(
-                              displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
-                              size: 88,
-                              photoPath: _photoPath,
-                            ),
-                            Positioned(
-                              right: -2,
-                              bottom: -2,
-                              child: Container(
-                                width: 31,
-                                height: 31,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.surface,
-                                    width: 2.5,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.camera_alt_rounded,
-                                  size: 16,
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                ),
+                        Positioned(
+                          right: -1,
+                          bottom: -1,
+                          child: Container(
+                            width: 27,
+                            height: 27,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.surface,
+                                width: 2,
                               ),
                             ),
-                          ],
+                            child: Icon(
+                              Icons.camera_alt_rounded,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _photoPath == null ? 'Toca la cámara para añadir una foto' : 'Foto del contacto',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Perfil del contacto',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          _photoPath == null
+                              ? 'Añade una fotografía para identificarlo fácilmente.'
+                              : 'Fotografía seleccionada.',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            height: 1.35,
+                          ),
+                        ),
+                        if (_photoPath != null)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                _photoPath = null;
+                                _photoHash = null;
+                              }),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.only(top: 6),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text('Quitar fotografía'),
+                            ),
+                          ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  if (_photoPath != null)
-                    TextButton.icon(
-                      onPressed: () => setState(() {
-                        _photoPath = null;
-                        _photoHash = null;
-                      }),
-                      icon: const Icon(Icons.delete_outline, size: 18),
-                      label: const Text('Eliminar foto'),
-                    ),
                 ],
               ),
             ),

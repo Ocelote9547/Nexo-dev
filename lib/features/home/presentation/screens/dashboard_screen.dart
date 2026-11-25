@@ -299,7 +299,7 @@ class _NexoHeaderWavesPainter extends CustomPainter {
 
     // Tres cintas de agua superpuestas con cresta, valle y volumen translúcido.
     for (var layer = 0; layer < 3; layer++) {
-      final shift = layer * 0.11;
+      final shift = layer * 0.075;
       final top = Path()
         ..moveTo(-size.width * 0.08, size.height * (0.58 + shift))
         ..cubicTo(
@@ -310,17 +310,17 @@ class _NexoHeaderWavesPainter extends CustomPainter {
         ..cubicTo(
           size.width * 0.70, size.height * (0.00 + shift),
           size.width * 0.88, size.height * (0.92 - shift),
-          size.width * 1.08, size.height * (0.30 + shift),
+          size.width * 1.08, size.height * (0.43 + shift),
         );
       final ribbon = Path()
         ..addPath(top, Offset.zero)
         ..cubicTo(
-          size.width * 0.89, size.height * (0.66 + shift),
-          size.width * 0.72, size.height * (0.27 + shift),
-          size.width * 0.53, size.height * (0.67 + shift),
+          size.width * 0.89, size.height * (0.78 + shift),
+          size.width * 0.72, size.height * (0.40 + shift),
+          size.width * 0.53, size.height * (0.82 + shift),
         )
         ..cubicTo(
-          size.width * 0.33, size.height * (1.10 - shift),
+          size.width * 0.33, size.height * (1.18 - shift),
           size.width * 0.15, size.height * (0.30 + shift),
           -size.width * 0.08, size.height * (0.83 + shift),
         )
@@ -342,7 +342,7 @@ class _NexoHeaderWavesPainter extends CustomPainter {
         ribbon,
         Paint()
           ..shader = shader
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.8),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.9),
       );
       canvas.drawPath(ribbon, Paint()..shader = shader);
       canvas.drawPath(

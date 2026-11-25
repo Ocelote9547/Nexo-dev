@@ -32,7 +32,9 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: tokens.background,
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 76),
+        child: FloatingActionButton(
         heroTag: 'nexo_open_dialpad',
         tooltip: 'Abrir teclado del teléfono',
         backgroundColor: tokens.accent,
@@ -42,6 +44,7 @@ class DashboardScreen extends ConsumerWidget {
           await ref.read(quickActionsServiceProvider).call('');
         },
         child: const Icon(Icons.dialpad_rounded, size: 25),
+        ),
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -299,28 +302,28 @@ class _NexoHeaderWavesPainter extends CustomPainter {
 
     // Tres cintas de agua superpuestas con cresta, valle y volumen translúcido.
     for (var layer = 0; layer < 3; layer++) {
-      final shift = layer * 0.11;
+      final shift = layer * 0.075;
       final top = Path()
-        ..moveTo(-size.width * 0.08, size.height * (0.58 + shift))
+        ..moveTo(-size.width * 0.08, size.height * (0.48 + shift))
         ..cubicTo(
-          size.width * 0.15, size.height * (0.02 + shift),
-          size.width * 0.34, size.height * (1.02 - shift),
-          size.width * 0.53, size.height * (0.43 + shift),
+          size.width * 0.15, size.height * (0.10 + shift),
+          size.width * 0.34, size.height * (0.88 - shift),
+          size.width * 0.53, size.height * (0.40 + shift),
         )
         ..cubicTo(
-          size.width * 0.70, size.height * (0.00 + shift),
-          size.width * 0.88, size.height * (0.92 - shift),
-          size.width * 1.08, size.height * (0.30 + shift),
+          size.width * 0.70, size.height * (0.12 + shift),
+          size.width * 0.88, size.height * (0.82 - shift),
+          size.width * 1.08, size.height * (0.34 + shift),
         );
       final ribbon = Path()
         ..addPath(top, Offset.zero)
         ..cubicTo(
-          size.width * 0.89, size.height * (0.66 + shift),
-          size.width * 0.72, size.height * (0.27 + shift),
-          size.width * 0.53, size.height * (0.67 + shift),
+          size.width * 0.89, size.height * (0.72 + shift),
+          size.width * 0.72, size.height * (0.32 + shift),
+          size.width * 0.53, size.height * (0.64 + shift),
         )
         ..cubicTo(
-          size.width * 0.33, size.height * (1.10 - shift),
+          size.width * 0.33, size.height * (0.96 - shift),
           size.width * 0.15, size.height * (0.30 + shift),
           -size.width * 0.08, size.height * (0.83 + shift),
         )
@@ -331,8 +334,8 @@ class _NexoHeaderWavesPainter extends CustomPainter {
         end: Alignment.centerRight,
         colors: [
           color.withValues(alpha: 0.015),
-          color.withValues(alpha: layer == 0 ? 0.23 : 0.13),
-          cyan.withValues(alpha: layer == 0 ? 0.20 : 0.11),
+          color.withValues(alpha: layer == 0 ? 0.19 : 0.10),
+          cyan.withValues(alpha: layer == 0 ? 0.16 : 0.085),
           color.withValues(alpha: 0.015),
         ],
         stops: const [0.0, 0.34, 0.70, 1.0],
@@ -342,7 +345,7 @@ class _NexoHeaderWavesPainter extends CustomPainter {
         ribbon,
         Paint()
           ..shader = shader
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.8),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.6),
       );
       canvas.drawPath(ribbon, Paint()..shader = shader);
       canvas.drawPath(

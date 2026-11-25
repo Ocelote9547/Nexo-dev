@@ -42,10 +42,10 @@ Requisitos: Flutter instalado y SDK de Android configurado.
 flutter pub get
 flutter analyze
 flutter test
-flutter build apk --release --flavor production
+flutter build apk --release
 ```
 
-El APK de producción utiliza el identificador `com.nexo.nexo`. El flavor QA utiliza `com.nexo.nexo.qa`.
+La compilación release genera únicamente la aplicación NEXO publicable, con el identificador `com.nexo.nexo`.
 
 ## Versión 1.2
 

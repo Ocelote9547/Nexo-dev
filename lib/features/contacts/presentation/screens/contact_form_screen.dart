@@ -415,10 +415,10 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         child: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 36),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 42),
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 21),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -428,7 +428,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                     Theme.of(context).colorScheme.surfaceContainerLow,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(26),
+                borderRadius: BorderRadius.circular(23),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
                 ),
@@ -473,7 +473,7 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                           children: [
                             NexoAvatar(
                               displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
-                              size: 82,
+                              size: 88,
                               photoPath: _photoPath,
                             ),
                             Positioned(

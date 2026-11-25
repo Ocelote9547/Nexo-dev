@@ -829,6 +829,7 @@ class _AddressRowState extends State<_AddressRow> {
   List<_AddressSuggestion> _suggestions = [];
   bool _searching = false;
   bool _searched = false;
+  bool _searchError = false;
   String _query = '';
 
   @override
@@ -867,29 +868,67 @@ class _AddressRowState extends State<_AddressRow> {
         _suggestions = [];
         _searching = false;
         _searched = false;
+        _searchError = false;
       });
       return;
     }
-    setState(() => _searching = true);
+    setState(() { _searching = true; _searched = false; _searchError = false; });
     _debounce = Timer(const Duration(milliseconds: 1100), _search);
   }
 
-  Future<void> _search() async {
-    final query = _query;
-    if (query.length < 4 || !mounted) return;
+
+  static DateTime? _lastNominatimRequestAt;
+
+  Future<void> _search({bool explicitSearch = false}) async {
+    final query = _query.trim();
+    if (query.length < 3 || !mounted) return;
     final key = query.toLowerCase();
     final cached = _cache[key];
-    if (cached != null) {
+    if (cached != null && (cached.isNotEmpty || !explicitSearch)) {
       if (mounted && query == _query) {
         setState(() {
           _suggestions = cached;
           _searching = false;
-          _searched = true;
+          _searched = explicitSearch;
         });
       }
-      return;
+      if (cached.isNotEmpty || !explicitSearch) return;
     }
 
+    List<_AddressSuggestion> results = [];
+    var photonFailed = false;
+    try {
+      results = await _requestPhoton(query);
+    } catch (_) {
+      photonFailed = true;
+    }
+
+    // Nominatim se consulta solo tras una acción explícita del usuario.
+    // No se usa para autocompletar: su política pública prohíbe ese patrón.
+    var nominatimFailed = false;
+    if (results.isEmpty && explicitSearch) {
+      try {
+        results = await _requestNominatim(query);
+      } catch (_) {
+        nominatimFailed = true;
+      }
+    }
+
+    if (results.isNotEmpty || !photonFailed) {
+      _cache[key] = results;
+    }
+
+    if (mounted && query == _query) {
+      setState(() {
+        _suggestions = results;
+        _searching = false;
+        _searched = explicitSearch && results.isEmpty;
+        _searchError = explicitSearch && results.isEmpty && photonFailed && nominatimFailed;
+      });
+    }
+  }
+
+  Future<List<_AddressSuggestion>> _requestPhoton(String query) async {
     HttpClient? client;
     try {
       client = HttpClient()
@@ -908,7 +947,7 @@ class _AddressRowState extends State<_AddressRow> {
       final body = await response.transform(utf8.decoder).join();
       final decoded = jsonDecode(body) as Map<String, dynamic>;
       final features = decoded['features'] as List<dynamic>? ?? [];
-      final results = features.map((feature) {
+      return features.map((feature) {
         final item = feature as Map<String, dynamic>;
         final properties = item['properties'] as Map<String, dynamic>? ?? {};
         final geometry = item['geometry'] as Map<String, dynamic>? ?? {};
@@ -921,26 +960,79 @@ class _AddressRowState extends State<_AddressRow> {
           city: (properties['city'] ?? properties['locality'] ?? properties['district'] ?? '').toString(),
           region: (properties['state'] ?? '').toString(),
           country: (properties['country'] ?? '').toString(),
-          latitude: coordinates.length > 1 ? (coordinates[1] as num).toDouble() : null,
-          longitude: coordinates.isNotEmpty ? (coordinates[0] as num).toDouble() : null,
+          latitude: coordinates.length > 1 && coordinates[1] is num
+              ? (coordinates[1] as num).toDouble()
+              : null,
+          longitude: coordinates.isNotEmpty && coordinates[0] is num
+              ? (coordinates[0] as num).toDouble()
+              : null,
         );
       }).where((item) => item.display.isNotEmpty).toList();
-      _cache[key] = results;
-      if (mounted && query == _query) {
-        setState(() {
-          _suggestions = results;
-          _searching = false;
-          _searched = true;
-        });
+    } finally {
+      client?.close(force: true);
+    }
+  }
+
+  Future<List<_AddressSuggestion>> _requestNominatim(String query) async {
+    final previous = _lastNominatimRequestAt;
+    if (previous != null) {
+      final elapsed = DateTime.now().difference(previous);
+      if (elapsed < const Duration(seconds: 1)) {
+        await Future.delayed(const Duration(seconds: 1) - elapsed);
       }
-    } catch (_) {
-      if (mounted && query == _query) {
-        setState(() {
-          _suggestions = [];
-          _searching = false;
-          _searched = true;
-        });
+    }
+    _lastNominatimRequestAt = DateTime.now();
+
+    HttpClient? client;
+    try {
+      client = HttpClient()
+        ..connectionTimeout = const Duration(seconds: 7)
+        ..userAgent = 'NEXO/1.2 (https://github.com/Ocelote9547/Nexo-dev)';
+      final uri = Uri.https('nominatim.openstreetmap.org', '/search', {
+        'q': query,
+        'format': 'jsonv2',
+        'addressdetails': '1',
+        'limit': '5',
+        'accept-language': 'es',
+      });
+      final request = await client.getUrl(uri).timeout(const Duration(seconds: 8));
+      final response = await request.close().timeout(const Duration(seconds: 8));
+      if (response.statusCode != HttpStatus.ok) {
+        throw HttpException('Nominatim HTTP ${response.statusCode}');
       }
+      final body = await response.transform(utf8.decoder).join();
+      final decoded = jsonDecode(body);
+      if (decoded is! List) return [];
+
+      String firstValue(Map<String, dynamic> map, List<String> keys) {
+        for (final key in keys) {
+          final value = map[key]?.toString().trim() ?? '';
+          if (value.isNotEmpty) return value;
+        }
+        return '';
+      }
+
+      return decoded.whereType<Map<String, dynamic>>().map((item) {
+        final address = item['address'] as Map<String, dynamic>? ?? {};
+        final street = firstValue(address, [
+          'road', 'pedestrian', 'residential', 'footway', 'path',
+        ]);
+        final city = firstValue(address, [
+          'city', 'town', 'village', 'municipality', 'hamlet', 'locality',
+        ]);
+        return _AddressSuggestion(
+          name: (item['name'] ?? city ?? '').toString(),
+          displayName: (item['display_name'] ?? '').toString(),
+          street: street.isEmpty ? null : street,
+          number: firstValue(address, ['house_number']),
+          postalCode: firstValue(address, ['postcode']),
+          city: city,
+          region: firstValue(address, ['state', 'province', 'region']),
+          country: firstValue(address, ['country']),
+          latitude: double.tryParse(item['lat']?.toString() ?? ''),
+          longitude: double.tryParse(item['lon']?.toString() ?? ''),
+        );
+      }).where((item) => item.display.isNotEmpty).toList();
     } finally {
       client?.close(force: true);
     }
@@ -949,7 +1041,9 @@ class _AddressRowState extends State<_AddressRow> {
   void _selectSuggestion(_AddressSuggestion suggestion) {
     final street = suggestion.street.isNotEmpty
         ? suggestion.street
-        : suggestion.name;
+        : (suggestion.name.trim().toLowerCase() == suggestion.city.trim().toLowerCase()
+          ? ''
+          : suggestion.name);
     final address = Address(
       id: widget.address.id,
       contactId: widget.address.contactId,
@@ -1015,7 +1109,7 @@ class _AddressRowState extends State<_AddressRow> {
             onChanged: _onQueryChanged,
             onSubmitted: (_) {
               _debounce?.cancel();
-              _search();
+              _search(explicitSearch: true);
             },
           ),
           if (_suggestions.isNotEmpty)
@@ -1040,7 +1134,7 @@ class _AddressRowState extends State<_AddressRow> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Resultados de Photon · © OpenStreetMap contributors',
+                        'Resultados cartográficos · © OpenStreetMap contributors',
                         style: TextStyle(fontSize: 10),
                       ),
                     ),
@@ -1052,7 +1146,9 @@ class _AddressRowState extends State<_AddressRow> {
             Padding(
               padding: const EdgeInsets.only(top: 7),
               child: Text(
-                'No se encontraron coincidencias. Puedes modificar la búsqueda o guardarla como texto manual.',
+                _searchError
+                    ? 'No se pudo conectar con los servicios de mapas. Comprueba la conexión e inténtalo de nuevo.'
+                    : 'No se encontraron coincidencias. Puedes modificar la búsqueda o guardar la dirección como texto manual.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
             ),
@@ -1080,6 +1176,7 @@ class _AddressSuggestion {
   final String country;
   final double? latitude;
   final double? longitude;
+  final String? displayName;
 
   const _AddressSuggestion({
     required this.name,
@@ -1091,9 +1188,11 @@ class _AddressSuggestion {
     required this.country,
     required this.latitude,
     required this.longitude,
+    this.displayName,
   });
 
   String get display {
+    if (displayName != null && displayName!.trim().isNotEmpty) return displayName!;
     final streetLine = [
       if (number.isNotEmpty) number,
       if (street.isNotEmpty) street else name,

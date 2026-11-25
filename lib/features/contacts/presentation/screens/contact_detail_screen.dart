@@ -133,23 +133,23 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 34),
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 25),
+                padding: const EdgeInsets.fromLTRB(22, 24, 22, 23),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                       Theme.of(context).colorScheme.surfaceContainerLow,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(26),
+                  borderRadius: BorderRadius.circular(28),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.045),
-                      blurRadius: 18,
-                      offset: const Offset(0, 7),
+                      blurRadius: 22,
+                      offset: const Offset(0, 9),
                     ),
                   ],
                 ),
@@ -161,7 +161,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: c.isFavorite ? NexoColors.favorite : Theme.of(context).colorScheme.primary.withValues(alpha: 0.45), width: 2),
                       ),
-                      child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 96),
+                      child: NexoAvatar(displayName: c.displayName, photoPath: c.photoPath, size: 106),
                     ),
                     const SizedBox(height: 10),
                     Text(c.displayName, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
@@ -303,22 +303,84 @@ class _Section extends StatelessWidget {
   final List<Widget> children;
   const _Section({required this.title, required this.children});
 
+  IconData get _icon {
+    switch (title) {
+      case 'Teléfonos':
+        return Icons.phone_outlined;
+      case 'Correos':
+        return Icons.email_outlined;
+      case 'Direcciones':
+        return Icons.location_on_outlined;
+      case 'Organizaciones':
+        return Icons.business_outlined;
+      case 'Redes sociales':
+        return Icons.link_rounded;
+      case 'Fechas':
+      case 'Cumpleaños':
+      case 'Recordatorios de cumpleaños':
+        return Icons.event_outlined;
+      case 'Notas':
+        return Icons.notes_rounded;
+      case 'Campos personalizados':
+        return Icons.tune_rounded;
+      case 'Etiquetas':
+        return Icons.sell_outlined;
+      case 'Colecciones':
+        return Icons.folder_outlined;
+      default:
+        return Icons.info_outline_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (children.isEmpty) return const SizedBox.shrink();
+    final colors = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: NexoSpacing.md),
-      padding: const EdgeInsets.fromLTRB(18, 16, 15, 11),
+      padding: const EdgeInsets.fromLTRB(17, 15, 15, 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(23),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45)),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.50)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.035),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 15, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary)),
-          const SizedBox(height: NexoSpacing.md),
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(_icon, color: colors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: colors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Divider(height: 1, thickness: 1, color: colors.outlineVariant.withValues(alpha: 0.45)),
+          const SizedBox(height: 13),
           ...children,
         ],
       ),

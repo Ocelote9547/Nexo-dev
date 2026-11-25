@@ -364,70 +364,80 @@ class _ContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: NexoDesignSpacing.md),
-      padding: contact.isFavorite ? const EdgeInsets.all(1.5) : EdgeInsets.zero,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: contact.isFavorite
-            ? Border.all(color: NexoDesignColors.favorite, width: 1.35)
-            : Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.42),
-              ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(
-              alpha: Theme.of(context).brightness == Brightness.dark ? 0.16 : 0.035,
-            ),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: NexoCard(
-      margin: EdgeInsets.zero,
-      color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(18),
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
-        );
-      },
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: NexoDesignSpacing.md,
-          vertical: 5,
-        ),
-        dense: true,
-        visualDensity: const VisualDensity(vertical: -1),
-        onTap: () {
-          Navigator.of(context).push(
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: NexoDesignSpacing.sm),
+      child: Material(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(19),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
-          );
-        },
-        leading: NexoAvatar(
-          displayName: contact.displayName,
-          photoPath: contact.photoPath,
-          size: 48,
+          ),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(13, 11, 12, 11),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(19),
+              border: Border.all(
+                color: contact.isFavorite
+                    ? NexoDesignColors.favorite.withValues(alpha: 0.72)
+                    : colors.outlineVariant.withValues(alpha: 0.42),
+              ),
+            ),
+            child: Row(
+              children: [
+                NexoAvatar(
+                  displayName: contact.displayName,
+                  photoPath: contact.photoPath,
+                  size: 52,
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        contact.displayName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.05,
+                        ),
+                      ),
+                      if (_secondaryInfo() != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          _secondaryInfo()!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          'Contacto',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (contact.isFavorite)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 7),
+                    child: Icon(Icons.star_rounded, color: NexoDesignColors.favorite, size: 19),
+                  ),
+                Icon(Icons.chevron_right_rounded, color: colors.onSurfaceVariant, size: 23),
+              ],
+            ),
+          ),
         ),
-        title: Text(
-          contact.displayName,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: _secondaryInfo() != null
-            ? Text(
-                _secondaryInfo()!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              )
-            : null,
-        trailing: contact.isFavorite
-            ? const Icon(Icons.star, color: NexoDesignColors.favorite, size: 20)
-            : null,
-      ),
       ),
     );
   }

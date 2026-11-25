@@ -172,8 +172,8 @@ class _NexoBottomWavePainter extends CustomPainter {
     // no una simple línea decorativa ni un panel opaco bajo los iconos.
     for (var layer = 0; layer < 3; layer++) {
       final top = Path();
-      final baseY = 52.0 + layer * 5.0;
-      final lift = 18.0 - layer * 3.0;
+      final baseY = 46.0 + layer * 8.0;
+      final lift = 20.0 - layer * 3.0;
       final sigma = spacing * (0.72 + layer * 0.10);
       double waveY(double x) {
         final d = (x - selectedX) / sigma;
@@ -194,7 +194,7 @@ class _NexoBottomWavePainter extends CustomPainter {
       final ribbon = Path()..addPath(top, Offset.zero);
       for (var i = 160; i >= 0; i--) {
         final x = size.width * i / 160;
-        ribbon.lineTo(x, waveY(x) + 7.0 + layer * 1.5);
+        ribbon.lineTo(x, waveY(x) + 15.0 + layer * 3.0);
       }
       ribbon.close();
 
@@ -203,8 +203,8 @@ class _NexoBottomWavePainter extends CustomPainter {
         end: Alignment.centerRight,
         colors: [
           blue.withValues(alpha: 0.0),
-          blue.withValues(alpha: layer == 0 ? 0.22 : 0.12),
-          cyan.withValues(alpha: layer == 0 ? 0.19 : 0.10),
+          blue.withValues(alpha: layer == 0 ? 0.17 : 0.085),
+          cyan.withValues(alpha: layer == 0 ? 0.14 : 0.075),
           blue.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.34, 0.70, 1.0],
@@ -213,7 +213,7 @@ class _NexoBottomWavePainter extends CustomPainter {
         ribbon,
         Paint()
           ..shader = gradient
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.2),
       );
       canvas.drawPath(ribbon, Paint()..shader = gradient);
     }

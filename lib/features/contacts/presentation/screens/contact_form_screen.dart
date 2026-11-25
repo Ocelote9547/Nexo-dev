@@ -532,24 +532,42 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
               ),
             ),
             const SizedBox(height: NexoSpacing.md),
-            Text('Nombre', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: NexoSpacing.md),
-            TextField(controller: _givenName, decoration: const InputDecoration(labelText: 'Nombre')),
-            const SizedBox(height: NexoSpacing.sm),
-            TextField(controller: _familyName, decoration: const InputDecoration(labelText: 'Apellidos')),
-            const SizedBox(height: NexoSpacing.md),
-            ExpansionTile(
-              title: const Text('Detalles del nombre'),
-              children: [
-                TextField(controller: _prefix, decoration: const InputDecoration(labelText: 'Prefijo')),
-                const SizedBox(height: NexoSpacing.sm),
-                TextField(controller: _middleName, decoration: const InputDecoration(labelText: 'Segundo nombre')),
-                const SizedBox(height: NexoSpacing.sm),
-                TextField(controller: _suffix, decoration: const InputDecoration(labelText: 'Sufijo')),
-                const SizedBox(height: NexoSpacing.sm),
-                TextField(controller: _nickname, decoration: const InputDecoration(labelText: 'Apodo')),
-                const SizedBox(height: NexoSpacing.sm),
-              ],
+            _FormItemSurface(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.badge_outlined, color: Theme.of(context).colorScheme.primary, size: 19),
+                      const SizedBox(width: 9),
+                      Text(
+                        'Nombre y apellidos',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: NexoSpacing.md),
+                  TextField(controller: _givenName, decoration: const InputDecoration(labelText: 'Nombre')),
+                  const SizedBox(height: NexoSpacing.sm),
+                  TextField(controller: _familyName, decoration: const InputDecoration(labelText: 'Apellidos')),
+                  const SizedBox(height: NexoSpacing.xs),
+                  ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    childrenPadding: const EdgeInsets.only(top: 8),
+                    title: const Text('Detalles adicionales'),
+                    children: [
+                      TextField(controller: _prefix, decoration: const InputDecoration(labelText: 'Prefijo')),
+                      const SizedBox(height: NexoSpacing.sm),
+                      TextField(controller: _middleName, decoration: const InputDecoration(labelText: 'Segundo nombre')),
+                      const SizedBox(height: NexoSpacing.sm),
+                      TextField(controller: _suffix, decoration: const InputDecoration(labelText: 'Sufijo')),
+                      const SizedBox(height: NexoSpacing.sm),
+                      TextField(controller: _nickname, decoration: const InputDecoration(labelText: 'Apodo')),
+                      const SizedBox(height: NexoSpacing.sm),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: NexoSpacing.lg),
             _SectionHeader(title: 'Teléfonos', onAdd: _addPhone),
@@ -700,6 +718,27 @@ class _FormItemSurface extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
+  IconData get _icon {
+    switch (title) {
+      case 'Teléfonos':
+        return Icons.phone_outlined;
+      case 'Correos':
+        return Icons.email_outlined;
+      case 'Direcciones':
+        return Icons.location_on_outlined;
+      case 'Organizaciones':
+        return Icons.business_outlined;
+      case 'Redes sociales':
+        return Icons.link_rounded;
+      case 'Fechas importantes':
+        return Icons.event_outlined;
+      case 'Notas':
+        return Icons.notes_rounded;
+      default:
+        return Icons.tune_rounded;
+    }
+  }
+
   final String title;
   final VoidCallback onAdd;
   const _SectionHeader({required this.title, required this.onAdd});
@@ -717,8 +756,23 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(_icon, color: Theme.of(context).colorScheme.primary, size: 18),
+          ),
+          const SizedBox(width: 10),
           Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
-          TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add, size: 18), label: const Text('Añadir')),
+          TextButton.icon(
+            onPressed: onAdd,
+            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Añadir'),
+          ),
         ],
       ),
     );

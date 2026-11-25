@@ -987,6 +987,10 @@ class _AddressRowState extends State<_AddressRow> {
               ),
             ),
             onChanged: _onQueryChanged,
+            onSubmitted: (_) {
+              _debounce?.cancel();
+              _search();
+            },
           ),
           if (_suggestions.isNotEmpty)
             Container(

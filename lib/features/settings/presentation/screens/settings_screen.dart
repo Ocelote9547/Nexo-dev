@@ -326,12 +326,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Ajustes'),
         centerTitle: false,
+        toolbarHeight: 68,
+        scrolledUnderElevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
         children: [
           Container(
-            padding: const EdgeInsets.fromLTRB(18, 19, 18, 18),
+            padding: const EdgeInsets.fromLTRB(17, 17, 17, 17),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -347,11 +349,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Row(
               children: [
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     color: tokens.accent.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(17),
                   ),
                   child: Icon(Icons.tune_rounded, color: tokens.accent, size: 24),
                 ),
@@ -369,7 +371,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Apariencia, avisos, datos y seguridad en un solo lugar.',
+                        'Tu experiencia, tus datos y la seguridad de tu agenda.',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: tokens.textSecondary,
                           height: 1.35,
@@ -381,7 +383,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 22),
 
           _SettingsSectionHeading(
             title: 'Apariencia',
@@ -393,7 +395,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             tokens,
             child: Column(children: _appearancePreferences()),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           _SettingsSectionHeading(
             title: 'Notificaciones',
@@ -532,13 +534,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: tokens.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: tokens.border.withValues(alpha: 0.85)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: tokens.border.withValues(alpha: 0.72)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
-            blurRadius: 16,
-            offset: const Offset(0, 5),
+            blurRadius: 19,
+            offset: const Offset(0, 7),
           ),
         ],
       ),

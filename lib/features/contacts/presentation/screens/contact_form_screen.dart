@@ -807,6 +807,7 @@ class _AddressRowState extends State<_AddressRow> {
   Timer? _debounce;
   List<_AddressSuggestion> _suggestions = [];
   bool _searching = false;
+  bool _searched = false;
   String _query = '';
 
   @override
@@ -844,6 +845,7 @@ class _AddressRowState extends State<_AddressRow> {
       setState(() {
         _suggestions = [];
         _searching = false;
+        _searched = false;
       });
       return;
     }
@@ -861,6 +863,7 @@ class _AddressRowState extends State<_AddressRow> {
         setState(() {
           _suggestions = cached;
           _searching = false;
+          _searched = true;
         });
       }
       return;
@@ -906,6 +909,7 @@ class _AddressRowState extends State<_AddressRow> {
         setState(() {
           _suggestions = results;
           _searching = false;
+          _searched = true;
         });
       }
     } catch (_) {
@@ -913,6 +917,7 @@ class _AddressRowState extends State<_AddressRow> {
         setState(() {
           _suggestions = [];
           _searching = false;
+          _searched = true;
         });
       }
     } finally {
@@ -1022,9 +1027,17 @@ class _AddressRowState extends State<_AddressRow> {
                 ],
               ),
             ),
+          if (_searched && _suggestions.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: Text(
+                'No se encontraron coincidencias. Puedes modificar la búsqueda o guardarla como texto manual.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              ),
+            ),
           const SizedBox(height: 4),
           Text(
-            'La búsqueda envía únicamente el texto de esta dirección al servicio de mapas. También puedes escribirla manualmente.',
+            'Selecciona un resultado para asociar la dirección a una ubicación reconocida. También puedes guardarla manualmente. La búsqueda envía el texto al servicio de mapas.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),

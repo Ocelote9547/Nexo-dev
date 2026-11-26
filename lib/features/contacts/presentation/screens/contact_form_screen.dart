@@ -377,11 +377,27 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
         toolbarHeight: 64,
         title: Text(_isEditing ? 'Editar contacto' : 'Nuevo contacto'),
         actions: [
-          TextButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('Guardar'),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: FilledButton.icon(
+              onPressed: _saving ? null : _save,
+              icon: _saving
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Guardar'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 40),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
         ],
       ),
@@ -418,12 +434,12 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 42),
           children: [
             Container(
-              padding: const EdgeInsets.all(17),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.68),
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.58),
                 ),
               ),
               child: Row(
@@ -438,19 +454,19 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.55),
-                              width: 2,
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                              width: 1.5,
                             ),
                           ),
                           child: NexoAvatar(
                             displayName: _givenName.text.isEmpty ? '?' : _givenName.text,
-                            size: 76,
+                            size: 78,
                             photoPath: _photoPath,
                           ),
                         ),
                         Positioned(
-                          right: -1,
-                          bottom: -1,
+                          right: 0,
+                          bottom: 0,
                           child: Container(
                             width: 27,
                             height: 27,
@@ -472,43 +488,57 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 15),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Perfil del contacto',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
+                          'Fotografía del contacto',
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 4),
                         Text(
                           _photoPath == null
-                              ? 'Añade una fotografía para identificarlo fácilmente.'
+                              ? 'Añade una imagen para reconocerlo rápidamente.'
                               : 'Fotografía seleccionada.',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            height: 1.35,
+                            height: 1.3,
                           ),
                         ),
-                        if (_photoPath != null)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                _photoPath = null;
-                                _photoHash = null;
-                              }),
+                        const SizedBox(height: 5),
+                        Wrap(
+                          spacing: 4,
+                          children: [
+                            TextButton.icon(
+                              onPressed: _pickPhoto,
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.only(top: 6),
-                                minimumSize: Size.zero,
+                                padding: const EdgeInsets.symmetric(horizontal: 7),
+                                minimumSize: const Size(0, 32),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('Quitar fotografía'),
+                              icon: const Icon(Icons.photo_library_outlined, size: 16),
+                              label: Text(_photoPath == null ? 'Añadir' : 'Cambiar'),
                             ),
-                          ),
+                            if (_photoPath != null)
+                              TextButton(
+                                onPressed: () => setState(() {
+                                  _photoPath = null;
+                                  _photoHash = null;
+                                }),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                                  minimumSize: const Size(0, 32),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  foregroundColor: Theme.of(context).colorScheme.error,
+                                ),
+                                child: const Text('Quitar'),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -517,11 +547,11 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             ),
             const SizedBox(height: NexoSpacing.xl),
             Text(
-              'INFORMACIÓN PRINCIPAL',
+              'Datos básicos',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
+                letterSpacing: -0.1,
               ),
             ),
             const SizedBox(height: NexoSpacing.md),
@@ -701,9 +731,9 @@ class _FormItemSurface extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.fromLTRB(10, 10, 8, 4),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.38)),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.48)),
       ),
       child: child,
     );
@@ -738,32 +768,38 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 9),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(11),
+              color: colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_icon, color: Theme.of(context).colorScheme.primary, size: 18),
+            child: Icon(_icon, color: colors.onSurfaceVariant, size: 18),
           ),
           const SizedBox(width: 10),
-          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
+          ),
           TextButton.icon(
             onPressed: onAdd,
-            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
-            icon: const Icon(Icons.add, size: 18),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+              minimumSize: const Size(0, 34),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            icon: const Icon(Icons.add_rounded, size: 17),
             label: const Text('Añadir'),
           ),
         ],

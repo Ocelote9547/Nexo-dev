@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
-import '../../../../core/design/components/nexo_button.dart';
 import '../../../../core/design/components/nexo_search_bar.dart';
 import '../../../../core/design/nexo_design_system.dart';
 import '../../../../shared/widgets/nexo_widgets.dart';
@@ -21,6 +20,7 @@ class ContactsScreen extends ConsumerStatefulWidget {
 
 class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   String _query = '';
+  bool _favoritesOnly = false;
   Timer? _searchDebounce;
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _sectionKeys = {};
@@ -88,7 +88,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     return 999;
   }
 
-  List<_Section> _buildSections(List<Contact> contacts) {
+  List<_Section> _buildSections(List<Contact> contacts, {bool showFavoritesAtTop = true}) {
     // Separar favoritos para la sección superior "★"
     final favorites = <Contact>[];
     for (final c in contacts) {
@@ -99,7 +99,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     favorites.sort((a, b) => _normalize(a.displayName).compareTo(_normalize(b.displayName)));
 
     final sections = <_Section>[];
-    if (favorites.isNotEmpty) {
+    if (showFavoritesAtTop && favorites.isNotEmpty) {
       sections.add(_Section(letter: '★', contacts: favorites, isFavorites: true));
     }
 
@@ -144,22 +144,32 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         scrolledUnderElevation: 0,
         elevation: 0,
         toolbarHeight: 66,
-        title: Text(
-          'Contactos',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Contactos',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
+              ),
+            ),
+            Text(
+              'Tu agenda personal',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11),
+            ),
+          ],
         ),
         actions: [
-          NexoButton(
+          IconButton.filledTonal(
+            tooltip: 'Crear contacto',
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const ContactFormScreen()),
               );
             },
-            variant: NexoButtonVariant.text,
-            isSmall: true,
-            child: const Text('Nuevo'),
+            icon: const Icon(Icons.person_add_alt_1_rounded, size: 20),
           ),
           const SizedBox(width: NexoDesignSpacing.sm),
         ],
@@ -178,13 +188,44 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               onChanged: _onSearchChanged,
             ),
           ),
-          // Contador de contactos mostrados
-          _CounterDisplay(query: query),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              NexoDesignSpacing.lg,
+              2,
+              NexoDesignSpacing.lg,
+              NexoDesignSpacing.md,
+            ),
+            child: Row(
+              children: [
+                _ContactsFilterChip(
+                  label: 'Todos',
+                  icon: Icons.people_outline_rounded,
+                  selected: !_favoritesOnly,
+                  onTap: () => setState(() => _favoritesOnly = false),
+                ),
+                const SizedBox(width: 8),
+                _ContactsFilterChip(
+                  label: 'Favoritos',
+                  icon: Icons.star_outline_rounded,
+                  selected: _favoritesOnly,
+                  onTap: () => setState(() => _favoritesOnly = true),
+                ),
+                const Spacer(),
+                if (!_favoritesOnly) _CounterDisplay(query: query),
+              ],
+            ),
+          ),
           Expanded(
             child: allAsync.when(
               data: (all) {
                 if (query.trim().isEmpty) {
-                  final sections = _buildSections(all);
+                  final visible = _favoritesOnly
+                      ? all.where((contact) => contact.isFavorite).toList()
+                      : all;
+                  final sections = _buildSections(
+                    visible,
+                    showFavoritesAtTop: !_favoritesOnly,
+                  );
                   if (sections.isEmpty) {
                     return const NexoEmptyState(
                       icon: Icons.people_outline,
@@ -246,7 +287,9 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     }
                     final ids = snapshot.data ?? [];
                     final idSet = ids.toSet();
-                    final filtered = all.where((c) => idSet.contains(c.id)).toList()
+                    final filtered = all.where((c) =>
+                      idSet.contains(c.id) && (!_favoritesOnly || c.isFavorite),
+                    ).toList()
                       ..sort((a, b) {
                         // Favoritos primero, luego orden alfabético
                         if (a.isFavorite != b.isFavorite) {
@@ -322,6 +365,51 @@ class _CounterDisplay extends ConsumerWidget {
   }
 }
 
+class _ContactsFilterChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ContactsFilterChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return ChoiceChip(
+      selected: selected,
+      onSelected: (_) => onTap(),
+      showCheckmark: false,
+      avatar: Icon(
+        icon,
+        size: 17,
+        color: selected ? colors.onSecondaryContainer : colors.onSurfaceVariant,
+      ),
+      label: Text(label),
+      labelStyle: TextStyle(
+        fontSize: 12,
+        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+        color: selected ? colors.onSecondaryContainer : colors.onSurfaceVariant,
+      ),
+      backgroundColor: colors.surfaceContainerLow,
+      selectedColor: colors.secondaryContainer,
+      side: BorderSide(
+        color: selected
+            ? colors.secondary.withValues(alpha: 0.30)
+            : colors.outlineVariant.withValues(alpha: 0.45),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      visualDensity: VisualDensity.compact,
+    );
+  }
+}
+
 class _Section {
   final String letter;
   final List<Contact> contacts;
@@ -363,80 +451,79 @@ class _ContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(14),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ContactDetailScreen(contactId: contact.id),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 7),
+      child: Material(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(15),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ContactDetailScreen(contactId: contact.id),
+            ),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.40),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-              child: Row(
-                children: [
-                  NexoAvatar(
-                    displayName: contact.displayName,
-                    photoPath: contact.photoPath,
-                    size: 48,
-                  ),
-                  const SizedBox(width: 13),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          contact.displayName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0,
-                          ),
+            child: Row(
+              children: [
+                NexoAvatar(
+                  displayName: contact.displayName,
+                  photoPath: contact.photoPath,
+                  size: 48,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        contact.displayName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.1,
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          _secondaryInfo() ?? 'Contacto',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (contact.isFavorite)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 7),
-                      child: Icon(
-                        Icons.star_rounded,
-                        color: NexoDesignColors.favorite,
-                        size: 18,
                       ),
-                    ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: colors.onSurfaceVariant,
-                    size: 21,
+                      const SizedBox(height: 3),
+                      Text(
+                        _secondaryInfo() ?? 'Contacto',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                if (contact.isFavorite)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 5, right: 3),
+                    child: Icon(
+                      Icons.star_rounded,
+                      color: NexoDesignColors.favorite,
+                      size: 18,
+                    ),
+                  ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.8),
+                  size: 21,
+                ),
+              ],
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 61),
-          child: Divider(
-            height: 1,
-            thickness: 1,
-            color: colors.outlineVariant.withValues(alpha: 0.42),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

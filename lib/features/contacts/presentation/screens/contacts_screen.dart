@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 import '../../../../core/design/components/nexo_button.dart';
-import '../../../../core/design/components/nexo_card.dart';
 import '../../../../core/design/components/nexo_search_bar.dart';
 import '../../../../core/design/nexo_design_system.dart';
 import '../../../../shared/widgets/nexo_widgets.dart';

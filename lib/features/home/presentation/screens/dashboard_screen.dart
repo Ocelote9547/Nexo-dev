@@ -1,8 +1,6 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/design/nexo_design_system.dart';
 import '../../../../shared/widgets/nexo_widgets.dart';
 import '../providers/dashboard_providers.dart';
@@ -37,7 +35,8 @@ class DashboardScreen extends ConsumerWidget {
         tooltip: 'Abrir teclado del teléfono',
         backgroundColor: tokens.accent,
         foregroundColor: Colors.white,
-        elevation: 6,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
         onPressed: () async {
           await ref.read(quickActionsServiceProvider).call('');
         },
@@ -47,7 +46,7 @@ class DashboardScreen extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _Header(tokens: tokens, onNavigate: onNavigate),
+              child: _Header(tokens: tokens),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
@@ -88,14 +87,13 @@ class DashboardScreen extends ConsumerWidget {
 // Encabezado NEXO — Compacto, marca reconocible
 // ============================================================================
 
-class _Header extends ConsumerWidget {
+class _Header extends StatelessWidget {
   final NexoDesignTokens tokens;
-  final void Function(int)? onNavigate;
-  const _Header({required this.tokens, this.onNavigate});
+
+  const _Header({required this.tokens});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentMode = ref.watch(nexoThemeModeProvider);
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         NexoDesignSpacing.lg,
@@ -106,23 +104,11 @@ class _Header extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Logotipo NEXO — círculo con fondo navy y borde fino
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: tokens.accent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(NexoDesignRadii.md),
-              border: Border.all(
-                color: tokens.border,
-                width: 1,
-              ),
-            ),
-            child: Icon(
-              Icons.hub,
-              color: tokens.accent,
-              size: 24,
-            ),
+          Image.asset(
+            'assets/images/icon_nexo.png',
+            width: 46,
+            height: 46,
+            fit: BoxFit.contain,
           ),
           const SizedBox(width: NexoDesignSpacing.md),
           Expanded(
@@ -130,36 +116,21 @@ class _Header extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  height: 38,
-                  child: Stack(
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _NexoHeaderWavesPainter(
-                            color: tokens.accent.withValues(alpha: 0.22),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'NEXO',
-                        style: NexoDesignTypography.nexoName.copyWith(
-                          color: tokens.textPrimary,
-                          fontSize: 29,
-                        ),
-                      ),
-                    ],
+                Text(
+                  'NEXO',
+                  style: NexoDesignTypography.nexoName.copyWith(
+                    color: tokens.textPrimary,
+                    fontSize: 26,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: NexoDesignSpacing.xs),
+                const SizedBox(height: 2),
                 Text(
                   'Tu agenda, siempre cerca.',
                   style: NexoDesignTypography.caption.copyWith(
                     color: tokens.textSecondary,
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.05,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -171,78 +142,11 @@ class _Header extends ConsumerWidget {
             icon: Icons.person_add_alt_1_rounded,
             tooltip: 'Crear contacto',
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const ContactFormScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const ContactFormScreen()),
             ),
-            size: 40,
-          ),
-          const SizedBox(width: NexoDesignSpacing.sm),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: tokens.surfaceElevated,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: tokens.border),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ThemeChoice(
-                  icon: Icons.wb_sunny_outlined,
-                  selected: currentMode == NexoThemeMode.light,
-                  tokens: tokens,
-                  onTap: () => ref.read(nexoThemeModeProvider.notifier)
-                      .setMode(NexoThemeMode.light),
-                ),
-                _ThemeChoice(
-                  icon: Icons.nightlight_round,
-                  selected: currentMode == NexoThemeMode.dark,
-                  tokens: tokens,
-                  onTap: () => ref.read(nexoThemeModeProvider.notifier)
-                      .setMode(NexoThemeMode.dark),
-                ),
-              ],
-            ),
+            size: 42,
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Botón circular de acción en el encabezado.
-class _ThemeChoice extends StatelessWidget {
-  final IconData icon;
-  final bool selected;
-  final NexoDesignTokens tokens;
-  final VoidCallback onTap;
-
-  const _ThemeChoice({
-    required this.icon,
-    required this.selected,
-    required this.tokens,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: selected ? tokens.accentSelected : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: selected ? tokens.textPrimary : tokens.textSecondary,
-        ),
       ),
     );
   }
@@ -287,80 +191,6 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-/// Ondas decorativas en capas, con degradado azul y cian detrás de la marca NEXO.
-class _NexoHeaderWavesPainter extends CustomPainter {
-  final Color color;
-  const _NexoHeaderWavesPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.width <= 0 || size.height <= 0) return;
-    const cyan = Color(0xFF39C6E8);
-
-    // Tres cintas de agua superpuestas con cresta, valle y volumen translúcido.
-    for (var layer = 0; layer < 3; layer++) {
-      final shift = layer * 0.075;
-      final top = Path()
-        ..moveTo(-size.width * 0.08, size.height * (0.58 + shift))
-        ..cubicTo(
-          size.width * 0.15, size.height * (0.02 + shift),
-          size.width * 0.34, size.height * (1.02 - shift),
-          size.width * 0.53, size.height * (0.43 + shift),
-        )
-        ..cubicTo(
-          size.width * 0.70, size.height * (0.00 + shift),
-          size.width * 0.88, size.height * (0.92 - shift),
-          size.width * 1.08, size.height * (0.43 + shift),
-        );
-      final ribbon = Path()
-        ..addPath(top, Offset.zero)
-        ..cubicTo(
-          size.width * 0.89, size.height * (0.78 + shift),
-          size.width * 0.72, size.height * (0.40 + shift),
-          size.width * 0.53, size.height * (0.82 + shift),
-        )
-        ..cubicTo(
-          size.width * 0.33, size.height * (1.18 - shift),
-          size.width * 0.15, size.height * (0.30 + shift),
-          -size.width * 0.08, size.height * (0.83 + shift),
-        )
-        ..close();
-
-      final shader = LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [
-          color.withValues(alpha: 0.015),
-          color.withValues(alpha: layer == 0 ? 0.23 : 0.13),
-          cyan.withValues(alpha: layer == 0 ? 0.20 : 0.11),
-          color.withValues(alpha: 0.015),
-        ],
-        stops: const [0.0, 0.34, 0.70, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-      canvas.drawPath(
-        ribbon,
-        Paint()
-          ..shader = shader
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.9),
-      );
-      canvas.drawPath(ribbon, Paint()..shader = shader);
-      canvas.drawPath(
-        top,
-        Paint()
-          ..color = cyan.withValues(alpha: layer == 0 ? 0.28 : 0.15)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = layer == 0 ? 0.9 : 0.65
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _NexoHeaderWavesPainter oldDelegate) =>
-      oldDelegate.color != color;
-}
-
 // ============================================================================
 // Sección Favoritos — Fila horizontal de agenda, sin tarjetas
 // ============================================================================
@@ -381,13 +211,13 @@ class _FavoritesSection extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
       padding: const EdgeInsets.fromLTRB(13, 10, 13, 12),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
-        borderRadius: BorderRadius.circular(23),
+        color: tokens.surface,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
+            blurRadius: 14,
             offset: const Offset(0, 7),
           ),
         ],
@@ -600,13 +430,13 @@ class _UpcomingSection extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
       padding: const EdgeInsets.fromLTRB(13, 10, 13, 13),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
-        borderRadius: BorderRadius.circular(20),
+        color: tokens.surface,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
-            blurRadius: 18,
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
+            blurRadius: 14,
             offset: const Offset(0, 6),
           ),
         ],
@@ -841,13 +671,13 @@ class _RecentSection extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: NexoDesignSpacing.lg),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: tokens.surface.withValues(alpha: tokens.isDark ? 0.88 : 1.0),
+        color: tokens.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: tokens.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: tokens.isDark ? 0.20 : 0.05),
-            blurRadius: 18,
+            color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
+            blurRadius: 14,
             offset: const Offset(0, 6),
           ),
         ],

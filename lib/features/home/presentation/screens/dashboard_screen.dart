@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/design/nexo_design_system.dart';
 import '../../../../shared/widgets/nexo_widgets.dart';
 import '../providers/dashboard_providers.dart';

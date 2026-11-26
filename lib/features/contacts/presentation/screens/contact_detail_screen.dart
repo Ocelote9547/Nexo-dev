@@ -129,6 +129,26 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
               : '';
           final birthdayDates = cwr.dates.where((d) => d.type == 'birthday').toList();
           final qa = ref.read(quickActionsServiceProvider);
+          final primaryPhone = cwr.phones.isNotEmpty ? cwr.phones.first.valueRaw : null;
+          final primaryEmail = cwr.emails.isNotEmpty ? cwr.emails.first.value : null;
+          final firstAddress = cwr.addresses.isNotEmpty ? cwr.addresses.first : null;
+          final streetLine = firstAddress == null
+              ? ''
+              : [firstAddress.street, firstAddress.number, firstAddress.apartment]
+                  .where((value) => value != null && value.trim().isNotEmpty)
+                  .join(' ');
+          final primaryAddress = firstAddress == null
+              ? ''
+              : [
+                  streetLine,
+                  firstAddress.postalCode,
+                  firstAddress.city,
+                  firstAddress.region,
+                  firstAddress.country,
+                ].where((value) => value != null && value.trim().isNotEmpty).join(', ');
+          final primaryMapQuery = firstAddress?.latitude != null && firstAddress?.longitude != null
+              ? '${firstAddress!.latitude},${firstAddress.longitude}'
+              : primaryAddress;
           return ListView(
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 34),
             children: [
@@ -200,6 +220,41 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                   ],
                 ),
               ),
+              if (primaryPhone != null || primaryEmail != null || primaryMapQuery.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 48,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      if (primaryPhone != null)
+                        _ContactQuickAction(
+                          icon: Icons.call_outlined,
+                          label: 'Llamar',
+                          onTap: () => qa.call(primaryPhone),
+                        ),
+                      if (primaryPhone != null)
+                        _ContactQuickAction(
+                          icon: Icons.chat_bubble_outline_rounded,
+                          label: 'Mensaje',
+                          onTap: () => qa.sendSms(primaryPhone),
+                        ),
+                      if (primaryEmail != null)
+                        _ContactQuickAction(
+                          icon: Icons.mail_outline_rounded,
+                          label: 'Correo',
+                          onTap: () => qa.sendEmail(primaryEmail),
+                        ),
+                      if (primaryMapQuery.isNotEmpty)
+                        _ContactQuickAction(
+                          icon: Icons.location_on_outlined,
+                          label: 'Mapa',
+                          onTap: () => qa.openMap(primaryMapQuery),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: NexoSpacing.lg),
               _Section(title: 'Teléfonos', children: cwr.phones.map((p) => _ActionLine(
                 icon: Icons.phone,
@@ -306,6 +361,38 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
   }
 }
 
+class _ContactQuickAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ContactQuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilledButton.tonalIcon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18),
+        label: Text(label),
+        style: FilledButton.styleFrom(
+          backgroundColor: colors.secondaryContainer.withValues(alpha: 0.72),
+          foregroundColor: colors.onSecondaryContainer,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+}
+
 class _ProfileCountChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -390,31 +477,23 @@ class _Section extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: colors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: Icon(_icon, color: colors.primary, size: 18),
-              ),
+              Icon(_icon, color: colors.onSurfaceVariant, size: 19),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: colors.primary,
+                    color: colors.onSurface,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Divider(height: 1, thickness: 1, color: colors.outlineVariant.withValues(alpha: 0.45)),
-          const SizedBox(height: 13),
+          const SizedBox(height: 11),
+          Divider(height: 1, thickness: 1, color: colors.outlineVariant.withValues(alpha: 0.42)),
+          const SizedBox(height: 11),
           ...children,
         ],
       ),

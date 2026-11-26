@@ -147,7 +147,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                   firstAddress.country,
                 ].where((value) => value != null && value.trim().isNotEmpty).join(', ');
           final primaryMapQuery = firstAddress?.latitude != null && firstAddress?.longitude != null
-              ? '${firstAddress!.latitude},${firstAddress.longitude}'
+              ? '${firstAddress!.latitude},${firstAddress!.longitude}'
               : primaryAddress;
           return ListView(
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 34),

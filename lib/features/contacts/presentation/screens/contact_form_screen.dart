@@ -420,17 +420,10 @@ class _ContactFormScreenState extends ConsumerState<ContactFormScreen> {
             Container(
               padding: const EdgeInsets.all(17),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.13),
-                    Theme.of(context).colorScheme.surfaceContainerLow,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55),
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.68),
                 ),
               ),
               child: Row(

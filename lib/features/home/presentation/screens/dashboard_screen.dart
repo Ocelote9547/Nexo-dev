@@ -50,6 +50,8 @@ class DashboardScreen extends ConsumerWidget {
               child: _Header(tokens: tokens),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            SliverToBoxAdapter(child: _DashboardIntro(tokens: tokens)),
+            const SliverToBoxAdapter(child: SizedBox(height: 4)),
             SliverToBoxAdapter(
               child: _FavoritesSection(
                 tokens: tokens,
@@ -79,6 +81,54 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DashboardIntro extends StatelessWidget {
+  final NexoDesignTokens tokens;
+
+  const _DashboardIntro({required this.tokens});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        NexoDesignSpacing.lg,
+        NexoDesignSpacing.md,
+        NexoDesignSpacing.lg,
+        NexoDesignSpacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'TU AGENDA',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: tokens.textSecondary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'Lo importante, a mano.',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: tokens.textPrimary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.45,
+              height: 1.16,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Personas y fechas que quieres tener cerca.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: tokens.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -620,16 +670,16 @@ class _BirthdayRow extends StatelessWidget {
                 'Faltan ${upcoming.daysUntil} ${upcoming.daysUntil == 1 ? 'día' : 'días'}',
                 textAlign: TextAlign.center,
                 style: NexoDesignTypography.birthdayDays.copyWith(
-                  color: tokens.favorite,
+                  color: tokens.accent,
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.calendar_month, size: 15, color: tokens.favorite),
+                  Icon(Icons.calendar_month, size: 15, color: tokens.accent),
                   const SizedBox(width: 5),
                   Flexible(
                     child: Text(
@@ -749,8 +799,11 @@ class _RecentSection extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 itemCount: recent.length,
-                separatorBuilder: (_, _) =>
-                    const SizedBox(height: NexoDesignSpacing.sm),
+                separatorBuilder: (_, _) => Container(
+                  height: 1,
+                  margin: const EdgeInsets.only(left: 50),
+                  color: tokens.border.withValues(alpha: 0.75),
+                ),
                 itemBuilder: (context, index) => _RecentRow(
                   tokens: tokens,
                   contact: recent[index],
@@ -793,18 +846,13 @@ class _RecentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: tokens.surfaceElevated,
-      borderRadius: BorderRadius.circular(16),
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          height: 57,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: tokens.border),
-          ),
+          height: 62,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
           child: Row(
             children: [
               Container(

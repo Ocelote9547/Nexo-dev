@@ -355,7 +355,6 @@ class _ContactTile extends StatelessWidget {
   const _ContactTile({required this.contact});
 
   String? _secondaryInfo() {
-    // Mostrar el primer apodo disponible como información secundaria
     if (contact.nickname != null && contact.nickname!.isNotEmpty) {
       return contact.nickname;
     }
@@ -365,80 +364,80 @@ class _ContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: NexoDesignSpacing.sm),
-      child: Material(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(19),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ContactDetailScreen(contactId: contact.id)),
-          ),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(13, 11, 12, 11),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(19),
-              border: Border.all(
-                color: contact.isFavorite
-                    ? NexoDesignColors.favorite.withValues(alpha: 0.72)
-                    : colors.outlineVariant.withValues(alpha: 0.42),
+    return Column(
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ContactDetailScreen(contactId: contact.id),
               ),
             ),
-            child: Row(
-              children: [
-                NexoAvatar(
-                  displayName: contact.displayName,
-                  photoPath: contact.photoPath,
-                  size: 52,
-                ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        contact.displayName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.05,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+              child: Row(
+                children: [
+                  NexoAvatar(
+                    displayName: contact.displayName,
+                    photoPath: contact.photoPath,
+                    size: 48,
+                  ),
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          contact.displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0,
+                          ),
                         ),
-                      ),
-                      if (_secondaryInfo() != null) ...[
                         const SizedBox(height: 3),
                         Text(
-                          _secondaryInfo()!,
+                          _secondaryInfo() ?? 'Contacto',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
                         ),
-                      ] else ...[
-                        const SizedBox(height: 3),
-                        Text(
-                          'Contacto',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.onSurfaceVariant,
-                          ),
-                        ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                if (contact.isFavorite)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 7),
-                    child: Icon(Icons.star_rounded, color: NexoDesignColors.favorite, size: 19),
+                  if (contact.isFavorite)
+                    const Padding(
+                      padding: EdgeInsets.only(right: 7),
+                      child: Icon(
+                        Icons.star_rounded,
+                        color: NexoDesignColors.favorite,
+                        size: 18,
+                      ),
+                    ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: colors.onSurfaceVariant,
+                    size: 21,
                   ),
-                Icon(Icons.chevron_right_rounded, color: colors.onSurfaceVariant, size: 23),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.only(left: 61),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+            color: colors.outlineVariant.withValues(alpha: 0.42),
+          ),
+        ),
+      ],
     );
   }
 }

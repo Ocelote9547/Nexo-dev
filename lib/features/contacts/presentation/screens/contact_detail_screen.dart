@@ -135,23 +135,11 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
               Container(
                 padding: const EdgeInsets.fromLTRB(22, 24, 22, 23),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                    ],
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.68),
                   ),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.55)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.045),
-                      blurRadius: 22,
-                      offset: const Offset(0, 9),
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
@@ -394,15 +382,8 @@ class _Section extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(17, 15, 15, 10),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.50)),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withValues(alpha: 0.035),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -335,16 +335,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(17, 17, 17, 17),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  tokens.accent.withValues(alpha: tokens.isDark ? 0.22 : 0.13),
-                  tokens.surface,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: tokens.accent.withValues(alpha: 0.28)),
+              color: tokens.surfaceElevated,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: tokens.border),
             ),
             child: Row(
               children: [
@@ -534,15 +527,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: tokens.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: tokens.border.withValues(alpha: 0.72)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: tokens.isDark ? 0.12 : 0.035),
-            blurRadius: 19,
-            offset: const Offset(0, 7),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),

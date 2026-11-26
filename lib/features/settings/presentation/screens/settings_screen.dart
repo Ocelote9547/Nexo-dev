@@ -288,31 +288,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   List<Widget> _appearancePreferences() {
     final tokens = ref.tokens(context);
     return [
-      _AppearanceRow(
-        tokens: tokens,
-        mode: NexoThemeMode.light,
-        current: _themeMode,
-        label: 'Claro',
-        subtitle: 'Fondo claro y superficies blancas',
-        onTap: _setThemeMode,
-      ),
-      Divider(height: 1, indent: 16, endIndent: 16, color: tokens.border),
-      _AppearanceRow(
-        tokens: tokens,
-        mode: NexoThemeMode.dark,
-        current: _themeMode,
-        label: 'Oscuro',
-        subtitle: 'Fondo azul noche y superficies navy',
-        onTap: _setThemeMode,
-      ),
-      Divider(height: 1, indent: 16, endIndent: 16, color: tokens.border),
-      _AppearanceRow(
-        tokens: tokens,
-        mode: NexoThemeMode.system,
-        current: _themeMode,
-        label: 'Automático',
-        subtitle: 'Sigue el tema del sistema Android',
-        onTap: _setThemeMode,
+      Row(
+        children: [
+          Expanded(
+            child: _AppearanceRow(
+              tokens: tokens,
+              mode: NexoThemeMode.light,
+              current: _themeMode,
+              label: 'Claro',
+              onTap: _setThemeMode,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _AppearanceRow(
+              tokens: tokens,
+              mode: NexoThemeMode.dark,
+              current: _themeMode,
+              label: 'Oscuro',
+              onTap: _setThemeMode,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _AppearanceRow(
+              tokens: tokens,
+              mode: NexoThemeMode.system,
+              current: _themeMode,
+              label: 'Sistema',
+              onTap: _setThemeMode,
+            ),
+          ),
+        ],
       ),
     ];
   }
@@ -333,41 +340,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
         children: [
           Container(
-            padding: const EdgeInsets.fromLTRB(17, 17, 17, 17),
+            padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
             decoration: BoxDecoration(
               color: tokens.surfaceElevated,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(color: tokens.border),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: tokens.accent.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(17),
+                    color: tokens.background,
+                    borderRadius: BorderRadius.circular(13),
+                    border: Border.all(color: tokens.border),
                   ),
-                  child: Icon(Icons.tune_rounded, color: tokens.accent, size: 24),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: tokens.textSecondary,
+                    size: 21,
+                  ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Personaliza NEXO',
+                        'Tu NEXO, a tu manera',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: tokens.textPrimary,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
-                        'Tu experiencia, tus datos y la seguridad de tu agenda.',
+                        'Apariencia, avisos, datos y privacidad.',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: tokens.textSecondary,
-                          height: 1.35,
+                          height: 1.3,
                         ),
                       ),
                     ],
@@ -545,73 +557,63 @@ class _AppearanceRow extends StatelessWidget {
   final NexoThemeMode mode;
   final NexoThemeMode current;
   final String label;
-  final String subtitle;
   final ValueChanged<NexoThemeMode> onTap;
+
   const _AppearanceRow({
     required this.tokens,
     required this.mode,
     required this.current,
     required this.label,
-    required this.subtitle,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final isSelected = current == mode;
-    return InkWell(
-      onTap: () => onTap(mode),
-      borderRadius: BorderRadius.circular(NexoDesignRadii.md),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: NexoSpacing.md,
-          vertical: NexoSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? tokens.accent.withValues(alpha: 0.10) : null,
-          borderRadius: BorderRadius.circular(NexoDesignRadii.md),
-          border: isSelected
-              ? Border.all(color: tokens.accent, width: 1)
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              _iconForMode(mode),
-              color: isSelected ? tokens.accent : tokens.textSecondary,
-              size: 20,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: InkWell(
+        onTap: () => onTap(mode),
+        borderRadius: BorderRadius.circular(15),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 78,
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 9),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? tokens.accent.withValues(alpha: tokens.isDark ? 0.15 : 0.09)
+                : tokens.surfaceElevated.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: isSelected
+                  ? tokens.accent.withValues(alpha: 0.65)
+                  : tokens.border,
+              width: isSelected ? 1.2 : 1,
             ),
-            const SizedBox(width: NexoSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: isSelected ? tokens.accent : tokens.textPrimary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: NexoSpacing.xs),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: tokens.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               Icon(
-                Icons.check_circle,
-                color: NexoDesignColors.accent,
+                _iconForMode(mode),
+                color: isSelected ? tokens.accent : tokens.textSecondary,
+                size: 21,
               ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isSelected ? tokens.accent : tokens.textPrimary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -620,11 +622,11 @@ class _AppearanceRow extends StatelessWidget {
   IconData _iconForMode(NexoThemeMode mode) {
     switch (mode) {
       case NexoThemeMode.light:
-        return Icons.brightness_7;
+        return Icons.light_mode_outlined;
       case NexoThemeMode.dark:
-        return Icons.brightness_4;
+        return Icons.dark_mode_outlined;
       case NexoThemeMode.system:
-        return Icons.device_unknown;
+        return Icons.brightness_auto_outlined;
     }
   }
 }
@@ -645,7 +647,7 @@ class _SettingsSectionHeading extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 19, color: theme.colorScheme.primary),
+        Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: 9),
         Expanded(
           child: Column(
@@ -653,7 +655,7 @@ class _SettingsSectionHeading extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, fontSize: 15),
               ),
               const SizedBox(height: 2),
               Text(
@@ -693,10 +695,10 @@ class _SettingsActionTile extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.10),
+          color: color.withValues(alpha: 0.07),
           borderRadius: BorderRadius.circular(13),
         ),
-        child: Icon(icon, color: color, size: 21),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 21),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),

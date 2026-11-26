@@ -304,7 +304,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                         return _normalize(a.displayName).compareTo(_normalize(b.displayName));
                       });
                     if (filtered.isEmpty) {
-                      return const NexoEmptyState(
+                      return NexoEmptyState(
                         icon: Icons.search_off,
                         title: 'Sin resultados',
                         subtitle: _favoritesOnly

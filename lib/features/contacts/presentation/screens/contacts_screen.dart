@@ -227,11 +227,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     showFavoritesAtTop: !_favoritesOnly,
                   );
                   if (sections.isEmpty) {
-                    return const NexoEmptyState(
-                      icon: Icons.people_outline,
-                      title: 'Sin contactos',
-                      subtitle: 'Añade tu primer contacto para empezar.',
-                    );
+                    return _favoritesOnly
+                        ? const NexoEmptyState(
+                            icon: Icons.star_outline_rounded,
+                            title: 'Aún no tienes favoritos',
+                            subtitle: 'Marca con una estrella los contactos que quieras tener a mano.',
+                          )
+                        : const NexoEmptyState(
+                            icon: Icons.people_outline,
+                            title: 'Sin contactos',
+                            subtitle: 'Añade tu primer contacto para empezar.',
+                          );
                   }
                   final availableLetters = sections
                       .where((s) => s.letter != '★')
@@ -301,7 +307,9 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       return const NexoEmptyState(
                         icon: Icons.search_off,
                         title: 'Sin resultados',
-                        subtitle: 'No se encontraron contactos.',
+                        subtitle: _favoritesOnly
+                            ? 'No se encontraron favoritos con esa búsqueda.'
+                            : 'No se encontraron contactos.',
                       );
                     }
                     return ListView.builder(
@@ -340,26 +348,24 @@ class _CounterDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(contactDisplayCountProvider(query));
+    final label = count == 1 ? '1 contacto' : '$count contactos';
+    final colors = Theme.of(context).colorScheme;
 
-    String label;
-    if (count == 0) {
-      label = '0 contactos';
-    } else if (count == 1) {
-      label = '1 contacto';
-    } else {
-      label = '$count contactos';
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        NexoDesignSpacing.lg,
-        0,
-        NexoDesignSpacing.lg,
-        NexoDesignSpacing.lg,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: colors.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
